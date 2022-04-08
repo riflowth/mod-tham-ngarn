@@ -1,11 +1,11 @@
 name: CI the backend
 
 on:
-  push:
-    branches-ignore: 
-      - main
+  pull_request:
+    types: [ opened, synchronize ]
     paths:
       - 'packages/backend/**'
+  workflow_dispatch:
 
 jobs:
   test:
