@@ -1,0 +1,82 @@
+name: CI & CD the backend
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'packages/backend/**'
+  workflow_dispatch:
+
+env:
+  RAW_IMAGE_TAG: ghcr.io/${{ github.repository }}-backend
+  REGISTRY: ghcr.io
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./packages/backend
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js 16.14.2 (LTS)
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.14.2'
+
+      - working-directory: .
+        run: cp yarn.lock ./packages/backend
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run unit testing
+        run: yarn test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the container registry ${{ env.REGISTRY }}
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: |
+          echo "IMAGE_TAG=${RAW_IMAGE_TAG,,}" >>${GITHUB_ENV}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v2
+        with:
+          file: backend.Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_TAG }}:latest
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "IMAGE_TAG=${RAW_IMAGE_TAG,,}" >>${GITHUB_ENV}
+
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          password: ${{ secrets.DEPLOY_PASSWORD }}
+          script: |
+            echo ${{ secrets.PAT }} | docker login ${{ env.REGISTRY }} -u USERNAME --password-stdin
+            docker stop mod-tham-ngarn-backend || true && docker rm mod-tham-ngarn-backend || true
+            docker rmi ${{ env.IMAGE_TAG }}:latest
+            docker pull ${{ env.IMAGE_TAG }}:latest
+            docker run -p 4000:4000 -d --name mod-tham-ngarn-backend ${{ env.IMAGE_TAG }}:latest
+
+

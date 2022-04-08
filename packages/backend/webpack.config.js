@@ -7,48 +7,50 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
-const app = {
-  entry: path.resolve(srcPath, 'App.ts'),
-  module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        loader: 'ts-loader',
-        include: srcPath,
-        options: { transpileOnly: true },
-      },
-    ],
-  },
-  plugins: [
-    new ESLintPlugin({
-      extensions: ['ts'],
-    }),
-    new ForkTsCheckerWebpackPlugin(),
-  ],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
+const app = (env) => {
+  return {
+    entry: path.resolve(srcPath, 'App.ts'),
+    module: {
+      rules: [
+        {
+          test: /\.ts$/,
+          loader: 'ts-loader',
+          include: srcPath,
+          options: { transpileOnly: true },
+        },
+      ],
     },
-    extensions: ['.ts'],
-  },
-  externalsPresets: { node: true },
-  externals: [nodeExternals({
-    modulesDir: path.resolve(__dirname, '../../node_modules'),
-  })],
-  stats: {
-    preset: 'minimal',
-    assets: false,
-    modules: false,
-  },
-  optimization: {
-    minimize: true,
-    minimizer: [new TerserPlugin({ extractComments: false })],
-  },
-  output: {
-    filename: 'app.js',
-    path: distPath,
-    clean: true,
-  },
+    plugins: [
+      new ESLintPlugin({
+        extensions: ['ts'],
+      }),
+      new ForkTsCheckerWebpackPlugin(),
+    ],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src'),
+      },
+      extensions: ['.ts'],
+    },
+    externalsPresets: { node: true },
+    externals: [nodeExternals(env.ci ? {} : {
+      modulesDir: path.resolve(__dirname, '../../node_modules'),
+    })],
+    stats: {
+      preset: 'minimal',
+      assets: false,
+      modules: false,
+    },
+    optimization: {
+      minimize: true,
+      minimizer: [new TerserPlugin({ extractComments: false })],
+    },
+    output: {
+      filename: 'app.js',
+      path: distPath,
+      clean: true,
+    },
+  };
 };
 
-module.exports = [app];
+module.exports = (env) => [app(env)];
