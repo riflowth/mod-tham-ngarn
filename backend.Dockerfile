@@ -2,16 +2,16 @@
 FROM node:lts-alpine AS deps
 
 WORKDIR /opt/webserver
-COPY package.json yarn.lock .
-RUN yarn install --frozen-lockfile
+COPY /packages/backend/package.json .
+RUN yarn install
 
-#mod Rebuild the source code of application only when needed
+# Rebuild the source code of application only when needed
 FROM node:lts-alpine AS builder
 
 WORKDIR /opt/webserver
 COPY --from=deps /opt/webserver/node_modules ./node_modules
-COPY . .
-RUN yarn build
+COPY /packages/backend/. .
+RUN yarn build:ci
 
 # For running the application
 FROM node:lts-alpine AS runner
