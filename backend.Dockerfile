@@ -2,8 +2,8 @@
 FROM node:lts-alpine AS deps
 
 WORKDIR /opt/webserver
-COPY /packages/backend/package.json .
-RUN yarn install
+COPY /packages/backend/package.json yarn.lock .
+RUN yarn install --frozen-lockfile
 
 # Rebuild the source code of application only when needed
 FROM node:lts-alpine AS builder
@@ -18,6 +18,9 @@ FROM node:lts-alpine AS runner
 
 WORKDIR /opt/webserver
 
+RUN apk add tzdata
+ENV TZ Asia/Bangkok
+
 ENV NODE_ENV production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 app
@@ -28,6 +31,6 @@ COPY --from=builder --chown=app:nodejs /opt/webserver/dist ./dist
 RUN yarn install --frozen-lockfile --production
 
 USER app
-EXPOSE 3000
+EXPOSE 4000
 
 CMD [ "yarn", "start" ]
