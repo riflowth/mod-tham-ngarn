@@ -18,6 +18,9 @@ FROM node:lts-alpine AS runner
 
 WORKDIR /opt/webserver
 
+RUN apk add tzdata
+ENV TZ Asia/Bangkok
+
 ENV NODE_ENV production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 app
