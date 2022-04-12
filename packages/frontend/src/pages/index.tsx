@@ -1,6 +1,6 @@
-import Navbar from "../components/Navbar";
 import type { NextPage } from "next";
-import Home from "@components/Home";
+import Navbar from "../components/Navbar";
+import Home from "../components/Home";
 
 const IndexPage: NextPage = () => {
   return (
