@@ -1,6 +1,5 @@
 import React from "react";
-import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from "recharts";
-import MachineLogItem from "./MachineLogItem";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 type ConfigRender = {
   cx: number;
   cy: number;
@@ -76,7 +75,6 @@ const Machinelog = () => {
           </ResponsiveContainer>
         </div>
       </div>
-      <MachineLogItem />
     </div>
   );
 };
