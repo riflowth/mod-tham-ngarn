@@ -3,17 +3,20 @@ import http from 'http';
 import express, { Application } from 'express';
 import { IndexController } from '@/controllers/IndexController';
 import { ControllerRegistry } from '@/controllers/ControllerRegistry';
+import { DatabaseRegistry } from '@/utils/database/DatabaseRegistry';
 
 export class Server {
 
   private readonly app: Application;
   private readonly port: number;
   private readonly controllerRegistry: ControllerRegistry;
+  private readonly databaseRegistry: DatabaseRegistry;
 
   public constructor(port: number) {
     this.app = express();
     this.port = port;
     this.controllerRegistry = new ControllerRegistry(this.app);
+    this.databaseRegistry = new DatabaseRegistry();
   }
 
   public run(): http.Server {
