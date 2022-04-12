@@ -35,7 +35,7 @@ export class Controller {
     const routes = Reflect.getMetadataKeys(this);
 
     routes.forEach((route) => {
-      const routeHandler: RouteHandler = ErrorHandler.wrap(this[route]);
+      const routeHandler: RouteHandler = ErrorHandler.wrap(this[route].bind(this));
       const routeProperty: RouteMetadata = Reflect.getMetadata(route, this);
       this.router[routeProperty.method.toLowerCase()](routeProperty.path, routeHandler);
     });
