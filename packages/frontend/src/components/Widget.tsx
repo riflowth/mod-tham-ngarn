@@ -10,7 +10,7 @@ const Widget = () => {
       <div className="px-1">
         <input
           type="text"
-          className="w-32 h-8 px-2 rounded-xl "
+          className="w-32 h-8 px-2 rounded-xl sm:"
           placeholder="Search"
         />
       </div>
