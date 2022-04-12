@@ -1,7 +1,7 @@
 import React from "react";
 import Chart from "./AreaChart";
 import ErrorLog from "./ErrorLog";
-import Machinelog from "./Machinelog";
+import MachineLog from "./MachineLog";
 import TwoBarChart from "./TwoBarChart";
 
 const Home = () => {
@@ -26,12 +26,12 @@ const Home = () => {
 
         {/* Machine  */}
         <div className="bg-[#353147] rounded-xl md:row-span-2">
-          <Machinelog />
+          <MachineLog />
         </div>
 
         {/* Twobar */}
         <div className="bg-[#353147] rounded-xl md:col-span-2">
-          <div className="self-start p-2 ml-12 text-xl font-bold text-[#CBC3D8]">
+          <div className="self-start p-3 pt-6 ml-12 text-xl font-bold text-[#CBC3D8]">
             What is this Bars?
           </div>
           <div className="flex flex-col justify-around md:flex-row">

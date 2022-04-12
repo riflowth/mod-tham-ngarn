@@ -23,7 +23,7 @@ const Sidebar = () => {
   return (
     <div className="sm:flex-[3] md:flex-[3] lg:flex-[2] 2xl:flex-[1] flex-[3] bg-[#75659E] relative mx-auto z-50">
       {/*Start LOGO */}
-      <div className="absolute z-20 w-full h-full bg-gradient-to-r from-transparent to-[#353147]"></div>
+      <div className=" absolute z-20 w-full h-full bg-gradient-to-r from-transparent to-[#353147]"></div>
       <div
         className="flex items-center justify-center py-5 px-2 sm:py-10 bg-gradient-to-t from-[#353147] via-[#7743EF] to-[#E78DD2] z-30"
         onClick={() => setIsShowed(!isShowed)}
@@ -36,10 +36,10 @@ const Sidebar = () => {
         </span>
       </div>
       {/*End LOGO */}
-
+      <div className="z-50 w-full border-2 border-white animate-pulse"></div>
       {/* Start DropMenu */}
       <div
-        className={`absolute bg-[#353147] sm:flex-[2] lg:w-[275px] flex-[3] mx-auto px-4 -z-10 py-5 transition-transform duration-500 ease-in-out  space-y-8 rounded-b-lg ${
+        className={` absolute bg-[#353147] sm:flex-[2] lg:w-[275px] flex-[3] mx-auto px-4 -z-10 py-5 transition-transform duration-500 ease-in-out  space-y-8 rounded-b-lg ${
           isShowed ? "translate-y-0" : "translate-y-[-700px] "
         } `}
       >
@@ -54,7 +54,7 @@ const Sidebar = () => {
               className="border border-white rounded-full "
             />
           </div>
-          <span className="hidden font-bold text-white text-md md:text-lg lg:text-xl md:inline-block">
+          <span className="hidden font-bold text-white text-md md:text-lg lg:text-xl md:inline-block ">
             Nathree lnwza
           </span>
         </div>

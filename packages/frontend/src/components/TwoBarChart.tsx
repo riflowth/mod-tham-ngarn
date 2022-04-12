@@ -74,7 +74,7 @@ const TwoBarChart = () => {
         <YAxis tick={{ fill: "white" }} />
         <Tooltip />
         <Legend />
-        <Bar dataKey="pv" fill="#2EB7E7" />
+        <Bar dataKey="pv" fill="#7743EF" />
         <Bar dataKey="uv" fill="#E78DD2" />
       </BarChart>
     </ResponsiveContainer>
