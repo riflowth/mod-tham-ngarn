@@ -3,9 +3,10 @@ import { Controller } from '@/controllers/Controller';
 import { Methods } from '@/controllers/Route';
 import { ControllerMapping } from '@/decorators/ControllerDecorator';
 import { RouteMapping } from '@/decorators/RouteDecorator';
-import { CookieBuilder } from '@/utils/cookie/CookieBuilder';
 import { CookieProvider } from '@/utils/cookie/CookieProvider';
 import { NextFunction, Request, Response } from 'express';
+import { Cookie } from '@/utils/cookie/Cookie';
+import { NotFoundException } from '@/exceptions/NotFoundException';
 
 @ControllerMapping('/auth')
 export class AuthController extends Controller {
@@ -20,9 +21,8 @@ export class AuthController extends Controller {
   @RouteMapping('/set', Methods.GET)
   private async setSessionId(req: Request, res: Response, next: NextFunction): Promise<void> {
     const sessionId = crypto.randomUUID();
-    const cookie = new CookieBuilder('sid', sessionId)
-      .setHttpOnly(true)
-      .build();
+    const cookie = new Cookie('sid', sessionId)
+      .setHttpOnly(true);
 
     this.cookieProvider.setCookie(res, cookie);
 
@@ -34,6 +34,10 @@ export class AuthController extends Controller {
   @RouteMapping('/get', Methods.GET)
   private async getSessionId(req: Request, res: Response, next: NextFunction): Promise<void> {
     const sessionId = this.cookieProvider.getCookie(req, 'sid');
+
+    if (!sessionId) {
+      throw new NotFoundException('can not get session id');
+    }
 
     res.status(200).json({
       session_id: sessionId,
