@@ -9,8 +9,8 @@
     "build": "yarn run build:prod",
     "dev": "npm-run-all --silent --parallel build:dev start:dev",
     "lint": "eslint . --ext .ts",
-    "start:dev": "nodemon dist/app.js -q -w dist -e js",
-    "start:prod": "node dist/app.js",
+    "start:dev": "nodemon -r dotenv/config dist/app.js -q -w dist -e js",
+    "start:prod": "node -r dotenv/config dist/app.js",
     "start": "yarn run start:prod",
     "test": "jest --silent"
   },
