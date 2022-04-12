@@ -15,7 +15,7 @@ import SidebarItem from "./SidebarItem";
 import Image from "next/image";
 
 const Sidebar = () => {
-  const [isShowed, setIsShowed] = useState(true);
+  const [isShowed, setIsShowed] = useState(false);
   const myLoader = () => {
     return `https://images.unsplash.com/photo-1644982647869-e1337f992828?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=735&q=80`;
   };

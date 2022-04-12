@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { BellIcon, PencilAltIcon } from "@heroicons/react/solid";
+import { BellIcon, PencilAltIcon, SearchIcon } from "@heroicons/react/solid";
 import React from "react";
 
 const Widget = () => {
@@ -7,9 +7,10 @@ const Widget = () => {
     <div className="flex-[6] bg-[#353147] flex items-center sm:justify-around md:px-10">
       {/*Left item*/}
       <div className="px-1 flex-[2]">
+        <SearchIcon className="absolute w-5 h-5 mt-2 ml-2 lg:mt-3 lg:ml-3 text-slate-500" />
         <input
           type="text"
-          className="w-32 h-8 px-3 rounded-xl sm:w-64 lg:w-96 bg-[#75659E] text-white font-bold outline-none placeholder-slate-300"
+          className="w-32 h-8 sm:h-9  lg:h-12 px-3 sm:px-8 md:px-9 lg:px-10 rounded-xl sm:w-64 lg:w-96 bg-[#22202e] text-white font-bold outline-none sm:placeholder-slate-500 placeholder-transparent "
           placeholder="Search"
         />
       </div>
