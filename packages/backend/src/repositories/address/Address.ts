@@ -1,4 +1,5 @@
 export class Address {
+
   private readonly postalCode: string;
   private region: string;
   private country: string;
@@ -28,4 +29,5 @@ export class Address {
     this.country = country;
     return this;
   }
+
 }
