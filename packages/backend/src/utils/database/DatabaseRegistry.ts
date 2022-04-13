@@ -5,7 +5,7 @@ export class DatabaseRegistry {
 
   private readonly mySqlConnection: Pool;
 
-  getMySqlConnection(): Pool {
+  public getMySqlConnection(): Pool {
     return this.mySqlConnection;
   }
 
