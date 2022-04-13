@@ -11,7 +11,7 @@ type Secrets = {
 export class Mysql {
 
   private readonly secrets: Secrets;
-  private connection: any;
+  private connection: Pool;
 
   public constructor() {
     this.secrets = this.getSecrets();
