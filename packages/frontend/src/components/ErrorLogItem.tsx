@@ -16,7 +16,7 @@ const ErrorLogItem = ({ name, id }: ErrorlogDetail) => {
       |
       <div className="flex flex-col">
         {/* Title */}
-        <span className="font-bold">Title: นายพลทหารได้ใบเบิ้ล</span>
+        <span className="font-bold">Title: นายพลทหารได้ไบเบิล</span>
         {/* Staff */}
         <div className="space-x-2">
           <span className="font-semibold">StaffID: {id}</span>
