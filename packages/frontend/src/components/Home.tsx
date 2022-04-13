@@ -1,7 +1,8 @@
 import React from "react";
 import Chart from "./AreaChart";
 import ErrorLog from "./ErrorLog";
-import MachineLog from "./MachineLog";
+
+import Progressbar from "./Progressbar";
 import TwoBarChart from "./TwoBarChart";
 
 const Home = () => {
@@ -23,10 +24,9 @@ const Home = () => {
         <div className="bg-[#353147] rounded-xl ">
           <ErrorLog />
         </div>
-
-        {/* Machine  */}
-        <div className="bg-[#353147] rounded-xl md:row-span-2">
-          <MachineLog />
+        {/* Calendar*/}
+        <div className="bg-[#353147] rounded-xl">
+          <Progressbar />
         </div>
 
         {/* Twobar */}
@@ -45,6 +45,8 @@ const Home = () => {
             </div>
           </div>
         </div>
+        {/* Machine  */}
+        <div className="bg-[#353147] rounded-xl ">{/* <MachineLog /> */}</div>
       </div>
     </div>
   );
