@@ -38,7 +38,10 @@ export default class Branch {
   public setTelNo(telNo: string): Branch {
     this.telNo = telNo;
     return this;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 05a91d7a2b18ac8d49172e84a82500b387eef234
   }
 
 }
