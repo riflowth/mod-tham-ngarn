@@ -69,7 +69,6 @@ const TwoBarChart = () => {
           bottom: 5,
         }}
       >
-        <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" tick={{ fill: "white" }} />
         <YAxis tick={{ fill: "white" }} />
         <Tooltip />

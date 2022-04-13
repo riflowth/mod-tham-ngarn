@@ -68,7 +68,6 @@ const Chart = () => {
           bottom: 0,
         }}
       >
-        <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" tick={{ fill: "white" }} />
         <YAxis tick={{ fill: "white" }} />
         <Tooltip />
