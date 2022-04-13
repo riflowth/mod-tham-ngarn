@@ -32,6 +32,7 @@ export class Address {
   public setCountry(country: string): Address {
     this.country = country;
     return this;
+
   }
 
 }
