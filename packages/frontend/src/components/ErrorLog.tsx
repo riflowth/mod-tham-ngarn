@@ -14,6 +14,7 @@ function ErrorLog() {
   const [errorLogData, setErrorLogData] = useState<DataPerPages>(ErrorLogData);
   const [dataInPage, setDataInPage] = useState<Result>([]);
   const [page, setPage] = useState(0);
+  const [isShowed, setIsShowed] = useState(false);
   //ข้อมูลทั้งหมด
   //จำนวนข้อมูลแต่ละหน้า กี่จำนวนต่อหนึ่งหน้า
   //จำนวนเลขหน้า = ข้อมลทั้งหมด / จำนวนข้อมูลแต่ละหน้า
@@ -25,6 +26,7 @@ function ErrorLog() {
       const start = index * foodPerPage; //[[0,..],[7,..]]
       return ErrorLogData.slice(start, start + foodPerPage);
     });
+    setIsShowed(true);
     return newFood;
   };
 
@@ -41,28 +43,30 @@ function ErrorLog() {
   return (
     <div className="w-full h-full">
       {/* Title */}
-      <div className="self-start p-2 ml-12 text-xl  font-bold text-[#CBC3D8]">
-        <span>ErrorLogs</span>
+      <div className="self-start p-2 ml-12 text-xl pt-6 font-bold text-[#CBC3D8]">
+        <span className="">ErrorLogs</span>
       </div>
       {/* ErrorLog */}
-      <div className="flex flex-col w-full h-full px-5 py-3 space-y-6 ">
+      <div className="flex flex-col w-full h-full px-5 space-y-6 ">
         <div className="min-h-[208px] space-y-2">
-          {errorLogData.map((element, index) => {
-            return <ErrorLogItem key={index} {...element} />;
-          })}
+          {isShowed &&
+            errorLogData.map((element, index) => {
+              return <ErrorLogItem key={index} {...element} />;
+            })}
         </div>
         <div className="flex self-center flex-1 h-full space-x-3 justify-self-end">
-          {dataInPage.map((data: DataPerPages, index: number) => {
-            return (
-              <button
-                className="w-8 h-8 "
-                key={index}
-                onClick={() => handlePage(index)}
-              >
-                {index + 1}
-              </button>
-            );
-          })}
+          {isShowed &&
+            dataInPage.map((data: DataPerPages, index: number) => {
+              return (
+                <button
+                  className="w-8 h-8 "
+                  key={index}
+                  onClick={() => handlePage(index)}
+                >
+                  {index + 1}
+                </button>
+              );
+            })}
         </div>
       </div>
     </div>

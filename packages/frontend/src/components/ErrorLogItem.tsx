@@ -2,12 +2,14 @@ import {
   DotsCircleHorizontalIcon,
   ShieldExclamationIcon,
 } from "@heroicons/react/solid";
-import React from "react";
+import React, { useState } from "react";
 type ErrorlogDetail = {
   name: string;
   id: string;
 };
+import { Dialog } from "@headlessui/react";
 const ErrorLogItem = ({ name, id }: ErrorlogDetail) => {
+  const [isOpen, setIsOpen] = useState(true);
   return (
     <div className="flex flex-1 justify-between items-center p-2 px-5   w-full bg-[#D599C6] rounded-full">
       <div className="w-12 h-12 text-[#be3c93] animate-pulse">
