@@ -1,4 +1,5 @@
 export default class Branch {
+
   private readonly branchId: number;
   private address: string;
   private postalCode: string;
@@ -26,17 +27,18 @@ export default class Branch {
 
   public setAddress(address: string): Branch {
     this.address = address;
-    return this
+    return this;
   }
 
   public setPostalCode(postalCode: string): Branch {
     this.postalCode = postalCode;
-    return this
+    return this;
   }
 
   public setTelNo(telNo: string): Branch {
     this.telNo = telNo;
-    return this
-  }
-}
+    return this;
 
+  }
+
+}
