@@ -8,8 +8,8 @@ export class Machine {
   private registrationDate: Date;
   private retiredDate: Date;
 
-  public constructor(machineId: number) {
-    this.machineId = machineId;
+  public getPrimaryKey(): number {
+    return this.machineId;
   }
 
   public getMachineId(): number {

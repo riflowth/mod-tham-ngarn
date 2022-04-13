@@ -9,8 +9,8 @@ export class Staff {
   private position: string;
   private dateOfBirth: Date;
 
-  public constructor(staffId: number) {
-    this.staffId = staffId;
+  public getPrimaryKey(): number {
+    return this.staffId;
   }
 
   public getStaffId(): number {

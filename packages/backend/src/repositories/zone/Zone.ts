@@ -5,11 +5,8 @@ export class Zone {
   private timeToEnd: Date;
   private branchId: number;
 
-  public constructor(zoneId: number, timeToStart: Date, timeToEnd: Date, branchId: number) {
-    this.zoneId = zoneId;
-    this.timeToStart = timeToStart;
-    this.timeToEnd = timeToEnd;
-    this.branchId = branchId;
+  public getPrimaryKey(): number {
+    return this.zoneId;
   }
 
   public getZoneId(): number {

@@ -5,8 +5,8 @@ export default class Branch {
   private postalCode: string;
   private telNo: string;
 
-  public constructor(branchId: number) {
-    this.branchId = branchId;
+  public getPrimaryKey(): number {
+    return this.branchId;
   }
 
   public getBranchId(): number {

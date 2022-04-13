@@ -8,6 +8,10 @@ export class Address {
     this.postalCode = postalCode;
   }
 
+  public getPrimaryKey(): string {
+    return this.postalCode;
+  }
+
   public getPostalCode(): string {
     return this.postalCode;
   }
