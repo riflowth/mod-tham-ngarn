@@ -3,16 +3,21 @@ import React, { useEffect, useState } from "react";
 import ErrorLogData from "src/data/ErrorLogData";
 import ErrorLogItem from "./ErrorLogItem";
 
-type DataPerPage = { name: string; id: string }[][];
-type PerPageData = { name: string; id: string }[][];
+type DataPerPage = {
+  name: string;
+  id: string;
+};
+type DataPerPages = Array<DataPerPage>;
+type Result = Array<DataPerPages>;
+
 function ErrorLog() {
-  const [errorLogData, setErrorLogData] = useState(ErrorLogData);
-  const [dataInPage, setDataInPage] = useState([]);
+  const [errorLogData, setErrorLogData] = useState<DataPerPages>(ErrorLogData);
+  const [dataInPage, setDataInPage] = useState<Result>([]);
   const [page, setPage] = useState(0);
   //ข้อมูลทั้งหมด
   //จำนวนข้อมูลแต่ละหน้า กี่จำนวนต่อหนึ่งหน้า
   //จำนวนเลขหน้า = ข้อมลทั้งหมด / จำนวนข้อมูลแต่ละหน้า
-  const pagination: any = () => {
+  const pagination = (): Result => {
     const foodPerPage = 3; //แสดง 3 รายการต่อหนึ่งหน้า
     const page = Math.ceil(ErrorLogData.length / foodPerPage); //จำนวนเลขหน้า
 
@@ -47,7 +52,7 @@ function ErrorLog() {
           })}
         </div>
         <div className="flex self-center flex-1 h-full space-x-3 justify-self-end">
-          {dataInPage.map((data: number, index: number) => {
+          {dataInPage.map((data: DataPerPages, index: number) => {
             return (
               <button
                 className="w-8 h-8 "
