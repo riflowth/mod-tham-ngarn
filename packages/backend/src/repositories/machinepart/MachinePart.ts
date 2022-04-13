@@ -1,9 +1,13 @@
 export class MachinePart {
 
   private readonly partId: number;
-  private readonly machineId: number;
+  private machineId: number;
   private partName: string;
   private status: string;
+
+  public getPrimaryKey(): number {
+    return this.partId;
+  }
 
   public getPartId(): number {
     return this.partId;
@@ -19,6 +23,11 @@ export class MachinePart {
 
   public getStatus(): string {
     return this.status;
+  }
+
+  public setMachineId(machineId: number): MachinePart {
+    this.machineId = machineId;
+    return this;
   }
 
   public setPartName(partname: string): MachinePart {

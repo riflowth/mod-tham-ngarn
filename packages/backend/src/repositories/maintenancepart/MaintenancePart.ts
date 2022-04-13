@@ -4,7 +4,7 @@ export class MaintenancePart {
   private readonly partId: number;
   private type : string;
   private status : string;
-  private readonly orderId: number;
+  private orderId: number;
 
   public getPrimaryKey(): [number, number] {
     return [this.maintenanceId, this.partId];
@@ -37,6 +37,11 @@ export class MaintenancePart {
 
   public setStatus(status: string): MaintenancePart {
     this.status = status;
+    return this;
+  }
+
+  public setOrderId(orderId: number): MaintenancePart {
+    this.orderId = orderId;
     return this;
   }
 
