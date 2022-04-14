@@ -26,7 +26,7 @@ export class RedisConnector {
   public async getConnection(): Promise<RedisClient> | never {
     if (!this.connection) {
       const client: RedisClient = createClient({
-        url: `redis://${this.user}:${this.password}@${this.host}:${this.port}`,
+        url: this.generateRedisUri(),
       });
 
       await client.connect();
@@ -34,6 +34,19 @@ export class RedisConnector {
     }
 
     return this.connection;
+  }
+
+  private generateRedisUri(): string {
+    const redisUrlTemplate = 'redis://{{username}}{{colon}}{{password}}{{at}}{{host}}:{{port}}';
+    const redisUrl = redisUrlTemplate
+      .replace('{{username}}', this.user ?? '')
+      .replace('{{colon}}', this.password ? ':' : '')
+      .replace('{{password}}', this.password ?? '')
+      .replace('{{at}}', (this.password || this.user) ? '@' : '')
+      .replace('{{host}}', this.host)
+      .replace('{{port}}', String(this.port));
+
+    return redisUrl;
   }
 
 }
