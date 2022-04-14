@@ -4,7 +4,7 @@ try {
   console.log('Starting up the application...');
   const server = new Server(4000);
   server.run();
-} catch (error: Error | unknown) {
+} catch (error: unknown) {
   if (error instanceof Error) {
     console.log(`${error.name}: ${error.message}`);
     console.log('Closing the application...');
