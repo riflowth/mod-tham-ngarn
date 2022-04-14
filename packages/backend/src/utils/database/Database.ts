@@ -16,8 +16,6 @@ export class Database {
       'MYSQL_DATABASE',
       'REDIS_HOST',
       'REDIS_PORT',
-      'REDIS_USER',
-      'REDIS_PASSWORD',
     ];
 
     expectedVariables.forEach((variable) => {
