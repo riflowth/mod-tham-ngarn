@@ -1,6 +1,8 @@
-export class MaintenanceLog {
+import { DatabaseEntity } from '../DatabaseEntity';
 
-  private readonly maintenanceId: number;
+export class MaintenanceLog implements DatabaseEntity {
+
+  private maintenanceId: number;
   private machineId: number;
   private reporterId: number;
   private maintainerId: number;
@@ -43,6 +45,16 @@ export class MaintenanceLog {
 
   public getStatus(): string {
     return this.status;
+  }
+
+  public setPrimaryKey(maintenanceId: number): MaintenanceLog {
+    this.maintenanceId = maintenanceId;
+    return this;
+  }
+
+  public setMaintenanceId(maintenanceId: number): MaintenanceLog {
+    this.maintenanceId = maintenanceId;
+    return this;
   }
 
   public setMachineId(machineId: number): MaintenanceLog {

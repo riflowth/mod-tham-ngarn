@@ -1,6 +1,8 @@
-export class Machine {
+import { DatabaseEntity } from '../DatabaseEntity';
 
-  private readonly machineId: number;
+export class Machine implements DatabaseEntity {
+
+  private machineId: number;
   private zoneId: number;
   private name: string;
   private serial: string;
@@ -38,6 +40,16 @@ export class Machine {
 
   public getRetiredDate(): Date {
     return this.retiredDate;
+  }
+
+  public setPrimaryKey(machineId: number): Machine {
+    this.machineId = machineId;
+    return this;
+  }
+
+  public setMachineId(machineId: number): Machine {
+    this.machineId = machineId;
+    return this;
   }
 
   public setZoneId(zoneId: number): Machine {

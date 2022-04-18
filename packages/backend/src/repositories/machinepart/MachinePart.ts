@@ -1,6 +1,8 @@
-export class MachinePart {
+import { DatabaseEntity } from '../DatabaseEntity';
 
-  private readonly partId: number;
+export class MachinePart implements DatabaseEntity {
+
+  private partId: number;
   private machineId: number;
   private partName: string;
   private status: string;
@@ -23,6 +25,16 @@ export class MachinePart {
 
   public getStatus(): string {
     return this.status;
+  }
+
+  public setPrimaryKey(partId: number): MachinePart {
+    this.partId = partId;
+    return this;
+  }
+
+  public setPartId(partId: number): MachinePart {
+    this.partId = partId;
+    return this;
   }
 
   public setMachineId(machineId: number): MachinePart {
