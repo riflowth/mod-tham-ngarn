@@ -1,6 +1,8 @@
-export class Zone {
+import { DatabaseEntity } from '../DatabaseEntity';
 
-  private readonly zoneId: number;
+export class Zone implements DatabaseEntity {
+
+  private zoneId: number;
   private timeToStart: Date;
   private timeToEnd: Date;
   private branchId: number;
@@ -23,6 +25,16 @@ export class Zone {
 
   public getBranchId(): number {
     return this.branchId;
+  }
+
+  public setPrimaryKey(zoneId: number): Zone {
+    this.zoneId = zoneId;
+    return this;
+  }
+
+  public setZoneId(zoneId: number): Zone {
+    this.zoneId = zoneId;
+    return this;
   }
 
   public setTimeToStart(timeToStart: Date): Zone {

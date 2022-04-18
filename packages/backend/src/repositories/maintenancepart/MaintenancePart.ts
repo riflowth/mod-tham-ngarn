@@ -1,7 +1,9 @@
-export class MaintenancePart {
+import { DatabaseEntity } from '../DatabaseEntity';
 
-  private readonly maintenanceId: number;
-  private readonly partId: number;
+export class MaintenancePart implements DatabaseEntity {
+
+  private maintenanceId: number;
+  private partId: number;
   private type : string;
   private status : string;
   private orderId: number;
@@ -28,6 +30,21 @@ export class MaintenancePart {
 
   public getOrderId(): number {
     return this.orderId;
+  }
+
+  public setPrimaryKey(primaryKey: [number, number]): MaintenancePart {
+    [this.maintenanceId, this.partId] = primaryKey;
+    return this;
+  }
+
+  public setMaintenanceId(maintenanceId: number): MaintenancePart {
+    this.maintenanceId = maintenanceId;
+    return this;
+  }
+
+  public setPartId(partId: number): MaintenancePart {
+    this.partId = partId;
+    return this;
   }
 
   public setType(type: string): MaintenancePart {

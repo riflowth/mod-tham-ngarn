@@ -1,6 +1,8 @@
-export class Order {
+import { DatabaseEntity } from '../DatabaseEntity';
 
-  private readonly orderId: number;
+export class Order implements DatabaseEntity {
+
+  private orderId: number;
   private machineId: number;
   private partId: number;
   private billId: number;
@@ -38,6 +40,16 @@ export class Order {
 
   public getStatus(): string {
     return this.status;
+  }
+
+  public setPrimaryKey(orderId: number): Order {
+    this.orderId = orderId;
+    return this;
+  }
+
+  public setOrderId(orderId: number): Order {
+    this.orderId = orderId;
+    return this;
   }
 
   public setMachineId(machineId: number): Order {

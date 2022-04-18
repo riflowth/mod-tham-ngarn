@@ -1,6 +1,8 @@
-export class Staff {
+import { DatabaseEntity } from '../DatabaseEntity';
 
-  private readonly staffId: number;
+export class Staff implements DatabaseEntity {
+
+  private staffId: number;
   private fullName: string;
   private branchId: number;
   private zoneId: number;
@@ -43,6 +45,16 @@ export class Staff {
 
   public getDateOfBirth(): Date {
     return this.dateOfBirth;
+  }
+
+  public setPrimaryKey(staffId: number): Staff {
+    this.staffId = staffId;
+    return this;
+  }
+
+  public setStaffId(staffId: number): Staff {
+    this.staffId = staffId;
+    return this;
   }
 
   public setFullName(fullName: string): Staff {
