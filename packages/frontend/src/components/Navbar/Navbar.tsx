@@ -2,7 +2,7 @@ import React from "react";
 import Sidebar from "./Sidebar";
 import Widget from "./Widget";
 
-const Home = () => {
+const Navbar = () => {
   return (
     <div className="flex font-[Nunito] bg-[#353147]">
       <Sidebar />
@@ -11,4 +11,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Navbar;

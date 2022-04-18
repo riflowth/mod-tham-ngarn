@@ -55,26 +55,40 @@ const data = [
 ];
 const TwoBarChart = () => {
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <BarChart
-        width={500}
-        height={300}
-        data={data}
-        margin={{
-          top: 5,
-          right: 30,
-          left: 20,
-          bottom: 5,
-        }}
-      >
-        <XAxis dataKey="name" tick={{ fill: "white" }} />
-        <YAxis tick={{ fill: "white" }} />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="pv" fill="#7743EF" />
-        <Bar dataKey="uv" fill="#E78DD2" />
-      </BarChart>
-    </ResponsiveContainer>
+    <>
+      <div className="self-start p-3 pt-6 ml-12 text-xl font-bold text-[#CBC3D8]">
+        What is this Bars?
+      </div>
+      <div className="flex flex-col justify-around md:flex-row">
+        <div className="h-[300px] w-[300px] md:w-[400px] xl:w-[900px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              width={500}
+              height={300}
+              data={data}
+              margin={{
+                top: 5,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <XAxis dataKey="name" tick={{ fill: "white" }} />
+              <YAxis tick={{ fill: "white" }} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="pv" fill="#7743EF" />
+              <Bar dataKey="uv" fill="#E78DD2" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="text-xl font-bold">
+          <span className="flex items-center justify-center">
+            Hello this is Xiaoxuxx
+          </span>
+        </div>
+      </div>
+    </>
   );
 };
 

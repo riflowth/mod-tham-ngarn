@@ -8,6 +8,7 @@ type ErrorlogDetail = {
   id: string;
 };
 import { Dialog } from "@headlessui/react";
+
 const ErrorLogItem = ({ name, id }: ErrorlogDetail) => {
   const [isOpen, setIsOpen] = useState(true);
   return (
