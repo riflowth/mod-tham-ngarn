@@ -1,6 +1,8 @@
-export class Bill {
+import { DatabaseEntity } from '../DatabaseEntity';
 
-  private readonly billId: number;
+export class Bill implements DatabaseEntity {
+
+  private billId: number;
   private storeName: string;
   private orderDate: Date;
   private orderBy: number;
@@ -23,6 +25,16 @@ export class Bill {
 
   public getOrderBy(): number {
     return this.orderBy;
+  }
+
+  public setPrimaryKey(billId: number): Bill {
+    this.billId = billId;
+    return this;
+  }
+
+  public setBillId(billId: number): Bill {
+    this.billId = billId;
+    return this;
   }
 
   public setStoreName(storeName: string): Bill {

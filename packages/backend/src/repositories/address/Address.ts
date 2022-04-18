@@ -1,12 +1,10 @@
-export class Address {
+import { DatabaseEntity } from '../DatabaseEntity';
 
-  private readonly postalCode: string;
+export class Address implements DatabaseEntity {
+
+  private postalCode: string;
   private region: string;
   private country: string;
-
-  public constructor(postalCode: string) {
-    this.postalCode = postalCode;
-  }
 
   public getPrimaryKey(): string {
     return this.postalCode;
@@ -22,6 +20,16 @@ export class Address {
 
   public getCountry(): string {
     return this.country;
+  }
+
+  public setPrimaryKey(postalCode: string): Address {
+    this.postalCode = postalCode;
+    return this;
+  }
+
+  public setPostalCode(postalCode: string): Address {
+    this.postalCode = postalCode;
+    return this;
   }
 
   public setRegion(region: string): Address {

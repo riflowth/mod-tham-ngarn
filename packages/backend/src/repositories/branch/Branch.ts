@@ -1,6 +1,8 @@
-export default class Branch {
+import { DatabaseEntity } from '../DatabaseEntity';
 
-  private readonly branchId: number;
+export default class Branch implements DatabaseEntity {
+
+  private branchId: number;
   private address: string;
   private postalCode: string;
   private telNo: string;
@@ -23,6 +25,16 @@ export default class Branch {
 
   public getTelNo(): string {
     return this.telNo;
+  }
+
+  public setPrimaryKey(branchId: number): Branch {
+    this.branchId = branchId;
+    return this;
+  }
+
+  public setBranchId(branchId: number): Branch {
+    this.branchId = branchId;
+    return this;
   }
 
   public setAddress(address: string): Branch {
