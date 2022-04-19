@@ -1,6 +1,6 @@
-import { DatabaseEntity } from '../DatabaseEntity';
+import { DatabaseEntity } from '@/repositories/DatabaseEntity';
 
-export default class Branch implements DatabaseEntity {
+export class BranchEntity implements DatabaseEntity {
 
   private branchId: number;
   private address: string;
@@ -27,27 +27,27 @@ export default class Branch implements DatabaseEntity {
     return this.telNo;
   }
 
-  public setPrimaryKey(branchId: number): Branch {
+  public setPrimaryKey(branchId: number): BranchEntity {
     this.branchId = branchId;
     return this;
   }
 
-  public setBranchId(branchId: number): Branch {
+  public setBranchId(branchId: number): BranchEntity {
     this.branchId = branchId;
     return this;
   }
 
-  public setAddress(address: string): Branch {
+  public setAddress(address: string): BranchEntity {
     this.address = address;
     return this;
   }
 
-  public setPostalCode(postalCode: string): Branch {
+  public setPostalCode(postalCode: string): BranchEntity {
     this.postalCode = postalCode;
     return this;
   }
 
-  public setTelNo(telNo: string): Branch {
+  public setTelNo(telNo: string): BranchEntity {
     this.telNo = telNo;
     return this;
   }

@@ -1,6 +1,6 @@
-import { DatabaseEntity } from '../DatabaseEntity';
+import { DatabaseEntity } from '@/repositories/DatabaseEntity';
 
-export class MachinePart implements DatabaseEntity {
+export class MachinePartEntity implements DatabaseEntity {
 
   private partId: number;
   private machineId: number;
@@ -27,27 +27,27 @@ export class MachinePart implements DatabaseEntity {
     return this.status;
   }
 
-  public setPrimaryKey(partId: number): MachinePart {
+  public setPrimaryKey(partId: number): MachinePartEntity {
     this.partId = partId;
     return this;
   }
 
-  public setPartId(partId: number): MachinePart {
+  public setPartId(partId: number): MachinePartEntity {
     this.partId = partId;
     return this;
   }
 
-  public setMachineId(machineId: number): MachinePart {
+  public setMachineId(machineId: number): MachinePartEntity {
     this.machineId = machineId;
     return this;
   }
 
-  public setPartName(partname: string): MachinePart {
+  public setPartName(partname: string): MachinePartEntity {
     this.partName = partname;
     return this;
   }
 
-  public setStatus(status: string): MachinePart {
+  public setStatus(status: string): MachinePartEntity {
     this.status = status;
     return this;
   }

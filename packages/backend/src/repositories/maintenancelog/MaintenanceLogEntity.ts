@@ -1,6 +1,6 @@
-import { DatabaseEntity } from '../DatabaseEntity';
+import { DatabaseEntity } from '@/repositories/DatabaseEntity';
 
-export class MaintenanceLog implements DatabaseEntity {
+export class MaintenanceLogEntity implements DatabaseEntity {
 
   private maintenanceId: number;
   private machineId: number;
@@ -47,47 +47,46 @@ export class MaintenanceLog implements DatabaseEntity {
     return this.status;
   }
 
-  public setPrimaryKey(maintenanceId: number): MaintenanceLog {
+  public setPrimaryKey(maintenanceId: number): MaintenanceLogEntity {
     this.maintenanceId = maintenanceId;
     return this;
   }
 
-  public setMaintenanceId(maintenanceId: number): MaintenanceLog {
+  public setMaintenanceId(maintenanceId: number): MaintenanceLogEntity {
     this.maintenanceId = maintenanceId;
     return this;
   }
 
-  public setMachineId(machineId: number): MaintenanceLog {
+  public setMachineId(machineId: number): MaintenanceLogEntity {
     this.machineId = machineId;
     return this;
   }
 
-  public setReporterId(reporterId: number): MaintenanceLog {
+  public setReporterId(reporterId: number): MaintenanceLogEntity {
     this.reporterId = reporterId;
     return this;
   }
 
-  public setMaintainerId(maintainerId: number): MaintenanceLog {
+  public setMaintainerId(maintainerId: number): MaintenanceLogEntity {
     this.maintainerId = maintainerId;
     return this;
   }
 
-  public setReportDate(reportDate: Date): MaintenanceLog {
+  public setReportDate(reportDate: Date): MaintenanceLogEntity {
     this.reportDate = reportDate;
     return this;
   }
 
-  public setMaintenaceDate(maintenacedate:Date): MaintenanceLog {
-    this.maintenaceDate = maintenacedate;
+  public setMaintenaceDate(maintenacedate:Date): MaintenanceLogEntity {
     return this;
   }
 
-  public setReason(reason: string): MaintenanceLog {
+  public setReason(reason: string): MaintenanceLogEntity {
     this.reason = reason;
     return this;
   }
 
-  public setStatus(status: string): MaintenanceLog {
+  public setStatus(status: string): MaintenanceLogEntity {
     this.status = status;
     return this;
   }
