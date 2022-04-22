@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from 'express';
 export class ErrorHandler {
 
   public static getHandler() {
-    const middleware = (error: HttpException | Error, req, res, next) => {
+    const errorHandler = (error: HttpException | Error, req, res, next) => {
       const statusCode = (error instanceof HttpException)
         ? error.getStatusCode()
         : 500;
@@ -19,7 +19,16 @@ export class ErrorHandler {
         });
     };
 
-    return middleware;
+    const notFoundHandler = (req, res) => {
+      res
+        .status(404)
+        .json({
+          path: req.baseUrl + req.path,
+          messsage: 'request not found',
+        });
+    };
+
+    return [errorHandler, notFoundHandler];
   }
 
   public static wrap(routeHandler: RouteHandler): RouteHandler {
