@@ -1,34 +1,39 @@
-import crypto from 'crypto';
 import { Controller } from '@/controllers/Controller';
 import { Methods } from '@/controllers/Route';
 import { ControllerMapping } from '@/decorators/ControllerDecorator';
 import { RouteMapping } from '@/decorators/RouteDecorator';
 import { CookieProvider } from '@/utils/cookie/CookieProvider';
 import { Request, Response } from 'express';
-import { Cookie } from '@/utils/cookie/Cookie';
 import { NotFoundException } from '@/exceptions/NotFoundException';
+import { RequestBody } from '@/decorators/RequestDecorator';
+import { AuthService } from '@/services/AuthService';
 
 @ControllerMapping('/auth')
 export class AuthController extends Controller {
 
-  private cookieProvider: CookieProvider;
+  private readonly cookieProvider: CookieProvider;
+  private readonly authService: AuthService;
 
-  public constructor(cookieProvider: CookieProvider) {
+  public constructor(cookieProvider: CookieProvider, authService: AuthService) {
     super();
     this.cookieProvider = cookieProvider;
+    this.authService = authService;
   }
 
-  @RouteMapping('/set', Methods.GET)
-  private async setSessionId(req: Request, res: Response): Promise<void> {
-    const sessionId = crypto.randomUUID();
-    const cookie = new Cookie('sid', sessionId)
-      .setHttpOnly(true);
+  @RouteMapping('/login', Methods.POST)
+  @RequestBody('username', 'password')
+  private async loginRoute(req: Request, res: Response): Promise<void> {
+    const { username, password } = req.body;
 
-    this.cookieProvider.setCookie(res, cookie);
+    const cookie = await this.authService.login(username, password);
 
-    res.status(200).json({
-      session_id: sessionId,
-    });
+    if (cookie) {
+      this.cookieProvider.setCookie(res, cookie);
+
+      res.status(200).json({
+        message: 'logged successfully',
+      });
+    }
   }
 
   @RouteMapping('/get', Methods.GET)
