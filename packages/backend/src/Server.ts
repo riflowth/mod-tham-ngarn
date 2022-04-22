@@ -5,6 +5,8 @@ import { IndexController } from '@/controllers/IndexController';
 import { ControllerRegistry } from '@/controllers/ControllerRegistry';
 import { Database } from '@/utils/database/Database';
 import { DatabaseException } from '@/exceptions/DatabaseException';
+import { CookieProvider } from '@/utils/cookie/CookieProvider';
+import { AuthController } from '@/controllers/AuthController';
 
 export class Server {
 
@@ -13,12 +15,14 @@ export class Server {
 
   private readonly database: Database;
   private readonly controllerRegistry: ControllerRegistry;
+  private readonly cookieProvider: CookieProvider;
 
   public constructor(port: number) {
     this.app = express();
     this.port = port;
     this.database = new Database();
     this.controllerRegistry = new ControllerRegistry(this.app);
+    this.cookieProvider = new CookieProvider('this-is-the-secret');
   }
 
   public async run(): Promise<http.Server> {
@@ -44,6 +48,7 @@ export class Server {
   private async loadControllers(): Promise<void> {
     this.controllerRegistry.loadControllers([
       new IndexController(),
+      new AuthController(this.cookieProvider),
     ]);
 
     const controllerCount = this.controllerRegistry.size();
