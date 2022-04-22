@@ -3,6 +3,7 @@ import { DatabaseEntity } from '@/repositories/DatabaseEntity';
 export class StaffEntity implements DatabaseEntity {
 
   private staffId: number;
+  private password: string;
   private fullName: string;
   private branchId: number;
   private zoneId: number;
@@ -17,6 +18,10 @@ export class StaffEntity implements DatabaseEntity {
 
   public getStaffId(): number {
     return this.staffId;
+  }
+
+  public getPassword(): string {
+    return this.password;
   }
 
   public getFullName(): string {
@@ -54,6 +59,11 @@ export class StaffEntity implements DatabaseEntity {
 
   public setStaffId(staffId: number): StaffEntity {
     this.staffId = staffId;
+    return this;
+  }
+
+  public setPassword(password: string): StaffEntity {
+    this.password = password;
     return this;
   }
 
