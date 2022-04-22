@@ -1,5 +1,6 @@
 import { LoginException } from '@/exceptions/service/LoginException';
 import { AuthService } from '@/services/AuthService';
+import { Cookie } from '@/utils/cookie/Cookie';
 
 describe('Test implementation of Auth Service', () => {
   const authService = new AuthService();
@@ -21,9 +22,9 @@ describe('Test implementation of Auth Service', () => {
       .toThrow(LoginException);
   });
 
-  it('should not throw LoginException', async () => {
+  it('should return cookie', async () => {
     await expect(authService.login(validUsername, validPassword))
       .resolves
-      .toBe(true);
+      .toBeInstanceOf(Cookie);
   });
 });
