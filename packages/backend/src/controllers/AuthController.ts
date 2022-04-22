@@ -4,7 +4,7 @@ import { Methods } from '@/controllers/Route';
 import { ControllerMapping } from '@/decorators/ControllerDecorator';
 import { RouteMapping } from '@/decorators/RouteDecorator';
 import { CookieProvider } from '@/utils/cookie/CookieProvider';
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { Cookie } from '@/utils/cookie/Cookie';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 
@@ -19,7 +19,7 @@ export class AuthController extends Controller {
   }
 
   @RouteMapping('/set', Methods.GET)
-  private async setSessionId(req: Request, res: Response, next: NextFunction): Promise<void> {
+  private async setSessionId(req: Request, res: Response): Promise<void> {
     const sessionId = crypto.randomUUID();
     const cookie = new Cookie('sid', sessionId)
       .setHttpOnly(true);
@@ -32,7 +32,7 @@ export class AuthController extends Controller {
   }
 
   @RouteMapping('/get', Methods.GET)
-  private async getSessionId(req: Request, res: Response, next: NextFunction): Promise<void> {
+  private async getSessionId(req: Request, res: Response): Promise<void> {
     const sessionId = this.cookieProvider.getCookie(req, 'sid');
 
     if (!sessionId) {

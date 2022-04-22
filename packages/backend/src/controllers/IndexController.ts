@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { Controller } from '@/controllers/Controller';
 import { Methods } from '@/controllers/Route';
 import { NotFoundException } from '@/exceptions/NotFoundException';
@@ -9,19 +9,19 @@ import { ControllerMapping } from '@/decorators/ControllerDecorator';
 export class IndexController extends Controller {
 
   @RouteMapping('/', Methods.GET)
-  private async index(req: Request, res: Response, next: NextFunction): Promise<void> {
+  private async index(req: Request, res: Response): Promise<void> {
     res.status(200).json({
       message: 'hello',
     });
   }
 
   @RouteMapping('/404', Methods.GET)
-  private async notFound(req: Request, res: Response, next: NextFunction): Promise<void> {
+  private async notFound(req: Request, res: Response): Promise<void> {
     throw new NotFoundException('test');
   }
 
   @RouteMapping('/500', Methods.GET)
-  private async throwError(req: Request, res: Response, next: NextFunction): Promise<void> {
+  private async throwError(req: Request, res: Response): Promise<void> {
     throw new Error('test');
   }
 
