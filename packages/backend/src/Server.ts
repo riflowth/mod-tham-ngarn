@@ -8,6 +8,8 @@ import { DatabaseException } from '@/exceptions/DatabaseException';
 import { CookieProvider } from '@/utils/cookie/CookieProvider';
 import { AuthController } from '@/controllers/AuthController';
 import { AuthService } from '@/services/AuthService';
+import { StaffRepository } from '@/repositories/staff/StaffRepository';
+import { DefaultStaffRepository } from '@/repositories/staff/DefaultStaffRepository';
 
 export class Server {
 
@@ -17,6 +19,8 @@ export class Server {
   private readonly database: Database;
   private readonly controllerRegistry: ControllerRegistry;
   private readonly cookieProvider: CookieProvider;
+
+  private staffRepository: StaffRepository;
 
   private authService: AuthService;
 
@@ -33,7 +37,8 @@ export class Server {
     this.app.use(express.json());
     this.app.disable('x-powered-by');
 
-    // await this.connectDatabase();
+    await this.connectDatabase();
+    await this.registerRepository();
     await this.registerServices();
     await this.loadControllers();
 
@@ -44,8 +49,13 @@ export class Server {
     console.log(`Listening on http://localhost:${this.port}/`);
   }
 
+  private async registerRepository(): Promise<void> {
+    const defaultDatabase = await this.database.getDefaultDatabase();
+    this.staffRepository = new DefaultStaffRepository(defaultDatabase);
+  }
+
   private async registerServices(): Promise<void> {
-    this.authService = new AuthService();
+    this.authService = new AuthService(this.staffRepository);
   }
 
   private async loadControllers(): Promise<void> {
