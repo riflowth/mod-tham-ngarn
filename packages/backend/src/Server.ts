@@ -7,6 +7,7 @@ import { Database } from '@/utils/database/Database';
 import { DatabaseException } from '@/exceptions/DatabaseException';
 import { CookieProvider } from '@/utils/cookie/CookieProvider';
 import { AuthController } from '@/controllers/AuthController';
+import { AuthService } from '@/services/AuthService';
 
 export class Server {
 
@@ -17,6 +18,8 @@ export class Server {
   private readonly controllerRegistry: ControllerRegistry;
   private readonly cookieProvider: CookieProvider;
 
+  private authService: AuthService;
+
   public constructor(port: number) {
     this.app = express();
     this.port = port;
@@ -26,12 +29,33 @@ export class Server {
   }
 
   public async run(): Promise<http.Server> {
-    await this.connectDatabase();
-    await this.loadControllers();
-
+    this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(express.json());
     this.app.disable('x-powered-by');
 
+    // await this.connectDatabase();
+    await this.registerServices();
+    await this.loadControllers();
+
     return this.app.listen(this.port, this.onStartup.bind(this));
+  }
+
+  private onStartup(): void {
+    console.log(`Listening on http://localhost:${this.port}/`);
+  }
+
+  private async registerServices(): Promise<void> {
+    this.authService = new AuthService();
+  }
+
+  private async loadControllers(): Promise<void> {
+    this.controllerRegistry.loadControllers([
+      new IndexController(),
+      new AuthController(this.cookieProvider, this.authService),
+    ]);
+
+    const controllerCount = this.controllerRegistry.size();
+    console.log(`Registered ${controllerCount} controller${controllerCount > 1 ? 's' : ''}`);
   }
 
   private async connectDatabase(): Promise<void> {
@@ -43,20 +67,6 @@ export class Server {
       }
       process.exit(1);
     }
-  }
-
-  private async loadControllers(): Promise<void> {
-    this.controllerRegistry.loadControllers([
-      new IndexController(),
-      new AuthController(this.cookieProvider),
-    ]);
-
-    const controllerCount = this.controllerRegistry.size();
-    console.log(`Registered ${controllerCount} controller${controllerCount > 1 ? 's' : ''}`);
-  }
-
-  private onStartup(): void {
-    console.log(`Listening on http://localhost:${this.port}/`);
   }
 
 }
