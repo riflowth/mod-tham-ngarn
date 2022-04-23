@@ -77,25 +77,19 @@ export class Server {
   }
 
   private async registerRepository(): Promise<void> {
-    const defaultDatabase = await this.databaseConnector.getDefaultDatabase();
-    const cachingDatabase = await this.databaseConnector.getCachingDatabase();
+    const defaultDb = await this.databaseConnector.getDefaultDatabase();
+    const cachingDb = await this.databaseConnector.getCachingDatabase();
 
-    this.addressRepository = new DefaultAddressRepository(defaultDatabase, cachingDatabase);
-    this.billRepository = new DefaultBillRepository(defaultDatabase, cachingDatabase);
-    this.branchRepository = new DefaultBranchRepository(defaultDatabase, cachingDatabase);
-    this.machineRepository = new DefaultMachineRepository(defaultDatabase, cachingDatabase);
-    this.machinePartRepository = new DefaultMachinePartRepository(defaultDatabase, cachingDatabase);
-    this.maintenanceLogRepository = new DefaultMaintenanceLogRepository(
-      defaultDatabase,
-      cachingDatabase,
-    );
-    this.maintenancePartRepository = new DefaultMaintenancePartRepository(
-      defaultDatabase,
-      cachingDatabase,
-    );
-    this.orderRepository = new DefaultOrderRepository(defaultDatabase, cachingDatabase);
-    this.staffRepository = new DefaultStaffRepository(defaultDatabase, cachingDatabase);
-    this.zoneRepository = new DefaultZoneRepository(defaultDatabase, cachingDatabase);
+    this.addressRepository = new DefaultAddressRepository(defaultDb, cachingDb);
+    this.billRepository = new DefaultBillRepository(defaultDb, cachingDb);
+    this.branchRepository = new DefaultBranchRepository(defaultDb, cachingDb);
+    this.machineRepository = new DefaultMachineRepository(defaultDb, cachingDb);
+    this.machinePartRepository = new DefaultMachinePartRepository(defaultDb, cachingDb);
+    this.maintenanceLogRepository = new DefaultMaintenanceLogRepository(defaultDb, cachingDb);
+    this.maintenancePartRepository = new DefaultMaintenancePartRepository(defaultDb, cachingDb);
+    this.orderRepository = new DefaultOrderRepository(defaultDb, cachingDb);
+    this.staffRepository = new DefaultStaffRepository(defaultDb, cachingDb);
+    this.zoneRepository = new DefaultZoneRepository(defaultDb, cachingDb);
   }
 
   private async registerServices(): Promise<void> {
