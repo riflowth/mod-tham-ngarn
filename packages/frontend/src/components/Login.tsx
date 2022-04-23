@@ -1,10 +1,51 @@
 /* eslint-disable jsx-a11y/alt-text */
 import Image from "next/image";
+import axios from "axios";
 import React, { useState } from "react";
+import Swal from "sweetalert2";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [state, setState] = useState({
+    username: "",
+    password: "",
+  });
+  const { username, password } = state;
+  const inputValue = (name: string) => (event: any) => {
+    setState({ ...state, [name]: event.target.value });
+  };
+  const submitFrom = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    username && password && password.length >= 8
+      ? axios
+          .post("https://cpe231.riflowth.com/api/auth/login", {
+            username,
+            password,
+          })
+          .then(function (response) {
+            Swal.fire(
+              "Good job!",
+              "The information was saved successfully.",
+              "success"
+            );
+            setState({ username: "", password: "" });
+          })
+          .catch(function (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Cant not Login",
+            });
+            console.log(error);
+          })
+      : Swal.fire({
+          imageUrl: "https://avatars.githubusercontent.com/u/73115539?v=4",
+          imageWidth: 400,
+          imageHeight: 200,
+          title: "Oops...",
+          text: "Please fill in the blanks.",
+          background: "/packages/frontend/public/eiei.png",
+        });
+  };
   const myLoader = () => {
     return `https://images.unsplash.com/photo-1522543558187-768b6df7c25c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80`;
   };
@@ -38,14 +79,14 @@ const Login = () => {
             <div className="text-2xl font-bold ">
               <span className="text-[#6043D0]">Login</span> your account
             </div>
-            <form action="" className="self-start w-full space-y-6">
+            <form onSubmit={submitFrom} className="self-start w-full space-y-6">
               <div className="flex flex-col pl-10 space-y-2">
                 <label className="text-lg font-bold"> Username</label>
                 <input
                   type="text"
                   className="border-b outline-none w-[80%] text-lg"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={inputValue("username")}
                 />
               </div>
               <div className="flex flex-col pl-10 space-y-2">
@@ -54,7 +95,7 @@ const Login = () => {
                   type="Password"
                   className="w-[80%] border-b outline-none  text-lg"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={inputValue("password")}
                 />
               </div>
               <div className=" text-xl font-extrabold bg-[#6043D0] w-[60%] flex items-center t mx-auto text-white py-2 hover:bg-[#6043D0]/90">
