@@ -1,5 +1,5 @@
 import { Zone } from '@/entities/Zone';
-import { ReadOptions } from '@/repositories/types/ReadOptions';
+import { ReadOptions } from '@/repositories/ReadOptions';
 
 export interface ZoneRepository {
 
