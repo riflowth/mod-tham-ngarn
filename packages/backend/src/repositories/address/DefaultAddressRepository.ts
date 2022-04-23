@@ -7,7 +7,7 @@ export class DefaultAddressRepository extends Database implements AddressReposit
 
   public async create(address: Address): Promise<Address> {
     const parameter = {
-      postalCode: address.getPostalCode(),
+      postal_code: address.getPostalCode(),
       region: address.getRegion(),
       country: address.getCountry(),
     };
@@ -24,7 +24,7 @@ export class DefaultAddressRepository extends Database implements AddressReposit
     const { limit, offset } = readOptions || {};
 
     const parameter = JSON.parse(JSON.stringify({
-      postalCode: address.getPostalCode(),
+      postal_code: address.getPostalCode(),
       region: address.getRegion(),
       country: address.getCountry(),
     }));
@@ -44,7 +44,7 @@ export class DefaultAddressRepository extends Database implements AddressReposit
 
     const addresses = results[0].map((result) => {
       return new Address()
-        .setPostalCode(result.postalCode)
+        .setPostalCode(result.postal_code)
         .setRegion(result.region)
         .setCountry(result.country);
     });
@@ -54,13 +54,13 @@ export class DefaultAddressRepository extends Database implements AddressReposit
 
   public async update(source: Address, destination: Address): Promise<boolean> {
     const sourceParameter = JSON.parse(JSON.stringify({
-      postalCode: source.getPostalCode(),
+      postal_code: source.getPostalCode(),
       region: source.getRegion(),
       country: source.getCountry(),
     }));
 
     const destinationParameter = JSON.parse(JSON.stringify({
-      postalCode: destination.getPostalCode(),
+      postal_code: destination.getPostalCode(),
       region: destination.getRegion(),
       country: destination.getCountry(),
     }));
@@ -80,7 +80,7 @@ export class DefaultAddressRepository extends Database implements AddressReposit
 
   public async delete(address: Address): Promise<boolean> {
     const parameter = JSON.parse(JSON.stringify({
-      postalCode: address.getPostalCode(),
+      postal_code: address.getPostalCode(),
       region: address.getRegion(),
       country: address.getCountry(),
     }));
