@@ -1,5 +1,5 @@
 import { Branch } from '@/entities/Branch';
-import { BranchRepository } from '@/repositories/branch/branchRepository';
+import { BranchRepository } from '@/repositories/branch/BranchRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { Database } from '@/utils/database/Database';
 
