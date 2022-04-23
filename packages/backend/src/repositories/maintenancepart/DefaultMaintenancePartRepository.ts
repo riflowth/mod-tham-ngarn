@@ -6,35 +6,35 @@ import { Database } from '@/utils/database/Database';
 export class DefaultMaintenancePartRepository
   extends Database implements MaintenancePartRepository {
 
-  public async create(maintenancepart: MaintenancePart): Promise<MaintenancePart> {
+  public async create(maintenancePart: MaintenancePart): Promise<MaintenancePart> {
     const parameter = {
-      maintenance_id: maintenancepart.getMaintenanceId(),
-      part_id: maintenancepart.getPartId(),
-      type: maintenancepart.getType(),
-      status: maintenancepart.getStatus(),
-      order_id: maintenancepart.getOrderId(),
+      maintenance_id: maintenancePart.getMaintenanceId(),
+      part_id: maintenancePart.getPartId(),
+      type: maintenancePart.getType(),
+      status: maintenancePart.getStatus(),
+      order_id: maintenancePart.getOrderId(),
     };
 
     try {
       const result: any = await this.query('INSERT INTO MaintenancePart SET ?', [parameter]);
-      return maintenancepart.setPrimaryKey(result[0].insertId);
+      return maintenancePart.setPrimaryKey(result[0].insertId);
     } catch (e) {
       return null;
     }
   }
 
   public async read(
-    maintenancepart: MaintenancePart,
+    maintenancePart: MaintenancePart,
     readOptions?: ReadOptions,
   ): Promise<MaintenancePart[]> {
     const { limit, offset } = readOptions || {};
 
     const parameter = {
-      maintenance_id: maintenancepart.getMaintenanceId(),
-      part_id: maintenancepart.getPartId(),
-      type: maintenancepart.getType(),
-      status: maintenancepart.getStatus(),
-      order_id: maintenancepart.getOrderId(),
+      maintenance_id: maintenancePart.getMaintenanceId(),
+      part_id: maintenancePart.getPartId(),
+      type: maintenancePart.getType(),
+      status: maintenancePart.getStatus(),
+      order_id: maintenancePart.getOrderId(),
     };
 
     const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
@@ -50,7 +50,7 @@ export class DefaultMaintenancePartRepository
 
     const results: any = await this.query(query, Object.values(parameter));
 
-    const maintenanceparts = results[0].map((result) => {
+    const maintenanceParts = results[0].map((result) => {
       return new MaintenancePart()
         .setPrimaryKey([result.part_id, result.machine_id])
         .setType(result.type)
@@ -58,7 +58,7 @@ export class DefaultMaintenancePartRepository
         .setOrderId(result.order_id);
     });
 
-    return maintenanceparts;
+    return maintenanceParts;
   }
 
   public async update(source: MaintenancePart, destination: MaintenancePart): Promise<number> {
@@ -91,13 +91,13 @@ export class DefaultMaintenancePartRepository
     return result[0].affectedRows;
   }
 
-  public async delete(maintenancepart: MaintenancePart): Promise<number> {
+  public async delete(maintenancePart: MaintenancePart): Promise<number> {
     const parameter = {
-      maintenance_id: maintenancepart.getMaintenanceId(),
-      part_id: maintenancepart.getPartId(),
-      type: maintenancepart.getType(),
-      status: maintenancepart.getStatus(),
-      order_id: maintenancepart.getOrderId(),
+      maintenance_id: maintenancePart.getMaintenanceId(),
+      part_id: maintenancePart.getPartId(),
+      type: maintenancePart.getType(),
+      status: maintenancePart.getStatus(),
+      order_id: maintenancePart.getOrderId(),
     };
 
     const query = [

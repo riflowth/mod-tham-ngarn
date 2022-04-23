@@ -6,41 +6,41 @@ import { DateUtil } from '@/utils/DateUtil';
 
 export class DefaultMaintenanceLogRepository extends Database implements MaintenanceLogRepository {
 
-  public async create(maintenancelog: MaintenanceLog): Promise<MaintenanceLog> {
+  public async create(maintenanceLog: MaintenanceLog): Promise<MaintenanceLog> {
     const parameter = {
-      maintenance_id: maintenancelog.getMaintenaceId(),
-      machine_id: maintenancelog.getmachineId(),
-      reporter_id: maintenancelog.getReporterId(),
-      maintainer_id: maintenancelog.getMaintainerId(),
-      report_date: DateUtil.formatToSQL(maintenancelog.getReportDate()),
-      maintenace_date: DateUtil.formatToSQL(maintenancelog.getMaintenaceDate()),
-      reason: maintenancelog.getReason(),
-      status: maintenancelog.getStatus(),
+      maintenance_id: maintenanceLog.getMaintenanceId(),
+      machine_id: maintenanceLog.getMachineId(),
+      reporter_id: maintenanceLog.getReporterId(),
+      maintainer_id: maintenanceLog.getMaintainerId(),
+      report_date: DateUtil.formatToSQL(maintenanceLog.getReportDate()),
+      maintenance_date: DateUtil.formatToSQL(maintenanceLog.getMaintenanceDate()),
+      reason: maintenanceLog.getReason(),
+      status: maintenanceLog.getStatus(),
     };
 
     try {
       const result: any = await this.query('INSERT INTO MaintenanceLog SET ?', [parameter]);
-      return maintenancelog.setMaintenanceId(result[0].insertId);
+      return maintenanceLog.setMaintenanceId(result[0].insertId);
     } catch (e) {
       return null;
     }
   }
 
   public async read(
-    maintenancelog: MaintenanceLog,
+    maintenanceLog: MaintenanceLog,
     readOptions?: ReadOptions,
   ): Promise<MaintenanceLog[]> {
     const { limit, offset } = readOptions || {};
 
     const parameter = {
-      maintenance_id: maintenancelog.getMaintenaceId(),
-      machine_id: maintenancelog.getmachineId(),
-      reporter_id: maintenancelog.getReporterId(),
-      maintainer_id: maintenancelog.getMaintainerId(),
-      report_date: DateUtil.formatToSQL(maintenancelog.getReportDate()),
-      maintenace_date: DateUtil.formatToSQL(maintenancelog.getMaintenaceDate()),
-      reason: maintenancelog.getReason(),
-      status: maintenancelog.getStatus(),
+      maintenance_id: maintenanceLog.getMaintenanceId(),
+      machine_id: maintenanceLog.getMachineId(),
+      reporter_id: maintenanceLog.getReporterId(),
+      maintainer_id: maintenanceLog.getMaintainerId(),
+      report_date: DateUtil.formatToSQL(maintenanceLog.getReportDate()),
+      maintenance_date: DateUtil.formatToSQL(maintenanceLog.getMaintenanceDate()),
+      reason: maintenanceLog.getReason(),
+      status: maintenanceLog.getStatus(),
     };
 
     const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
@@ -56,40 +56,40 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
 
     const results: any = await this.query(query, Object.values(parameter));
 
-    const maintenancelogs = results[0].map((result) => {
+    const maintenanceLogs = results[0].map((result) => {
       return new MaintenanceLog()
         .setMaintenanceId(result.maintenance_id)
         .setMachineId(result.machine_id)
         .setReporterId(result.reporter_id)
         .setMaintainerId(result.maintainer_id)
         .setReportDate(DateUtil.formatFromSQL(result.report_date))
-        .setMaintenaceDate(DateUtil.formatFromSQL(result.maintenace_date))
+        .setMaintenanceDate(DateUtil.formatFromSQL(result.maintenance_date))
         .setReason(result.reason)
         .setStatus(result.status);
     });
 
-    return maintenancelogs;
+    return maintenanceLogs;
   }
 
   public async update(source: MaintenanceLog, destination: MaintenanceLog): Promise<number> {
     const sourceParameter = {
-      maintenance_id: source.getMaintenaceId(),
-      machine_id: source.getmachineId(),
+      maintenance_id: source.getMaintenanceId(),
+      machine_id: source.getMachineId(),
       reporter_id: source.getReporterId(),
       maintainer_id: source.getMaintainerId(),
       report_date: DateUtil.formatToSQL(source.getReportDate()),
-      maintenace_date: DateUtil.formatToSQL(source.getMaintenaceDate()),
+      maintenance_date: DateUtil.formatToSQL(source.getMaintenanceDate()),
       reason: source.getReason(),
       status: source.getStatus(),
     };
 
     const destinationParameter = {
-      maintenance_id: destination.getMaintenaceId(),
-      machine_id: destination.getmachineId(),
+      maintenance_id: destination.getMaintenanceId(),
+      machine_id: destination.getMachineId(),
       reporter_id: destination.getReporterId(),
       maintainer_id: destination.getMaintainerId(),
       report_date: DateUtil.formatToSQL(destination.getReportDate()),
-      maintenace_date: DateUtil.formatToSQL(destination.getMaintenaceDate()),
+      maintenance_date: DateUtil.formatToSQL(destination.getMaintenanceDate()),
       reason: destination.getReason(),
       status: destination.getStatus(),
     };
@@ -107,16 +107,16 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
     return result[0].affectedRows;
   }
 
-  public async delete(maintenancelog: MaintenanceLog): Promise<number> {
+  public async delete(maintenanceLog: MaintenanceLog): Promise<number> {
     const parameter = {
-      maintenance_id: maintenancelog.getMaintenaceId(),
-      machine_id: maintenancelog.getmachineId(),
-      reporter_id: maintenancelog.getReporterId(),
-      maintainer_id: maintenancelog.getMaintainerId(),
-      report_date: DateUtil.formatToSQL(maintenancelog.getReportDate()),
-      maintenace_date: DateUtil.formatToSQL(maintenancelog.getMaintenaceDate()),
-      reason: maintenancelog.getReason(),
-      status: maintenancelog.getStatus(),
+      maintenance_id: maintenanceLog.getMaintenanceId(),
+      machine_id: maintenanceLog.getMachineId(),
+      reporter_id: maintenanceLog.getReporterId(),
+      maintainer_id: maintenanceLog.getMaintainerId(),
+      report_date: DateUtil.formatToSQL(maintenanceLog.getReportDate()),
+      maintenance_date: DateUtil.formatToSQL(maintenanceLog.getMaintenanceDate()),
+      reason: maintenanceLog.getReason(),
+      status: maintenanceLog.getStatus(),
     };
 
     const query = [
