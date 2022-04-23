@@ -1,8 +1,8 @@
 import { Database } from '@/utils/database/Database';
 import { Staff } from '@/entities/Staff';
 import { StaffRepository } from '@/repositories/staff/StaffRepository';
-import { ReadOptions } from '@/repositories/types/ReadOptions';
 import { DateUtil } from '@/utils/DateUtil';
+import { ReadOptions } from '@/repositories/ReadOptions';
 
 export class DefaultStaffRepository extends Database implements StaffRepository {
 
