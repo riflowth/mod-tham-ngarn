@@ -1,7 +1,7 @@
 import { Database } from '@/utils/database/Database';
 import { Zone } from '@/entities/Zone';
 import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
-import { ReadOptions } from '@/repositories/ReadOptions'; 
+import { ReadOptions } from '@/repositories/ReadOptions';
 
 export class DefaultZoneRepository extends Database implements ZoneRepository {
 
