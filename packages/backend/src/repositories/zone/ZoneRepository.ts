@@ -1,14 +1,6 @@
 import { Zone } from '@/entities/Zone';
-import { ReadOptions } from '@/repositories/ReadOptions';
+import { Repository } from '@/repositories/Repository';
 
-export interface ZoneRepository {
-
-  create (zone: Zone): Promise<Zone>;
-
-  read (zone: Zone, readOptions: ReadOptions): Promise<Zone[]>;
-
-  update (source: Zone, destination: Zone): Promise<boolean>;
-
-  delete(zone: Zone): Promise<boolean>;
+export interface ZoneRepository extends Repository<Zone> {
 
 }
