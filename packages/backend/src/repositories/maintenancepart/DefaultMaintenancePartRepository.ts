@@ -61,7 +61,7 @@ export class DefaultMaintenancePartRepository
     return maintenanceparts;
   }
 
-  public async update(source: MaintenancePart, destination: MaintenancePart): Promise<boolean> {
+  public async update(source: MaintenancePart, destination: MaintenancePart): Promise<number> {
     const sourceParameter = {
       maintenance_id: source.getMaintenanceId(),
       part_id: source.getPartId(),
@@ -88,10 +88,10 @@ export class DefaultMaintenancePartRepository
       [sourceParameter, ...Object.values(destinationParameter)],
     );
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
-  public async delete(maintenancepart: MaintenancePart): Promise<boolean> {
+  public async delete(maintenancepart: MaintenancePart): Promise<number> {
     const parameter = {
       maintenance_id: maintenancepart.getMaintenanceId(),
       part_id: maintenancepart.getPartId(),
@@ -107,7 +107,7 @@ export class DefaultMaintenancePartRepository
 
     const result: any = await this.query(query, Object.values(parameter));
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
 }

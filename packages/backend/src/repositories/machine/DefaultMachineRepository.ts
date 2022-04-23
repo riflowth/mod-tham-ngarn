@@ -64,7 +64,7 @@ export class DefaultMachineRepository extends Database implements MachineReposit
     return machines;
   }
 
-  public async update(source: Machine, destination: Machine): Promise<boolean> {
+  public async update(source: Machine, destination: Machine): Promise<number> {
     const sourceParameter = {
       machine_id: source.getMachineId(),
       zone_id: source.getZoneId(),
@@ -95,10 +95,10 @@ export class DefaultMachineRepository extends Database implements MachineReposit
       [sourceParameter, ...Object.values(destinationParameter)],
     );
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
-  public async delete(machine: Machine): Promise<boolean> {
+  public async delete(machine: Machine): Promise<number> {
     const parameter = {
       machine_id: machine.getMachineId(),
       zone_id: machine.getZoneId(),
@@ -116,7 +116,7 @@ export class DefaultMachineRepository extends Database implements MachineReposit
 
     const result: any = await this.query(query, Object.values(parameter));
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
 }

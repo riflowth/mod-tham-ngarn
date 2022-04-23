@@ -65,7 +65,7 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
     return orders;
   }
 
-  public async update(source: Order, destination: Order): Promise<boolean> {
+  public async update(source: Order, destination: Order): Promise<number> {
     const sourceParameter = {
       order_id: source.getOrderId(),
       machine_id: source.getMachineId(),
@@ -96,10 +96,10 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
       [sourceParameter, ...Object.values(destinationParameter)],
     );
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
-  public async delete(order: Order): Promise<boolean> {
+  public async delete(order: Order): Promise<number> {
     const parameter = {
       order_id: order.getOrderId(),
       machine_id: order.getMachineId(),
@@ -117,7 +117,7 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
 
     const result: any = await this.query(query, Object.values(parameter));
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
 }

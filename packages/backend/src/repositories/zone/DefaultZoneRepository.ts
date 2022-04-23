@@ -56,7 +56,7 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
     return zones;
   }
 
-  public async update(source: Zone, destination: Zone): Promise<boolean> {
+  public async update(source: Zone, destination: Zone): Promise<number> {
     const sourceParameter = JSON.parse(JSON.stringify({
       zone_id: source.getZoneId(),
       time_to_start: source.getTimeToStart(),
@@ -81,10 +81,10 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
       [sourceParameter, ...Object.values(destinationParameter)],
     );
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
-  public async delete(zone: Zone): Promise<boolean> {
+  public async delete(zone: Zone): Promise<number> {
     const parameter = JSON.parse(JSON.stringify({
       zone_id: zone.getZoneId(),
       time_to_start: zone.getTimeToStart(),
@@ -98,7 +98,7 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
 
     const result: any = await this.query(query, Object.values(parameter));
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
 }

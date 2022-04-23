@@ -71,7 +71,7 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
     return maintenancelogs;
   }
 
-  public async update(source: MaintenanceLog, destination: MaintenanceLog): Promise<boolean> {
+  public async update(source: MaintenanceLog, destination: MaintenanceLog): Promise<number> {
     const sourceParameter = {
       maintenance_id: source.getMaintenaceId(),
       machine_id: source.getmachineId(),
@@ -104,10 +104,10 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
       [sourceParameter, ...Object.values(destinationParameter)],
     );
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
-  public async delete(maintenancelog: MaintenanceLog): Promise<boolean> {
+  public async delete(maintenancelog: MaintenanceLog): Promise<number> {
     const parameter = {
       maintenance_id: maintenancelog.getMaintenaceId(),
       machine_id: maintenancelog.getmachineId(),
@@ -126,7 +126,7 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
 
     const result: any = await this.query(query, Object.values(parameter));
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
 }

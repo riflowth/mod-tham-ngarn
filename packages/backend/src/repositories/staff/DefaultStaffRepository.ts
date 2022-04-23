@@ -70,7 +70,7 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
     return staffs;
   }
 
-  public async update(source: Staff, destination: Staff): Promise<boolean> {
+  public async update(source: Staff, destination: Staff): Promise<number> {
     const sourceParameter = JSON.parse(JSON.stringify({
       password: source.getPassword(),
       full_name: source.getFullName(),
@@ -103,10 +103,10 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
       [sourceParameter, ...Object.values(destinationParameter)],
     );
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
-  public async delete(staff: Staff): Promise<boolean> {
+  public async delete(staff: Staff): Promise<number> {
     const parameter = JSON.parse(JSON.stringify({
       staff_id: staff.getStaffId(),
       full_name: staff.getFullName(),
@@ -125,7 +125,7 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
 
     const result: any = await this.query(query, Object.values(parameter));
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
 }

@@ -52,7 +52,7 @@ export class DefaultAddressRepository extends Database implements AddressReposit
     return addresses;
   }
 
-  public async update(source: Address, destination: Address): Promise<boolean> {
+  public async update(source: Address, destination: Address): Promise<number> {
     const sourceParameter = JSON.parse(JSON.stringify({
       postal_code: source.getPostalCode(),
       region: source.getRegion(),
@@ -75,10 +75,10 @@ export class DefaultAddressRepository extends Database implements AddressReposit
       [sourceParameter, ...Object.values(destinationParameter)],
     );
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
-  public async delete(address: Address): Promise<boolean> {
+  public async delete(address: Address): Promise<number> {
     const parameter = JSON.parse(JSON.stringify({
       postal_code: address.getPostalCode(),
       region: address.getRegion(),
@@ -91,7 +91,7 @@ export class DefaultAddressRepository extends Database implements AddressReposit
 
     const result: any = await this.query(query, Object.values(parameter));
 
-    return result[0].affectedRows !== 0;
+    return result[0].affectedRows;
   }
 
 }
