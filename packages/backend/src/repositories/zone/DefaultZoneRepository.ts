@@ -2,14 +2,15 @@ import { Database } from '@/utils/database/Database';
 import { Zone } from '@/entities/Zone';
 import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
 import { ReadOptions } from '@/repositories/ReadOptions'; 
+import { DateUtil } from '@/utils/DateUtil';
 
 export class DefaultZoneRepository extends Database implements ZoneRepository {
 
   public async create(zone: Zone): Promise<Zone> {
     const parameter = {
       zoneId: zone.getZoneId(),
-      timeToStart: zone.getTimeToStart(),
-      timeToEnd: zone.getTimeToEnd(),
+      timeToStart: DateUtil.formatToSQL(zone.getTimeToStart()),
+      timeToEnd: DateUtil.formatToSQL(zone.getTimeToEnd()),
       branchId: zone.getBranchId(),
     };
 
@@ -47,8 +48,8 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
     const zones = results[0].map((result) => {
       return new Zone()
         .setZoneId(result.zoneId)
-        .setTimeToStart(result.timeToStart)
-        .setTimeToEnd(result.timeToEnd)
+        .setTimeToStart(DateUtil.formatFromSQL(result.timeToStart))
+        .setTimeToEnd(DateUtil.formatFromSQL(result.timeToEnd))
         .setBranchId(result.branchId);
     });
 

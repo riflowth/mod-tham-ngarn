@@ -1,6 +1,6 @@
 import { Machine } from '@/entities/Machine';
 import { MachineRepository } from '@/repositories/machine/MachineRepository';
-import { ReadOptions } from '@/repositories/ReadOptions'; 
+import { ReadOptions } from '@/repositories/ReadOptions';
 import { Database } from '@/utils/database/Database';
 import { DateUtil } from '@/utils/DateUtil';
 
@@ -13,8 +13,8 @@ export class DefaultMachineRepository extends Database implements MachineReposit
       name: machine.getName(),
       serial: machine.getSerial(),
       manufacturer: machine.getManufacturer(),
-      registrationDate: machine.getRegistrationDate(),
-      retiredDate: machine.getRetiredDate(),
+      registrationDate: DateUtil.formatToSQL(machine.getRetiredDate()),
+      retiredDate: DateUtil.formatToSQL(machine.getRetiredDate()),
     };
 
     try {
