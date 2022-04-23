@@ -1,6 +1,6 @@
-import { DatabaseEntity } from '@/repositories/DatabaseEntity';
+import { Entity } from '@/entities/Entity';
 
-export class BillEntity implements DatabaseEntity {
+export class Bill implements Entity<Bill, number> {
 
   private billId: number;
   private storeName: string;
@@ -27,27 +27,27 @@ export class BillEntity implements DatabaseEntity {
     return this.orderBy;
   }
 
-  public setPrimaryKey(billId: number): BillEntity {
+  public setPrimaryKey(billId: number): Bill {
     this.billId = billId;
     return this;
   }
 
-  public setBillId(billId: number): BillEntity {
+  public setBillId(billId: number): Bill {
     this.billId = billId;
     return this;
   }
 
-  public setStoreName(storeName: string): BillEntity {
+  public setStoreName(storeName: string): Bill {
     this.storeName = storeName;
     return this;
   }
 
-  public setOrderDate(orderDate: Date): BillEntity {
+  public setOrderDate(orderDate: Date): Bill {
     this.orderDate = orderDate;
     return this;
   }
 
-  public setOrderBy(orderBy: number): BillEntity {
+  public setOrderBy(orderBy: number): Bill {
     this.orderBy = orderBy;
     return this;
   }

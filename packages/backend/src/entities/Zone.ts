@@ -1,6 +1,6 @@
-import { DatabaseEntity } from '@/repositories/DatabaseEntity';
+import { Entity } from '@/entities/Entity';
 
-export class ZoneEntity implements DatabaseEntity {
+export class Zone implements Entity<Zone, number> {
 
   private zoneId: number;
   private timeToStart: Date;
@@ -27,27 +27,27 @@ export class ZoneEntity implements DatabaseEntity {
     return this.branchId;
   }
 
-  public setPrimaryKey(zoneId: number): ZoneEntity {
+  public setPrimaryKey(zoneId: number): Zone {
     this.zoneId = zoneId;
     return this;
   }
 
-  public setZoneId(zoneId: number): ZoneEntity {
+  public setZoneId(zoneId: number): Zone {
     this.zoneId = zoneId;
     return this;
   }
 
-  public setTimeToStart(timeToStart: Date): ZoneEntity {
+  public setTimeToStart(timeToStart: Date): Zone {
     this.timeToStart = timeToStart;
     return this;
   }
 
-  public setTimeToEnd(timeToEnd: Date): ZoneEntity {
+  public setTimeToEnd(timeToEnd: Date): Zone {
     this.timeToEnd = timeToEnd;
     return this;
   }
 
-  public setBranchId(branchId: number): ZoneEntity {
+  public setBranchId(branchId: number): Zone {
     this.branchId = branchId;
     return this;
   }

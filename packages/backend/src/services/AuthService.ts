@@ -4,7 +4,7 @@ import { LoginException } from '@/exceptions/service/LoginException';
 import { RegexUtil } from '@/utils/RegexUtil';
 import { Cookie } from '@/utils/cookie/Cookie';
 import { StaffRepository } from '@/repositories/staff/StaffRepository';
-import { StaffEntity } from '@/repositories/staff/StaffEntity';
+import { Staff } from '@/entities/Staff';
 
 export class AuthService {
 
@@ -23,7 +23,7 @@ export class AuthService {
       throw new LoginException('Password must be at least 8 characters');
     }
 
-    const expectedStaff = new StaffEntity()
+    const expectedStaff = new Staff()
       .setStaffId(Number(username));
     const [staff] = await this.staffRepository.read(expectedStaff);
 

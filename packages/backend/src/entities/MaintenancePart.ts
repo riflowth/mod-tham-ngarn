@@ -1,6 +1,6 @@
-import { DatabaseEntity } from '@/repositories/DatabaseEntity';
+import { Entity } from '@/entities/Entity';
 
-export class MaintenancePartEntity implements DatabaseEntity {
+export class MaintenancePart implements Entity<MaintenancePart, [number, number]> {
 
   private maintenanceId: number;
   private partId: number;
@@ -32,32 +32,32 @@ export class MaintenancePartEntity implements DatabaseEntity {
     return this.orderId;
   }
 
-  public setPrimaryKey(primaryKey: [number, number]): MaintenancePartEntity {
+  public setPrimaryKey(primaryKey: [number, number]): MaintenancePart {
     [this.maintenanceId, this.partId] = primaryKey;
     return this;
   }
 
-  public setMaintenanceId(maintenanceId: number): MaintenancePartEntity {
+  public setMaintenanceId(maintenanceId: number): MaintenancePart {
     this.maintenanceId = maintenanceId;
     return this;
   }
 
-  public setPartId(partId: number): MaintenancePartEntity {
+  public setPartId(partId: number): MaintenancePart {
     this.partId = partId;
     return this;
   }
 
-  public setType(type: string): MaintenancePartEntity {
+  public setType(type: string): MaintenancePart {
     this.type = type;
     return this;
   }
 
-  public setStatus(status: string): MaintenancePartEntity {
+  public setStatus(status: string): MaintenancePart {
     this.status = status;
     return this;
   }
 
-  public setOrderId(orderId: number): MaintenancePartEntity {
+  public setOrderId(orderId: number): MaintenancePart {
     this.orderId = orderId;
     return this;
   }

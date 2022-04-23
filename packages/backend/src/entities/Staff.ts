@@ -1,6 +1,6 @@
-import { DatabaseEntity } from '@/repositories/DatabaseEntity';
+import { Entity } from '@/entities/Entity';
 
-export class StaffEntity implements DatabaseEntity {
+export class Staff implements Entity<Staff, number> {
 
   private staffId: number;
   private password: string;
@@ -52,52 +52,52 @@ export class StaffEntity implements DatabaseEntity {
     return this.dateOfBirth;
   }
 
-  public setPrimaryKey(staffId: number): StaffEntity {
+  public setPrimaryKey(staffId: number): Staff {
     this.staffId = staffId;
     return this;
   }
 
-  public setStaffId(staffId: number): StaffEntity {
+  public setStaffId(staffId: number): Staff {
     this.staffId = staffId;
     return this;
   }
 
-  public setPassword(password: string): StaffEntity {
+  public setPassword(password: string): Staff {
     this.password = password;
     return this;
   }
 
-  public setFullName(fullName: string): StaffEntity {
+  public setFullName(fullName: string): Staff {
     this.fullName = fullName;
     return this;
   }
 
-  public setBranchId(branchId: number): StaffEntity {
+  public setBranchId(branchId: number): Staff {
     this.branchId = branchId;
     return this;
   }
 
-  public setZoneId(zoneId: number): StaffEntity {
+  public setZoneId(zoneId: number): Staff {
     this.zoneId = zoneId;
     return this;
   }
 
-  public setTelNo(telNo: string): StaffEntity {
+  public setTelNo(telNo: string): Staff {
     this.telNo = telNo;
     return this;
   }
 
-  public setSalary(salary: number): StaffEntity {
+  public setSalary(salary: number): Staff {
     this.salary = salary;
     return this;
   }
 
-  public setPosition(position: string): StaffEntity {
+  public setPosition(position: string): Staff {
     this.position = position;
     return this;
   }
 
-  public setDateOfBirth(dateOfBirth: Date): StaffEntity {
+  public setDateOfBirth(dateOfBirth: Date): Staff {
     this.dateOfBirth = dateOfBirth;
     return this;
   }

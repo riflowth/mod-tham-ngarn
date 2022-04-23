@@ -1,13 +1,13 @@
-import { StaffEntity } from '@/repositories/staff/StaffEntity';
+import { Staff } from '@/entities/Staff';
 
 export interface StaffRepository {
 
-  create(staff: StaffEntity): Promise<StaffEntity>;
+  create(staff: Staff): Promise<Staff>;
 
-  read(staff: StaffEntity): Promise<StaffEntity[]>;
+  read(staff: Staff): Promise<Staff[]>;
 
-  update(source: StaffEntity, destination: StaffEntity): Promise<boolean>;
+  update(source: Staff, destination: Staff): Promise<boolean>;
 
-  delete(staff: StaffEntity): Promise<boolean>;
+  delete(staff: Staff): Promise<boolean>;
 
 }

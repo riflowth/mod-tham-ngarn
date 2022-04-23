@@ -1,6 +1,6 @@
-import { DatabaseEntity } from '@/repositories/DatabaseEntity';
+import { Entity } from '@/entities/Entity';
 
-export class OrderEntity implements DatabaseEntity {
+export class Order implements Entity<Order, number> {
 
   private orderId: number;
   private machineId: number;
@@ -42,42 +42,42 @@ export class OrderEntity implements DatabaseEntity {
     return this.status;
   }
 
-  public setPrimaryKey(orderId: number): OrderEntity {
+  public setPrimaryKey(orderId: number): Order {
     this.orderId = orderId;
     return this;
   }
 
-  public setOrderId(orderId: number): OrderEntity {
+  public setOrderId(orderId: number): Order {
     this.orderId = orderId;
     return this;
   }
 
-  public setMachineId(machineId: number): OrderEntity {
+  public setMachineId(machineId: number): Order {
     this.machineId = machineId;
     return this;
   }
 
-  public setPartId(partId: number): OrderEntity {
+  public setPartId(partId: number): Order {
     this.partId = partId;
     return this;
   }
 
-  public setBillId(billId: number): OrderEntity {
+  public setBillId(billId: number): Order {
     this.billId = billId;
     return this;
   }
 
-  public setPrice(price: number): OrderEntity {
+  public setPrice(price: number): Order {
     this.price = price;
     return this;
   }
 
-  public setArrivalDate(arrivalDate: Date): OrderEntity {
+  public setArrivalDate(arrivalDate: Date): Order {
     this.arrivalDate = arrivalDate;
     return this;
   }
 
-  public setStatus(status: string): OrderEntity {
+  public setStatus(status: string): Order {
     this.status = status;
     return this;
   }

@@ -1,6 +1,6 @@
-import { DatabaseEntity } from '@/repositories/DatabaseEntity';
+import { Entity } from '@/entities/Entity';
 
-export class MachineEntity implements DatabaseEntity {
+export class Machine implements Entity<Machine, number> {
 
   private machineId: number;
   private zoneId: number;
@@ -42,42 +42,42 @@ export class MachineEntity implements DatabaseEntity {
     return this.retiredDate;
   }
 
-  public setPrimaryKey(machineId: number): MachineEntity {
+  public setPrimaryKey(machineId: number): Machine {
     this.machineId = machineId;
     return this;
   }
 
-  public setMachineId(machineId: number): MachineEntity {
+  public setMachineId(machineId: number): Machine {
     this.machineId = machineId;
     return this;
   }
 
-  public setZoneId(zoneId: number): MachineEntity {
+  public setZoneId(zoneId: number): Machine {
     this.zoneId = zoneId;
     return this;
   }
 
-  public setName(name: string): MachineEntity {
+  public setName(name: string): Machine {
     this.name = name;
     return this;
   }
 
-  public setSerial(serial: string): MachineEntity {
+  public setSerial(serial: string): Machine {
     this.serial = serial;
     return this;
   }
 
-  public setManufacturer(manufacturer: string): MachineEntity {
+  public setManufacturer(manufacturer: string): Machine {
     this.manufacturer = manufacturer;
     return this;
   }
 
-  public setRegistrationDate(registrationDate: Date): MachineEntity {
+  public setRegistrationDate(registrationDate: Date): Machine {
     this.registrationDate = registrationDate;
     return this;
   }
 
-  public setRetiredDate(retiredDate: Date): MachineEntity {
+  public setRetiredDate(retiredDate: Date): Machine {
     this.retiredDate = retiredDate;
     return this;
   }

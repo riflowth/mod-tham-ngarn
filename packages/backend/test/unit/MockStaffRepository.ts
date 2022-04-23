@@ -1,31 +1,31 @@
 import bcrypt from 'bcrypt';
-import { StaffEntity } from '@/repositories/staff/StaffEntity';
+import { Staff } from '@/entities/Staff';
 import { StaffRepository } from '@/repositories/staff/StaffRepository';
 
 export class MockStaffRepository implements StaffRepository {
 
-  private readonly staffs: StaffEntity[] = [];
+  private readonly staffs: Staff[] = [];
 
   public async intialize() {
-    const mockStaffEntity = new StaffEntity()
+    const mockStaff = new Staff()
       .setStaffId(123456789)
       .setPassword(await bcrypt.hash('this_is_valid_password', 10));
-    this.staffs.push(mockStaffEntity);
+    this.staffs.push(mockStaff);
   }
 
-  public async create(staff: StaffEntity): Promise<StaffEntity> {
+  public async create(staff: Staff): Promise<Staff> {
     throw new Error('Method not implemented.');
   }
 
-  public async read(staff: StaffEntity): Promise<StaffEntity[]> {
+  public async read(staff: Staff): Promise<Staff[]> {
     return [this.staffs.find((_staff) => _staff.getStaffId() === staff.getStaffId())];
   }
 
-  public async update(source: StaffEntity, destination: StaffEntity): Promise<boolean> {
+  public async update(source: Staff, destination: Staff): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 
-  public async delete(staff: StaffEntity): Promise<boolean> {
+  public async delete(staff: Staff): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 

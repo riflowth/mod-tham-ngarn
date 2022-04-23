@@ -1,6 +1,6 @@
-import { DatabaseEntity } from '@/repositories/DatabaseEntity';
+import { Entity } from '@/entities/Entity';
 
-export class AddressEntity implements DatabaseEntity {
+export class Address implements Entity<Address, string> {
 
   private postalCode: string;
   private region: string;
@@ -22,22 +22,22 @@ export class AddressEntity implements DatabaseEntity {
     return this.country;
   }
 
-  public setPrimaryKey(postalCode: string): AddressEntity {
+  public setPrimaryKey(postalCode: string): Address {
     this.postalCode = postalCode;
     return this;
   }
 
-  public setPostalCode(postalCode: string): AddressEntity {
+  public setPostalCode(postalCode: string): Address {
     this.postalCode = postalCode;
     return this;
   }
 
-  public setRegion(region: string): AddressEntity {
+  public setRegion(region: string): Address {
     this.region = region;
     return this;
   }
 
-  public setCountry(country: string): AddressEntity {
+  public setCountry(country: string): Address {
     this.country = country;
     return this;
   }
