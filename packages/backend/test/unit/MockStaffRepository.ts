@@ -21,11 +21,11 @@ export class MockStaffRepository implements StaffRepository {
     return [this.staffs.find((_staff) => _staff.getStaffId() === staff.getStaffId())];
   }
 
-  public async update(source: Staff, destination: Staff): Promise<boolean> {
+  public async update(source: Staff, destination: Staff): Promise<number> {
     throw new Error('Method not implemented.');
   }
 
-  public async delete(staff: Staff): Promise<boolean> {
+  public async delete(staff: Staff): Promise<number> {
     throw new Error('Method not implemented.');
   }
 
