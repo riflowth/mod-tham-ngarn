@@ -1,6 +1,7 @@
 import { Database } from '@/utils/database/Database';
 import { Staff } from '@/entities/Staff';
 import { StaffRepository } from '@/repositories/staff/StaffRepository';
+import { ReadOptions } from '@/repositories/types/ReadOptions';
 import { DateUtil } from '@/utils/DateUtil';
 
 export class DefaultStaffRepository extends Database implements StaffRepository {
@@ -25,7 +26,9 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
     }
   }
 
-  public async read(staff: Staff): Promise<Staff[]> {
+  public async read(staff: Staff, readOptions?: ReadOptions): Promise<Staff[]> {
+    const { limit, offset } = readOptions || {};
+
     const parameter = JSON.parse(JSON.stringify({
       password: staff.getPassword(),
       staff_id: staff.getStaffId(),
@@ -38,9 +41,15 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
       dob: staff.getDateOfBirth(),
     }));
 
+    const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
+    const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
+    const offsetOption = (limitOption && offset > 0) ? `OFFSET ${offset}` : '';
+
     const query = [
       'SELECT * FROM Staff WHERE 1',
-      ...Object.keys(parameter).map((key) => `AND ${key} = ?`),
+      ...condition,
+      limitOption,
+      offsetOption,
     ].join(' ');
 
     const results: any = await this.query(query, Object.values(parameter));
