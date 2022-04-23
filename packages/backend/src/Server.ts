@@ -28,6 +28,8 @@ import { DefaultMaintenancePartRepository } from '@/repositories/maintenancepart
 import { DefaultOrderRepository } from '@/repositories/order/DefaultOrderRepository';
 import { DefaultStaffRepository } from '@/repositories/staff/DefaultStaffRepository';
 import { DefaultZoneRepository } from '@/repositories/zone/DefaultZoneRepository';
+import { SessionRepository } from '@/repositories/session/SessionRepository';
+import { DefaultSessionRepository } from '@/repositories/session/DefaultSessionRepository';
 
 export class Server {
 
@@ -46,6 +48,7 @@ export class Server {
   private maintenanceLogRepository: MaintenanceLogRepository;
   private maintenancePartRepository: MaintenancePartRepository;
   private orderRepository: OrderRepository;
+  private sesionRepository: SessionRepository;
   private staffRepository: StaffRepository;
   private zoneRepository: ZoneRepository;
 
@@ -88,12 +91,13 @@ export class Server {
     this.maintenanceLogRepository = new DefaultMaintenanceLogRepository(defaultDb, cachingDb);
     this.maintenancePartRepository = new DefaultMaintenancePartRepository(defaultDb, cachingDb);
     this.orderRepository = new DefaultOrderRepository(defaultDb, cachingDb);
+    this.sesionRepository = new DefaultSessionRepository(defaultDb, cachingDb);
     this.staffRepository = new DefaultStaffRepository(defaultDb, cachingDb);
     this.zoneRepository = new DefaultZoneRepository(defaultDb, cachingDb);
   }
 
   private async registerServices(): Promise<void> {
-    this.authService = new AuthService(this.staffRepository);
+    this.authService = new AuthService(this.staffRepository, this.sesionRepository);
   }
 
   private async loadControllers(): Promise<void> {

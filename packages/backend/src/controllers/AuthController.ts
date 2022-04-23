@@ -4,7 +4,6 @@ import { ControllerMapping } from '@/decorators/ControllerDecorator';
 import { RouteMapping } from '@/decorators/RouteDecorator';
 import { CookieProvider } from '@/utils/cookie/CookieProvider';
 import { Request, Response } from 'express';
-import { NotFoundException } from '@/exceptions/NotFoundException';
 import { RequestBody } from '@/decorators/RequestDecorator';
 import { AuthService } from '@/services/AuthService';
 
@@ -31,21 +30,19 @@ export class AuthController extends Controller {
       this.cookieProvider.setCookie(res, cookie);
 
       res.status(200).json({
-        message: 'logged successfully',
+        message: 'logged in successfully',
       });
     }
   }
 
-  @RouteMapping('/get', Methods.GET)
-  private async getSessionId(req: Request, res: Response): Promise<void> {
+  @RouteMapping('/logout', Methods.GET)
+  private async logoutRoute(req: Request, res: Response): Promise<void> {
     const sessionId = this.cookieProvider.getCookie(req, 'sid');
 
-    if (!sessionId) {
-      throw new NotFoundException('can not get session id');
-    }
+    await this.authService.logout(sessionId);
 
     res.status(200).json({
-      session_id: sessionId,
+      message: 'logged out successfully',
     });
   }
 
