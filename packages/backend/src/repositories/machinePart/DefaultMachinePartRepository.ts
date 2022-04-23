@@ -62,12 +62,12 @@ export class DefaultMachinePartRepository extends Database implements MachinePar
   }
 
   public async delete(machinePart: MachinePart): Promise<number> {
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       part_id: machinePart.getPartId(),
       machine_id: machinePart.getMachineId(),
       part_name: machinePart.getPartName(),
       status: machinePart.getStatus(),
-    }));
+    };
 
     const result: any = await this.getSqlBuilder().delete('MachinePart', parameter);
 
