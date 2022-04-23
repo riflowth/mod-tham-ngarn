@@ -8,12 +8,12 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
 
   public async create(order: Order): Promise<Order> {
     const parameter = {
-      orderId: order.getOrderId(),
-      machineId: order.getMachineId(),
-      partId: order.getOrderId(),
-      billId: order.getBillId(),
+      order_id: order.getOrderId(),
+      machine_id: order.getMachineId(),
+      part_id: order.getOrderId(),
+      bill_id: order.getBillId(),
       price: order.getPrice(),
-      arrivalDate: DateUtil.formatToSQL(order.getArrivalDate()),
+      arrival_date: DateUtil.formatToSQL(order.getArrivalDate()),
       status: order.getStatus(),
     };
 
@@ -29,12 +29,12 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
     const { limit, offset } = readOptions || {};
 
     const parameter = {
-      orderId: order.getOrderId(),
-      machineId: order.getMachineId(),
-      partId: order.getOrderId(),
-      billId: order.getBillId(),
+      order_id: order.getOrderId(),
+      machine_id: order.getMachineId(),
+      part_id: order.getOrderId(),
+      bill_id: order.getBillId(),
       price: order.getPrice(),
-      arrivalDate: DateUtil.formatToSQL(order.getArrivalDate()),
+      arrival_date: DateUtil.formatToSQL(order.getArrivalDate()),
       status: order.getStatus(),
     };
 
@@ -53,12 +53,12 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
 
     const orders = results[0].map((result) => {
       return new Order()
-        .setOrderId(result.orderId)
-        .setMachineId(result.machineId)
-        .setPartId(result.partId)
-        .setBillId(result.billId)
+        .setOrderId(result.order_id)
+        .setMachineId(result.machine_id)
+        .setPartId(result.part_id)
+        .setBillId(result.bill_id)
         .setPrice(result.price)
-        .setArrivalDate(DateUtil.formatFromSQL(result.arrivalDate))
+        .setArrivalDate(DateUtil.formatFromSQL(result.arrival_date))
         .setStatus(result.status);
     });
 
@@ -67,22 +67,22 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
 
   public async update(source: Order, destination: Order): Promise<boolean> {
     const sourceParameter = {
-      orderId: source.getOrderId(),
-      machineId: source.getMachineId(),
-      partId: source.getOrderId(),
-      billId: source.getBillId(),
+      order_id: source.getOrderId(),
+      machine_id: source.getMachineId(),
+      part_id: source.getOrderId(),
+      bill_id: source.getBillId(),
       price: source.getPrice(),
-      arrivalDate: DateUtil.formatToSQL(source.getArrivalDate()),
+      arrival_date: DateUtil.formatToSQL(source.getArrivalDate()),
       status: source.getStatus(),
     };
 
     const destinationParameter = {
-      orderId: destination.getOrderId(),
-      machineId: destination.getMachineId(),
-      partId: destination.getOrderId(),
-      billId: destination.getBillId(),
+      order_id: destination.getOrderId(),
+      machine_id: destination.getMachineId(),
+      part_id: destination.getOrderId(),
+      bill_id: destination.getBillId(),
       price: destination.getPrice(),
-      arrivalDate: DateUtil.formatToSQL(destination.getArrivalDate()),
+      arrival_date: DateUtil.formatToSQL(destination.getArrivalDate()),
       status: destination.getStatus(),
     };
 
@@ -101,12 +101,12 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
 
   public async delete(order: Order): Promise<boolean> {
     const parameter = {
-      orderId: order.getOrderId(),
-      machineId: order.getMachineId(),
-      partId: order.getOrderId(),
-      billId: order.getBillId(),
+      order_id: order.getOrderId(),
+      machine_id: order.getMachineId(),
+      part_id: order.getOrderId(),
+      bill_id: order.getBillId(),
       price: order.getPrice(),
-      arrivalDate: DateUtil.formatToSQL(order.getArrivalDate()),
+      arrival_date: DateUtil.formatToSQL(order.getArrivalDate()),
       status: order.getStatus(),
     };
 

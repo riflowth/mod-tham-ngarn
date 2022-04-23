@@ -8,13 +8,13 @@ export class DefaultMachineRepository extends Database implements MachineReposit
 
   public async create(machine: Machine): Promise<Machine> {
     const parameter = {
-      machineId: machine.getMachineId(),
-      zoneId: machine.getZoneId(),
+      machine_id: machine.getMachineId(),
+      zone_id: machine.getZoneId(),
       name: machine.getName(),
       serial: machine.getSerial(),
       manufacturer: machine.getManufacturer(),
-      registrationDate: DateUtil.formatToSQL(machine.getRetiredDate()),
-      retiredDate: DateUtil.formatToSQL(machine.getRetiredDate()),
+      registration_date: DateUtil.formatToSQL(machine.getRetiredDate()),
+      retired_date: DateUtil.formatToSQL(machine.getRetiredDate()),
     };
 
     try {
@@ -29,13 +29,13 @@ export class DefaultMachineRepository extends Database implements MachineReposit
     const { limit, offset } = readOptions || {};
 
     const parameter = {
-      machineId: machine.getMachineId(),
-      zoneId: machine.getZoneId(),
+      machine_id: machine.getMachineId(),
+      zone_id: machine.getZoneId(),
       name: machine.getName(),
       serial: machine.getSerial(),
       manufacturer: machine.getManufacturer(),
-      registrationDate: machine.getRegistrationDate(),
-      retiredDate: machine.getRetiredDate(),
+      registration_date: machine.getRegistrationDate(),
+      retired_date: machine.getRetiredDate(),
     };
 
     const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
@@ -53,12 +53,12 @@ export class DefaultMachineRepository extends Database implements MachineReposit
 
     const machines = results[0].map((result) => {
       return new Machine()
-        .setMachineId(result.machineId)
-        .setZoneId(result.zoneId)
+        .setMachineId(result.machine_id)
+        .setZoneId(result.zone_id)
         .setName(result.name)
         .setSerial(result.serial)
-        .setRegistrationDate(DateUtil.formatFromSQL(result.registrationDate))
-        .setRetiredDate(DateUtil.formatFromSQL(result.retiredDate));
+        .setRegistrationDate(DateUtil.formatFromSQL(result.registration_date))
+        .setRetiredDate(DateUtil.formatFromSQL(result.retired_date));
     });
 
     return machines;
@@ -66,23 +66,23 @@ export class DefaultMachineRepository extends Database implements MachineReposit
 
   public async update(source: Machine, destination: Machine): Promise<boolean> {
     const sourceParameter = {
-      machineId: source.getMachineId(),
-      zoneId: source.getZoneId(),
+      machine_id: source.getMachineId(),
+      zone_id: source.getZoneId(),
       name: source.getName(),
       serial: source.getSerial(),
       manufacturer: source.getManufacturer(),
-      registrationDate: source.getRegistrationDate(),
-      retiredDate: source.getRetiredDate(),
+      registration_date: source.getRegistrationDate(),
+      retired_date: source.getRetiredDate(),
     };
 
     const destinationParameter = {
-      machineId: destination.getMachineId(),
-      zoneId: destination.getZoneId(),
+      machine_id: destination.getMachineId(),
+      zone_id: destination.getZoneId(),
       name: destination.getName(),
       serial: destination.getSerial(),
       manufacturer: destination.getManufacturer(),
-      registrationDate: destination.getRegistrationDate(),
-      retiredDate: destination.getRetiredDate(),
+      registration_date: destination.getRegistrationDate(),
+      retired_date: destination.getRetiredDate(),
     };
 
     const query = [
@@ -100,13 +100,13 @@ export class DefaultMachineRepository extends Database implements MachineReposit
 
   public async delete(machine: Machine): Promise<boolean> {
     const parameter = {
-      machineId: machine.getMachineId(),
-      zoneId: machine.getZoneId(),
+      machine_id: machine.getMachineId(),
+      zone_id: machine.getZoneId(),
       name: machine.getName(),
       serial: machine.getSerial(),
       manufacturer: machine.getManufacturer(),
-      registrationDate: machine.getRegistrationDate(),
-      retiredDate: machine.getRetiredDate(),
+      registration_date: machine.getRegistrationDate(),
+      retired_date: machine.getRetiredDate(),
     };
 
     const query = [

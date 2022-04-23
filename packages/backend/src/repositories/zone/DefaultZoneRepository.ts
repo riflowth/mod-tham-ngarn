@@ -8,10 +8,10 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
 
   public async create(zone: Zone): Promise<Zone> {
     const parameter = {
-      zoneId: zone.getZoneId(),
-      timeToStart: DateUtil.formatToSQL(zone.getTimeToStart()),
-      timeToEnd: DateUtil.formatToSQL(zone.getTimeToEnd()),
-      branchId: zone.getBranchId(),
+      zone_id: zone.getZoneId(),
+      time_to_start: DateUtil.formatToSQL(zone.getTimeToStart()),
+      time_to_end: DateUtil.formatToSQL(zone.getTimeToEnd()),
+      branch_id: zone.getBranchId(),
     };
 
     try {
@@ -26,10 +26,10 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
     const { limit, offset } = readOptions || {};
 
     const parameter = JSON.parse(JSON.stringify({
-      zoneId: zone.getZoneId(),
-      timeToStart: zone.getTimeToStart(),
-      timeToEnd: zone.getTimeToEnd(),
-      branchId: zone.getBranchId(),
+      zone_id: zone.getZoneId(),
+      time_to_start: zone.getTimeToStart(),
+      time_to_end: zone.getTimeToEnd(),
+      branch_id: zone.getBranchId(),
     }));
 
     const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
@@ -47,10 +47,10 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
 
     const zones = results[0].map((result) => {
       return new Zone()
-        .setZoneId(result.zoneId)
-        .setTimeToStart(DateUtil.formatFromSQL(result.timeToStart))
-        .setTimeToEnd(DateUtil.formatFromSQL(result.timeToEnd))
-        .setBranchId(result.branchId);
+        .setZoneId(result.zone_id)
+        .setTimeToStart(DateUtil.formatFromSQL(result.time_to_start))
+        .setTimeToEnd(DateUtil.formatFromSQL(result.time_to_end))
+        .setBranchId(result.branch_id);
     });
 
     return zones;
@@ -58,17 +58,17 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
 
   public async update(source: Zone, destination: Zone): Promise<boolean> {
     const sourceParameter = JSON.parse(JSON.stringify({
-      zoneId: source.getZoneId(),
-      timeToStart: source.getTimeToStart(),
-      timeToEnd: source.getTimeToEnd(),
-      branchId: source.getBranchId(),
+      zone_id: source.getZoneId(),
+      time_to_start: source.getTimeToStart(),
+      time_to_end: source.getTimeToEnd(),
+      branch_id: source.getBranchId(),
     }));
 
     const destinationParameter = JSON.parse(JSON.stringify({
-      zoneId: destination.getZoneId(),
-      timeToStart: destination.getTimeToStart(),
-      timeToEnd: destination.getTimeToEnd(),
-      branchId: destination.getBranchId(),
+      zone_id: destination.getZoneId(),
+      time_to_start: destination.getTimeToStart(),
+      time_to_end: destination.getTimeToEnd(),
+      branch_id: destination.getBranchId(),
     }));
 
     const query = [
@@ -86,10 +86,10 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
 
   public async delete(zone: Zone): Promise<boolean> {
     const parameter = JSON.parse(JSON.stringify({
-      zoneId: zone.getZoneId(),
-      timeToStart: zone.getTimeToStart(),
-      timeToEnd: zone.getTimeToEnd(),
-      branchId: zone.getBranchId(),
+      zone_id: zone.getZoneId(),
+      time_to_start: zone.getTimeToStart(),
+      time_to_end: zone.getTimeToEnd(),
+      branch_id: zone.getBranchId(),
     }));
     const query = [
       'DELETE FROM Zone WHERE 1',
