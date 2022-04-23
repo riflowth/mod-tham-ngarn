@@ -3,7 +3,7 @@ import http from 'http';
 import express, { Application } from 'express';
 import { IndexController } from '@/controllers/IndexController';
 import { ControllerRegistry } from '@/controllers/ControllerRegistry';
-import { Database } from '@/utils/database/Database';
+import { DatabaseConnector } from '@/utils/database/DatabaseConnector';
 import { DatabaseException } from '@/exceptions/DatabaseException';
 import { CookieProvider } from '@/utils/cookie/CookieProvider';
 import { AuthController } from '@/controllers/AuthController';
@@ -16,7 +16,7 @@ export class Server {
   private readonly app: Application;
   private readonly port: number;
 
-  private readonly database: Database;
+  private readonly databaseConnector: DatabaseConnector;
   private readonly controllerRegistry: ControllerRegistry;
   private readonly cookieProvider: CookieProvider;
 
@@ -27,7 +27,7 @@ export class Server {
   public constructor(port: number) {
     this.app = express();
     this.port = port;
-    this.database = new Database();
+    this.databaseConnector = new DatabaseConnector();
     this.controllerRegistry = new ControllerRegistry(this.app);
     this.cookieProvider = new CookieProvider('this-is-the-secret');
   }
@@ -50,8 +50,10 @@ export class Server {
   }
 
   private async registerRepository(): Promise<void> {
-    const defaultDatabase = await this.database.getDefaultDatabase();
-    this.staffRepository = new DefaultStaffRepository(defaultDatabase);
+    const defaultDatabase = await this.databaseConnector.getDefaultDatabase();
+    const cachingDatabase = await this.databaseConnector.getCachingDatabase();
+
+    this.staffRepository = new DefaultStaffRepository(defaultDatabase, cachingDatabase);
   }
 
   private async registerServices(): Promise<void> {
@@ -70,7 +72,7 @@ export class Server {
 
   private async connectDatabase(): Promise<void> {
     try {
-      await this.database.connect();
+      await this.databaseConnector.connect();
     } catch (error: unknown) {
       if (error instanceof DatabaseException) {
         console.log(error.message);

@@ -1,11 +1,11 @@
-import { DefaultRepository } from '@/repositories/DefaultRepository';
-import { StaffEntity } from '@/repositories/staff/StaffEntity';
+import { Database } from '@/utils/database/Database';
+import { Staff } from '@/entities/Staff';
 import { StaffRepository } from '@/repositories/staff/StaffRepository';
 import { DateUtil } from '@/utils/DateUtil';
 
-export class DefaultStaffRepository extends DefaultRepository implements StaffRepository {
+export class DefaultStaffRepository extends Database implements StaffRepository {
 
-  public async create(staff: StaffEntity): Promise<StaffEntity> {
+  public async create(staff: Staff): Promise<Staff> {
     const parameter = {
       password: staff.getPassword(),
       full_name: staff.getFullName(),
@@ -18,14 +18,14 @@ export class DefaultStaffRepository extends DefaultRepository implements StaffRe
     };
 
     try {
-      const result: any = await this.pool.query('INSERT INTO Staff SET ?', [parameter]);
+      const result: any = await this.query('INSERT INTO Staff SET ?', [parameter]);
       return staff.setStaffId(result[0].insertId);
     } catch (e) {
       return null;
     }
   }
 
-  public async read(staff: StaffEntity): Promise<StaffEntity[]> {
+  public async read(staff: Staff): Promise<Staff[]> {
     const parameter = JSON.parse(JSON.stringify({
       password: staff.getPassword(),
       staff_id: staff.getStaffId(),
@@ -43,10 +43,10 @@ export class DefaultStaffRepository extends DefaultRepository implements StaffRe
       ...Object.keys(parameter).map((key) => `AND ${key} = ?`),
     ].join(' ');
 
-    const results: any = await this.pool.query(query, Object.values(parameter));
+    const results: any = await this.query(query, Object.values(parameter));
 
     const staffs = results[0].map((result) => {
-      return new StaffEntity()
+      return new Staff()
         .setStaffId(result.staff_id)
         .setPassword(result.password)
         .setFullName(result.full_name)
@@ -61,7 +61,7 @@ export class DefaultStaffRepository extends DefaultRepository implements StaffRe
     return staffs;
   }
 
-  public async update(source: StaffEntity, destination: StaffEntity): Promise<boolean> {
+  public async update(source: Staff, destination: Staff): Promise<boolean> {
     const sourceParameter = JSON.parse(JSON.stringify({
       password: source.getPassword(),
       full_name: source.getFullName(),
@@ -89,7 +89,7 @@ export class DefaultStaffRepository extends DefaultRepository implements StaffRe
       ...Object.keys(destinationParameter).map((key) => `AND ${key} = ?`),
     ].join(' ');
 
-    const result: any = await this.pool.query(
+    const result: any = await this.query(
       query,
       [sourceParameter, ...Object.values(destinationParameter)],
     );
@@ -97,7 +97,7 @@ export class DefaultStaffRepository extends DefaultRepository implements StaffRe
     return result[0].affectedRows !== 0;
   }
 
-  public async delete(staff: StaffEntity): Promise<boolean> {
+  public async delete(staff: Staff): Promise<boolean> {
     const parameter = JSON.parse(JSON.stringify({
       staff_id: staff.getStaffId(),
       full_name: staff.getFullName(),
@@ -114,7 +114,7 @@ export class DefaultStaffRepository extends DefaultRepository implements StaffRe
       ...Object.keys(parameter).map((key) => `AND ${key} = ?`),
     ].join(' ');
 
-    const result: any = await this.pool.query(query, Object.values(parameter));
+    const result: any = await this.query(query, Object.values(parameter));
 
     return result[0].affectedRows !== 0;
   }
