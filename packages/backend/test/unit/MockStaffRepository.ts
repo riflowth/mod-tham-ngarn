@@ -6,7 +6,7 @@ export class MockStaffRepository implements StaffRepository {
 
   private readonly staffs: Staff[] = [];
 
-  public async intialize() {
+  public async initialize() {
     const mockStaff = new Staff()
       .setStaffId(123456789)
       .setPassword(await bcrypt.hash('this_is_valid_password', 10));
