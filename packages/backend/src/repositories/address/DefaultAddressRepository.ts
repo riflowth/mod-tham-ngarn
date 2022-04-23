@@ -13,7 +13,7 @@ export class DefaultAddressRepository extends Database implements AddressReposit
     };
 
     try {
-      await this.query('INSERT INTO Address SET ?', [parameter]);
+      await this.getSqlBuilder().insert('Address', parameter);
       return address;
     } catch (e) {
       return null;
@@ -21,26 +21,13 @@ export class DefaultAddressRepository extends Database implements AddressReposit
   }
 
   public async read(address: Address, readOptions?: ReadOptions): Promise<Address[]> {
-    const { limit, offset } = readOptions || {};
-
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       postal_code: address.getPostalCode(),
       region: address.getRegion(),
       country: address.getCountry(),
-    }));
+    };
 
-    const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
-    const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
-    const offsetOption = (limitOption && offset > 0) ? `OFFSET ${offset}` : '';
-
-    const query = [
-      'SELECT * FROM Address WHERE 1',
-      ...condition,
-      limitOption,
-      offsetOption,
-    ].join(' ');
-
-    const results: any = await this.query(query, Object.values(parameter));
+    const results: any = await this.getSqlBuilder().read('Address', parameter, readOptions);
 
     const addresses = results[0].map((result) => {
       return new Address()
@@ -53,42 +40,30 @@ export class DefaultAddressRepository extends Database implements AddressReposit
   }
 
   public async update(source: Address, destination: Address): Promise<number> {
-    const sourceParameter = JSON.parse(JSON.stringify({
+    const sourceParameter = {
       region: source.getRegion(),
       country: source.getCountry(),
-    }));
+    };
 
-    const destinationParameter = JSON.parse(JSON.stringify({
+    const destinationParameter = {
       postal_code: destination.getPostalCode(),
       region: destination.getRegion(),
       country: destination.getCountry(),
-    }));
+    };
 
-    const query = [
-      'UPDATE Address SET ? WHERE 1',
-      ...Object.keys(destinationParameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(
-      query,
-      [sourceParameter, ...Object.values(destinationParameter)],
-    );
+    const result: any = await this.getSqlBuilder().update('Address', sourceParameter, destinationParameter);
 
     return result[0].affectedRows;
   }
 
   public async delete(address: Address): Promise<number> {
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       postal_code: address.getPostalCode(),
       region: address.getRegion(),
       country: address.getCountry(),
-    }));
-    const query = [
-      'DELETE FROM Address WHERE 1',
-      ...Object.keys(parameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
+    };
 
-    const result: any = await this.query(query, Object.values(parameter));
+    const result: any = await this.getSqlBuilder().delete('Address', parameter);
 
     return result[0].affectedRows;
   }

@@ -14,7 +14,7 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
     };
 
     try {
-      const result: any = await this.query('INSERT INTO Zone SET ?', [parameter]);
+      const result: any = await this.getSqlBuilder().insert('Zone', parameter);
       return zone.setZoneId(result[0].insertId);
     } catch (e) {
       return null;
@@ -22,27 +22,14 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
   }
 
   public async read(zone: Zone, readOptions?: ReadOptions): Promise<Zone[]> {
-    const { limit, offset } = readOptions || {};
-
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       zone_id: zone.getZoneId(),
       time_to_start: zone.getTimeToStart(),
       time_to_end: zone.getTimeToEnd(),
       branch_id: zone.getBranchId(),
-    }));
+    };
 
-    const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
-    const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
-    const offsetOption = (limitOption && offset > 0) ? `OFFSET ${offset}` : '';
-
-    const query = [
-      'SELECT * FROM Zone WHERE 1',
-      ...condition,
-      limitOption,
-      offsetOption,
-    ].join(' ');
-
-    const results: any = await this.query(query, Object.values(parameter));
+    const results: any = await this.getSqlBuilder().read('Zone', parameter, readOptions);
 
     const zones = results[0].map((result) => {
       return new Zone()
@@ -56,45 +43,32 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
   }
 
   public async update(source: Zone, destination: Zone): Promise<number> {
-    const sourceParameter = JSON.parse(JSON.stringify({
+    const sourceParameter = {
       time_to_start: source.getTimeToStart(),
       time_to_end: source.getTimeToEnd(),
       branch_id: source.getBranchId(),
-    }));
+    };
 
-    const destinationParameter = JSON.parse(JSON.stringify({
+    const destinationParameter = {
       zone_id: destination.getZoneId(),
       time_to_start: destination.getTimeToStart(),
       time_to_end: destination.getTimeToEnd(),
       branch_id: destination.getBranchId(),
-    }));
+    };
 
-    const query = [
-      'UPDATE Zone SET ? WHERE 1',
-      ...Object.keys(destinationParameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(
-      query,
-      [sourceParameter, ...Object.values(destinationParameter)],
-    );
+    const result: any = await this.getSqlBuilder().update('Zone', sourceParameter, destinationParameter);
 
     return result[0].affectedRows;
   }
 
   public async delete(zone: Zone): Promise<number> {
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       zone_id: zone.getZoneId(),
       time_to_start: zone.getTimeToStart(),
       time_to_end: zone.getTimeToEnd(),
       branch_id: zone.getBranchId(),
-    }));
-    const query = [
-      'DELETE FROM Zone WHERE 1',
-      ...Object.keys(parameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(query, Object.values(parameter));
+    };
+    const result: any = await this.getSqlBuilder().delete('Zone', parameter);
 
     return result[0].affectedRows;
   }

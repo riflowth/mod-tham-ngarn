@@ -19,7 +19,7 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
     };
 
     try {
-      const result: any = await this.query('INSERT INTO Staff SET ?', [parameter]);
+      const result: any = await this.getSqlBuilder().insert('Staff', parameter);
       return staff.setStaffId(result[0].insertId);
     } catch (e) {
       return null;
@@ -27,9 +27,7 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
   }
 
   public async read(staff: Staff, readOptions?: ReadOptions): Promise<Staff[]> {
-    const { limit, offset } = readOptions || {};
-
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       password: staff.getPassword(),
       staff_id: staff.getStaffId(),
       full_name: staff.getFullName(),
@@ -39,20 +37,9 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
       salary: staff.getSalary(),
       position: staff.getPosition(),
       dob: staff.getDateOfBirth(),
-    }));
+    };
 
-    const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
-    const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
-    const offsetOption = (limitOption && offset > 0) ? `OFFSET ${offset}` : '';
-
-    const query = [
-      'SELECT * FROM Staff WHERE 1',
-      ...condition,
-      limitOption,
-      offsetOption,
-    ].join(' ');
-
-    const results: any = await this.query(query, Object.values(parameter));
+    const results: any = await this.getSqlBuilder().read('Staff', parameter, readOptions);
 
     const staffs = results[0].map((result) => {
       return new Staff()
@@ -71,7 +58,7 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
   }
 
   public async update(source: Staff, destination: Staff): Promise<number> {
-    const sourceParameter = JSON.parse(JSON.stringify({
+    const sourceParameter = {
       password: source.getPassword(),
       full_name: source.getFullName(),
       branch_id: source.getBranchId(),
@@ -80,9 +67,9 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
       salary: source.getSalary(),
       position: source.getPosition(),
       dob: source.getDateOfBirth(),
-    }));
+    };
 
-    const destinationParameter = JSON.parse(JSON.stringify({
+    const destinationParameter = {
       staff_id: destination.getStaffId(),
       full_name: destination.getFullName(),
       branch_id: destination.getBranchId(),
@@ -91,23 +78,15 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
       salary: destination.getSalary(),
       position: destination.getPosition(),
       dob: destination.getDateOfBirth(),
-    }));
+    };
 
-    const query = [
-      'UPDATE Staff SET ? WHERE 1',
-      ...Object.keys(destinationParameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(
-      query,
-      [sourceParameter, ...Object.values(destinationParameter)],
-    );
+    const result: any = await this.getSqlBuilder().update('Staff', sourceParameter, destinationParameter);
 
     return result[0].affectedRows;
   }
 
   public async delete(staff: Staff): Promise<number> {
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       staff_id: staff.getStaffId(),
       full_name: staff.getFullName(),
       branch_id: staff.getBranchId(),
@@ -116,14 +95,9 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
       salary: staff.getSalary(),
       position: staff.getPosition(),
       dob: staff.getDateOfBirth(),
-    }));
+    };
 
-    const query = [
-      'DELETE FROM Staff WHERE 1',
-      ...Object.keys(parameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(query, Object.values(parameter));
+    const result: any = await this.getSqlBuilder().delete('Staff', parameter);
 
     return result[0].affectedRows;
   }

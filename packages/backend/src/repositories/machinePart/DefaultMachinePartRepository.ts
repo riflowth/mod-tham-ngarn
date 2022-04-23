@@ -13,7 +13,7 @@ export class DefaultMachinePartRepository extends Database implements MachinePar
     };
 
     try {
-      const result: any = await this.query('INSERT INTO MachinePart SET ?', [parameter]);
+      const result: any = await this.getSqlBuilder().insert('MachinePart', parameter);
       return machinePart.setPrimaryKey(result[0].insertId);
     } catch (e) {
       return null;
@@ -21,29 +21,14 @@ export class DefaultMachinePartRepository extends Database implements MachinePar
   }
 
   public async read(machinePart: MachinePart, readOptions?: ReadOptions): Promise<MachinePart[]> {
-    const { limit, offset } = readOptions || {};
-
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       part_id: machinePart.getPartId(),
       machine_id: machinePart.getMachineId(),
       part_name: machinePart.getPartName(),
       status: machinePart.getStatus(),
-    }));
+    };
 
-    const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
-    const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
-    const offsetOption = (limitOption && offset > 0) ? `OFFSET ${offset}` : '';
-
-    const query = [
-      'SELECT * FROM MachinePart WHERE 1',
-      ...condition,
-      limitOption,
-      offsetOption,
-    ].join(' ');
-
-    console.log(query);
-
-    const results: any = await this.query(query, Object.values(parameter));
+    const results: any = await this.getSqlBuilder().read('MachinePart', parameter, readOptions);
 
     const machineParts = results[0].map((result) => {
       return new MachinePart()
@@ -58,28 +43,20 @@ export class DefaultMachinePartRepository extends Database implements MachinePar
   }
 
   public async update(source: MachinePart, destination: MachinePart): Promise<number> {
-    const sourceParameter = JSON.parse(JSON.stringify({
+    const sourceParameter = {
       machine_id: source.getMachineId(),
       part_name: source.getPartName(),
       status: source.getStatus(),
-    }));
+    };
 
-    const destinationParameter = JSON.parse(JSON.stringify({
+    const destinationParameter = {
       part_id: destination.getPartId(),
       machine_id: destination.getMachineId(),
       part_name: destination.getPartName(),
       status: destination.getStatus(),
-    }));
+    };
 
-    const query = [
-      'UPDATE MachinePart SET ? WHERE 1',
-      ...Object.keys(destinationParameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(
-      query,
-      [sourceParameter, ...Object.values(destinationParameter)],
-    );
+    const result: any = await this.getSqlBuilder().update('MachinePart', sourceParameter, destinationParameter);
 
     return result[0].affectedRows;
   }
@@ -92,12 +69,7 @@ export class DefaultMachinePartRepository extends Database implements MachinePar
       status: machinePart.getStatus(),
     }));
 
-    const query = [
-      'DELETE FROM MachinePart WHERE 1',
-      ...Object.keys(parameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(query, Object.values(parameter));
+    const result: any = await this.getSqlBuilder().delete('MachinePart', parameter);
 
     return result[0].affectedRows;
   }

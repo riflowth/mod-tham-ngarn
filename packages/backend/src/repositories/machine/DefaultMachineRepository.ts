@@ -17,7 +17,7 @@ export class DefaultMachineRepository extends Database implements MachineReposit
     };
 
     try {
-      const result: any = await this.query('INSERT INTO Machine SET ?', [parameter]);
+      const result: any = await this.getSqlBuilder().insert('Machine', parameter);
       return machine.setMachineId(result[0].insertId);
     } catch (e) {
       return null;
@@ -25,9 +25,7 @@ export class DefaultMachineRepository extends Database implements MachineReposit
   }
 
   public async read(machine: Machine, readOptions?: ReadOptions): Promise<Machine[]> {
-    const { limit, offset } = readOptions || {};
-
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       machine_id: machine.getMachineId(),
       zone_id: machine.getZoneId(),
       name: machine.getName(),
@@ -35,20 +33,9 @@ export class DefaultMachineRepository extends Database implements MachineReposit
       manufacturer: machine.getManufacturer(),
       registration_date: machine.getRegistrationDate(),
       retired_date: machine.getRetiredDate(),
-    }));
+    };
 
-    const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
-    const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
-    const offsetOption = (limitOption && offset > 0) ? `OFFSET ${offset}` : '';
-
-    const query = [
-      'SELECT * FROM Machine WHERE 1',
-      ...condition,
-      limitOption,
-      offsetOption,
-    ].join(' ');
-
-    const results: any = await this.query(query, Object.values(parameter));
+    const results: any = await this.getSqlBuilder().read('Machine', parameter, readOptions);
 
     const machines = results[0].map((result) => {
       return new Machine()
@@ -64,16 +51,16 @@ export class DefaultMachineRepository extends Database implements MachineReposit
   }
 
   public async update(source: Machine, destination: Machine): Promise<number> {
-    const sourceParameter = JSON.parse(JSON.stringify({
+    const sourceParameter = {
       zone_id: source.getZoneId(),
       name: source.getName(),
       serial: source.getSerial(),
       manufacturer: source.getManufacturer(),
       registration_date: source.getRegistrationDate(),
       retired_date: source.getRetiredDate(),
-    }));
+    };
 
-    const destinationParameter = JSON.parse(JSON.stringify({
+    const destinationParameter = {
       machine_id: destination.getMachineId(),
       zone_id: destination.getZoneId(),
       name: destination.getName(),
@@ -81,23 +68,15 @@ export class DefaultMachineRepository extends Database implements MachineReposit
       manufacturer: destination.getManufacturer(),
       registration_date: destination.getRegistrationDate(),
       retired_date: destination.getRetiredDate(),
-    }));
+    };
 
-    const query = [
-      'UPDATE Machine SET ? WHERE 1',
-      ...Object.keys(destinationParameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(
-      query,
-      [sourceParameter, ...Object.values(destinationParameter)],
-    );
+    const result: any = await this.getSqlBuilder().update('Machine', sourceParameter, destinationParameter);
 
     return result[0].affectedRows;
   }
 
   public async delete(machine: Machine): Promise<number> {
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       machine_id: machine.getMachineId(),
       zone_id: machine.getZoneId(),
       name: machine.getName(),
@@ -105,14 +84,9 @@ export class DefaultMachineRepository extends Database implements MachineReposit
       manufacturer: machine.getManufacturer(),
       registration_date: machine.getRegistrationDate(),
       retired_date: machine.getRetiredDate(),
-    }));
+    };
 
-    const query = [
-      'DELETE FROM Machine WHERE 1',
-      ...Object.keys(parameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(query, Object.values(parameter));
+    const result: any = await this.getSqlBuilder().delete('Machine', parameter);
 
     return result[0].affectedRows;
   }

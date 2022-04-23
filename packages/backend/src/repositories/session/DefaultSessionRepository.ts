@@ -14,7 +14,7 @@ export class DefaultSessionRepository extends Database implements SessionReposit
     };
 
     try {
-      await this.query('INSERT INTO Session SET ?', [parameter]);
+      await this.getSqlBuilder().insert('Session', parameter);
       return session;
     } catch (e) {
       return null;
@@ -22,26 +22,13 @@ export class DefaultSessionRepository extends Database implements SessionReposit
   }
 
   public async read(session: Session, readOptions?: ReadOptions): Promise<Session[]> {
-    const { limit, offset } = readOptions || {};
-
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       session_id: session.getSessionId(),
       staff_id: session.getStaffId(),
       expiry_date: DateUtil.formatToSQL(session.getExpiryDate()),
-    }));
+    };
 
-    const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
-    const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
-    const offsetOption = (limitOption && offset > 0) ? `OFFSET ${offset}` : '';
-
-    const query = [
-      'SELECT * FROM Session WHERE 1',
-      ...condition,
-      limitOption,
-      offsetOption,
-    ].join(' ');
-
-    const results: any = await this.query(query, Object.values(parameter));
+    const results: any = await this.getSqlBuilder().read('Session', parameter, readOptions);
 
     const sessions = results[0].map((result) => {
       return new Session()
@@ -54,43 +41,30 @@ export class DefaultSessionRepository extends Database implements SessionReposit
   }
 
   public async update(source: Session, destination: Session): Promise<number> {
-    const sourceParameter = JSON.parse(JSON.stringify({
+    const sourceParameter = {
       staff_id: source.getStaffId(),
       expiry_date: DateUtil.formatToSQL(source.getExpiryDate()),
-    }));
+    };
 
-    const destinationParameter = JSON.parse(JSON.stringify({
+    const destinationParameter = {
       session_id: destination.getSessionId(),
       staff_id: destination.getStaffId(),
       expiry_date: DateUtil.formatToSQL(destination.getExpiryDate()),
-    }));
+    };
 
-    const query = [
-      'UPDATE Session SET ? WHERE 1',
-      ...Object.keys(destinationParameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(
-      query,
-      [sourceParameter, ...Object.values(destinationParameter)],
-    );
+    const result: any = await this.getSqlBuilder().update('Session', sourceParameter, destinationParameter);
 
     return result[0].affectedRows;
   }
 
   public async delete(session: Session): Promise<number> {
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       session_id: session.getSessionId(),
       staff_id: session.getStaffId(),
       expiry_date: DateUtil.formatToSQL(session.getExpiryDate()),
-    }));
+    };
 
-    const query = [
-      'DELETE FROM Session WHERE 1',
-      ...Object.keys(parameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(query, Object.values(parameter));
+    const result: any = await this.getSqlBuilder().delete('Session', parameter);
 
     return result[0].affectedRows;
   }

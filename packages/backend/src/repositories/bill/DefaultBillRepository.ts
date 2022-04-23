@@ -13,7 +13,7 @@ export class DefaultBillRepository extends Database implements BillRepository {
     };
 
     try {
-      const result: any = await this.query('INSERT INTO Bill SET ?', [parameter]);
+      const result: any = await this.getSqlBuilder().insert('Bill', parameter);
       return bill.setBillId(result[0].insertId);
     } catch (e) {
       return null;
@@ -21,27 +21,14 @@ export class DefaultBillRepository extends Database implements BillRepository {
   }
 
   public async read(bill: Bill, readOptions?: ReadOptions): Promise<Bill[]> {
-    const { limit, offset } = readOptions || {};
-
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       bill_id: bill.getBillId(),
       store_name: bill.getStoreName(),
       bill_date: bill.getOrderDate(),
       order_by: bill.getOrderBy(),
-    }));
+    };
 
-    const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
-    const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
-    const offsetOption = (limitOption && offset > 0) ? `OFFSET ${offset}` : '';
-
-    const query = [
-      'SELECT * FROM Bill WHERE 1',
-      ...condition,
-      limitOption,
-      offsetOption,
-    ].join(' ');
-
-    const results: any = await this.query(query, Object.values(parameter));
+    const results: any = await this.getSqlBuilder().read('Bill', parameter, readOptions);
 
     const bills = results[0].map((result) => {
       return new Bill()
@@ -55,46 +42,33 @@ export class DefaultBillRepository extends Database implements BillRepository {
   }
 
   public async update(source: Bill, destination: Bill): Promise<number> {
-    const sourceParameter = JSON.parse(JSON.stringify({
+    const sourceParameter = {
       store_name: source.getStoreName(),
       bill_date: source.getOrderDate(),
       order_by: source.getOrderBy(),
-    }));
+    };
 
-    const destinationParameter = JSON.parse(JSON.stringify({
+    const destinationParameter = {
       bill_id: source.getBillId(),
       store_name: destination.getStoreName(),
       bill_date: destination.getOrderDate(),
       order_by: destination.getOrderBy(),
-    }));
+    };
 
-    const query = [
-      'UPDATE Bill SET ? WHERE 1',
-      ...Object.keys(destinationParameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(
-      query,
-      [sourceParameter, ...Object.values(destinationParameter)],
-    );
+    const result: any = await this.getSqlBuilder().update('Bill', sourceParameter, destinationParameter);
 
     return result[0].affectedRows;
   }
 
   public async delete(bill: Bill): Promise<number> {
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       bill_id: bill.getBillId(),
       store_name: bill.getStoreName(),
       bill_date: bill.getOrderDate(),
       order_by: bill.getOrderBy(),
-    }));
+    };
 
-    const query = [
-      'DELETE FROM Bill WHERE 1',
-      ...Object.keys(parameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(query, Object.values(parameter));
+    const result: any = await this.getSqlBuilder().delete('Bill', parameter);
 
     return result[0].affectedRows;
   }
