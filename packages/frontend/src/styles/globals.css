@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+	.hoverAnimation {
+		@apply hover:bg-[#e2e2e2] hover:bg-opacity-20 
+        rounded-full cursor-pointer w-[52px] h-[52px] xl:w-auto xl:h-auto xl:py-3 xl:px-4 transition duration-200 ease-out;
+	}
+	.icon {
+		@apply w-5 h-5 cursor-pointer;
+	}
+}
