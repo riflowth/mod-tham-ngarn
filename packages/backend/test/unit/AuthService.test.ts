@@ -9,7 +9,7 @@ describe('Test implementation of Auth Service', () => {
 
   beforeAll(async () => {
     mockStaffRepository = new MockStaffRepository();
-    await mockStaffRepository.intialize();
+    await mockStaffRepository.initialize();
     authService = new AuthService(mockStaffRepository);
   });
 

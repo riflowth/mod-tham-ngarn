@@ -24,7 +24,7 @@ export class ErrorHandler {
         .status(404)
         .json({
           path: req.baseUrl + req.path,
-          messsage: 'request not found',
+          message: 'request not found',
         });
     };
 

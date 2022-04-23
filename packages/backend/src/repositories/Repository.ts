@@ -6,8 +6,8 @@ export interface Repository<T> {
 
   read(entity: T, readOptions?: ReadOptions): Promise<T[]>;
 
-  update(source: T, destination: T): Promise<boolean>;
+  update(source: T, destination: T): Promise<number>;
 
-  delete(entity: T): Promise<boolean>;
+  delete(entity: T): Promise<number>;
 
 }

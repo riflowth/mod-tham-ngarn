@@ -42,8 +42,8 @@ export class MachinePart implements Entity<MachinePart, number> {
     return this;
   }
 
-  public setPartName(partname: string): MachinePart {
-    this.partName = partname;
+  public setPartName(partName: string): MachinePart {
+    this.partName = partName;
     return this;
   }
 

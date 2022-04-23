@@ -7,7 +7,7 @@ export class MaintenanceLog implements Entity<MaintenanceLog, number> {
   private reporterId: number;
   private maintainerId: number;
   private reportDate: Date;
-  private maintenaceDate: Date;
+  private maintenanceDate: Date;
   private reason: string;
   private status: string;
 
@@ -15,11 +15,11 @@ export class MaintenanceLog implements Entity<MaintenanceLog, number> {
     return this.maintenanceId;
   }
 
-  public getMaintenaceId(): number {
+  public getMaintenanceId(): number {
     return this.maintenanceId;
   }
 
-  public getmachineId(): number {
+  public getMachineId(): number {
     return this.machineId;
   }
 
@@ -35,8 +35,8 @@ export class MaintenanceLog implements Entity<MaintenanceLog, number> {
     return this.reportDate;
   }
 
-  public getMaintenaceDate(): Date {
-    return this.maintenaceDate;
+  public getMaintenanceDate(): Date {
+    return this.maintenanceDate;
   }
 
   public getReason(): string {
@@ -77,7 +77,7 @@ export class MaintenanceLog implements Entity<MaintenanceLog, number> {
     return this;
   }
 
-  public setMaintenaceDate(maintenacedate:Date): MaintenanceLog {
+  public setMaintenanceDate(maintenanceDate: Date): MaintenanceLog {
     return this;
   }
 
