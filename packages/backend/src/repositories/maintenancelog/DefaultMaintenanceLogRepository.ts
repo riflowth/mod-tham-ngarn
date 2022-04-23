@@ -8,7 +8,6 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
 
   public async create(maintenanceLog: MaintenanceLog): Promise<MaintenanceLog> {
     const parameter = {
-      maintenance_id: maintenanceLog.getMaintenanceId(),
       machine_id: maintenanceLog.getMachineId(),
       reporter_id: maintenanceLog.getReporterId(),
       maintainer_id: maintenanceLog.getMaintainerId(),
@@ -32,7 +31,7 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
   ): Promise<MaintenanceLog[]> {
     const { limit, offset } = readOptions || {};
 
-    const parameter = {
+    const parameter = JSON.parse(JSON.stringify({
       maintenance_id: maintenanceLog.getMaintenanceId(),
       machine_id: maintenanceLog.getMachineId(),
       reporter_id: maintenanceLog.getReporterId(),
@@ -41,7 +40,7 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
       maintenance_date: DateUtil.formatToSQL(maintenanceLog.getMaintenanceDate()),
       reason: maintenanceLog.getReason(),
       status: maintenanceLog.getStatus(),
-    };
+    }));
 
     const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
     const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
@@ -72,8 +71,7 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
   }
 
   public async update(source: MaintenanceLog, destination: MaintenanceLog): Promise<number> {
-    const sourceParameter = {
-      maintenance_id: source.getMaintenanceId(),
+    const sourceParameter = JSON.parse(JSON.stringify({
       machine_id: source.getMachineId(),
       reporter_id: source.getReporterId(),
       maintainer_id: source.getMaintainerId(),
@@ -81,9 +79,9 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
       maintenance_date: DateUtil.formatToSQL(source.getMaintenanceDate()),
       reason: source.getReason(),
       status: source.getStatus(),
-    };
+    }));
 
-    const destinationParameter = {
+    const destinationParameter = JSON.parse(JSON.stringify({
       maintenance_id: destination.getMaintenanceId(),
       machine_id: destination.getMachineId(),
       reporter_id: destination.getReporterId(),
@@ -92,7 +90,7 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
       maintenance_date: DateUtil.formatToSQL(destination.getMaintenanceDate()),
       reason: destination.getReason(),
       status: destination.getStatus(),
-    };
+    }));
 
     const query = [
       'UPDATE MaintenanceLog SET ? WHERE 1',
@@ -108,7 +106,7 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
   }
 
   public async delete(maintenanceLog: MaintenanceLog): Promise<number> {
-    const parameter = {
+    const parameter = JSON.parse(JSON.stringify({
       maintenance_id: maintenanceLog.getMaintenanceId(),
       machine_id: maintenanceLog.getMachineId(),
       reporter_id: maintenanceLog.getReporterId(),
@@ -117,7 +115,7 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
       maintenance_date: DateUtil.formatToSQL(maintenanceLog.getMaintenanceDate()),
       reason: maintenanceLog.getReason(),
       status: maintenanceLog.getStatus(),
-    };
+    }));
 
     const query = [
       'DELETE FROM MaintenanceLog WHERE 1',

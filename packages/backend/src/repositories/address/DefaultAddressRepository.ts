@@ -13,14 +13,14 @@ export class DefaultAddressRepository extends Database implements AddressReposit
     };
 
     try {
-      const result: any = await this.query('INSERT INTO Address SET ?', [parameter]);
-      return address.setPostalCode(result[0].insertId);
+      await this.query('INSERT INTO Address SET ?', [parameter]);
+      return address;
     } catch (e) {
       return null;
     }
   }
 
-  public async read(address: Address, readOptions: ReadOptions): Promise<Address[]> {
+  public async read(address: Address, readOptions?: ReadOptions): Promise<Address[]> {
     const { limit, offset } = readOptions || {};
 
     const parameter = JSON.parse(JSON.stringify({
@@ -54,7 +54,6 @@ export class DefaultAddressRepository extends Database implements AddressReposit
 
   public async update(source: Address, destination: Address): Promise<number> {
     const sourceParameter = JSON.parse(JSON.stringify({
-      postal_code: source.getPostalCode(),
       region: source.getRegion(),
       country: source.getCountry(),
     }));

@@ -18,7 +18,7 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
     };
 
     try {
-      const result: any = await this.query('INSERT INTO Staff SET ?', [parameter]);
+      const result: any = await this.query('INSERT INTO Order SET ?', [parameter]);
       return order.setOrderId(result[0].insertId);
     } catch (e) {
       return null;
@@ -28,7 +28,7 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
   public async read(order: Order, readOptions?: ReadOptions): Promise<Order[]> {
     const { limit, offset } = readOptions || {};
 
-    const parameter = {
+    const parameter = JSON.parse(JSON.stringify({
       order_id: order.getOrderId(),
       machine_id: order.getMachineId(),
       part_id: order.getOrderId(),
@@ -36,7 +36,7 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
       price: order.getPrice(),
       arrival_date: DateUtil.formatToSQL(order.getArrivalDate()),
       status: order.getStatus(),
-    };
+    }));
 
     const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
     const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
@@ -66,17 +66,16 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
   }
 
   public async update(source: Order, destination: Order): Promise<number> {
-    const sourceParameter = {
-      order_id: source.getOrderId(),
+    const sourceParameter = JSON.parse(JSON.stringify({
       machine_id: source.getMachineId(),
       part_id: source.getOrderId(),
       bill_id: source.getBillId(),
       price: source.getPrice(),
       arrival_date: DateUtil.formatToSQL(source.getArrivalDate()),
       status: source.getStatus(),
-    };
+    }));
 
-    const destinationParameter = {
+    const destinationParameter = JSON.parse(JSON.stringify({
       order_id: destination.getOrderId(),
       machine_id: destination.getMachineId(),
       part_id: destination.getOrderId(),
@@ -84,7 +83,7 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
       price: destination.getPrice(),
       arrival_date: DateUtil.formatToSQL(destination.getArrivalDate()),
       status: destination.getStatus(),
-    };
+    }));
 
     const query = [
       'UPDATE Order SET ? WHERE 1',
@@ -100,7 +99,7 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
   }
 
   public async delete(order: Order): Promise<number> {
-    const parameter = {
+    const parameter = JSON.parse(JSON.stringify({
       order_id: order.getOrderId(),
       machine_id: order.getMachineId(),
       part_id: order.getOrderId(),
@@ -108,7 +107,7 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
       price: order.getPrice(),
       arrival_date: DateUtil.formatToSQL(order.getArrivalDate()),
       status: order.getStatus(),
-    };
+    }));
 
     const query = [
       'DELETE FROM Order WHERE 1',

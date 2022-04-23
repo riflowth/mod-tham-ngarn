@@ -16,8 +16,8 @@ export class DefaultMaintenancePartRepository
     };
 
     try {
-      const result: any = await this.query('INSERT INTO MaintenancePart SET ?', [parameter]);
-      return maintenancePart.setPrimaryKey(result[0].insertId);
+      await this.query('INSERT INTO MaintenancePart SET ?', [parameter]);
+      return maintenancePart;
     } catch (e) {
       return null;
     }
@@ -29,13 +29,13 @@ export class DefaultMaintenancePartRepository
   ): Promise<MaintenancePart[]> {
     const { limit, offset } = readOptions || {};
 
-    const parameter = {
+    const parameter = JSON.parse(JSON.stringify({
       maintenance_id: maintenancePart.getMaintenanceId(),
       part_id: maintenancePart.getPartId(),
       type: maintenancePart.getType(),
       status: maintenancePart.getStatus(),
       order_id: maintenancePart.getOrderId(),
-    };
+    }));
 
     const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
     const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
@@ -62,21 +62,19 @@ export class DefaultMaintenancePartRepository
   }
 
   public async update(source: MaintenancePart, destination: MaintenancePart): Promise<number> {
-    const sourceParameter = {
-      maintenance_id: source.getMaintenanceId(),
-      part_id: source.getPartId(),
+    const sourceParameter = JSON.parse(JSON.stringify({
       type: source.getType(),
       status: source.getStatus(),
       order_id: source.getOrderId(),
-    };
+    }));
 
-    const destinationParameter = {
+    const destinationParameter = JSON.parse(JSON.stringify({
       maintenance_id: destination.getMaintenanceId(),
       part_id: destination.getPartId(),
       type: destination.getType(),
       status: destination.getStatus(),
       order_id: destination.getOrderId(),
-    };
+    }));
 
     const query = [
       'UPDATE MaintenancePart SET ? WHERE 1',
@@ -92,13 +90,13 @@ export class DefaultMaintenancePartRepository
   }
 
   public async delete(maintenancePart: MaintenancePart): Promise<number> {
-    const parameter = {
+    const parameter = JSON.parse(JSON.stringify({
       maintenance_id: maintenancePart.getMaintenanceId(),
       part_id: maintenancePart.getPartId(),
       type: maintenancePart.getType(),
       status: maintenancePart.getStatus(),
       order_id: maintenancePart.getOrderId(),
-    };
+    }));
 
     const query = [
       'DELETE FROM MaintenancePart WHERE 1',

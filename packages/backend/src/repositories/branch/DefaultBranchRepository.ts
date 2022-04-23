@@ -20,7 +20,7 @@ export class DefaultBranchRepository extends Database implements BranchRepositor
     }
   }
 
-  public async read(branch: Branch, readOptions: ReadOptions): Promise<Branch[]> {
+  public async read(branch: Branch, readOptions?: ReadOptions): Promise<Branch[]> {
     const { limit, offset } = readOptions || {};
 
     const parameter = JSON.parse(JSON.stringify({

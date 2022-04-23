@@ -7,7 +7,6 @@ export class DefaultMachinePartRepository extends Database implements MachinePar
 
   public async create(machinePart: MachinePart): Promise<MachinePart> {
     const parameter = {
-      part_id: machinePart.getPartId(),
       machine_id: machinePart.getMachineId(),
       part_name: machinePart.getPartName(),
       status: machinePart.getStatus(),

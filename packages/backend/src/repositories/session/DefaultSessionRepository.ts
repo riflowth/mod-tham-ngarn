@@ -24,11 +24,11 @@ export class DefaultSessionRepository extends Database implements SessionReposit
   public async read(session: Session, readOptions?: ReadOptions): Promise<Session[]> {
     const { limit, offset } = readOptions || {};
 
-    const parameter = {
+    const parameter = JSON.parse(JSON.stringify({
       session_id: session.getSessionId(),
       staff_id: session.getStaffId(),
       expiry_date: DateUtil.formatToSQL(session.getExpiryDate()),
-    };
+    }));
 
     const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
     const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
@@ -54,16 +54,16 @@ export class DefaultSessionRepository extends Database implements SessionReposit
   }
 
   public async update(source: Session, destination: Session): Promise<number> {
-    const sourceParameter = {
+    const sourceParameter = JSON.parse(JSON.stringify({
       staff_id: source.getStaffId(),
       expiry_date: DateUtil.formatToSQL(source.getExpiryDate()),
-    };
+    }));
 
-    const destinationParameter = {
+    const destinationParameter = JSON.parse(JSON.stringify({
       session_id: destination.getSessionId(),
       staff_id: destination.getStaffId(),
       expiry_date: DateUtil.formatToSQL(destination.getExpiryDate()),
-    };
+    }));
 
     const query = [
       'UPDATE Session SET ? WHERE 1',
@@ -79,11 +79,11 @@ export class DefaultSessionRepository extends Database implements SessionReposit
   }
 
   public async delete(session: Session): Promise<number> {
-    const parameter = {
+    const parameter = JSON.parse(JSON.stringify({
       session_id: session.getSessionId(),
       staff_id: session.getStaffId(),
       expiry_date: DateUtil.formatToSQL(session.getExpiryDate()),
-    };
+    }));
 
     const query = [
       'DELETE FROM Session WHERE 1',

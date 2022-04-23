@@ -8,7 +8,6 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
 
   public async create(zone: Zone): Promise<Zone> {
     const parameter = {
-      zone_id: zone.getZoneId(),
       time_to_start: DateUtil.formatToSQL(zone.getTimeToStart()),
       time_to_end: DateUtil.formatToSQL(zone.getTimeToEnd()),
       branch_id: zone.getBranchId(),
@@ -22,7 +21,7 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
     }
   }
 
-  public async read(zone: Zone, readOptions: ReadOptions): Promise<Zone[]> {
+  public async read(zone: Zone, readOptions?: ReadOptions): Promise<Zone[]> {
     const { limit, offset } = readOptions || {};
 
     const parameter = JSON.parse(JSON.stringify({
@@ -58,7 +57,6 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
 
   public async update(source: Zone, destination: Zone): Promise<number> {
     const sourceParameter = JSON.parse(JSON.stringify({
-      zone_id: source.getZoneId(),
       time_to_start: source.getTimeToStart(),
       time_to_end: source.getTimeToEnd(),
       branch_id: source.getBranchId(),
