@@ -8,15 +8,25 @@ import { DatabaseException } from '@/exceptions/DatabaseException';
 import { CookieProvider } from '@/utils/cookie/CookieProvider';
 import { AuthController } from '@/controllers/AuthController';
 import { AuthService } from '@/services/AuthService';
-import { StaffRepository } from '@/repositories/staff/StaffRepository';
-import { DefaultStaffRepository } from '@/repositories/staff/DefaultStaffRepository';
 import { AddressRepository } from '@/repositories/address/AddressRepository';
+import { BillRepository } from '@/repositories/bill/BillRepository';
+import { BranchRepository } from '@/repositories/branch/BranchRepository';
 import { MachineRepository } from '@/repositories/machine/MachineRepository';
+import { MachinePartRepository } from '@/repositories/machinePart/MachinePartRepository';
+import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
+import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
+import { StaffRepository } from '@/repositories/staff/StaffRepository';
 import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
 import { DefaultAddressRepository } from '@/repositories/address/DefaultAddressRepository';
+import { DefaultBillRepository } from '@/repositories/bill/DefaultBillRepository';
+import { DefaultBranchRepository } from '@/repositories/branch/DefaultBranchRepository';
 import { DefaultMachineRepository } from '@/repositories/machine/DefaultMachineRepository';
+import { DefaultMachinePartRepository } from '@/repositories/machinePart/DefaultMachinePartRepository';
+import { DefaultMaintenanceLogRepository } from '@/repositories/maintenancelog/DefaultMaintenanceLogRepository';
+import { DefaultMaintenancePartRepository } from '@/repositories/maintenancepart/DefaultMaintenancePartRepository';
 import { DefaultOrderRepository } from '@/repositories/order/DefaultOrderRepository';
+import { DefaultStaffRepository } from '@/repositories/staff/DefaultStaffRepository';
 import { DefaultZoneRepository } from '@/repositories/zone/DefaultZoneRepository';
 
 export class Server {
@@ -29,7 +39,12 @@ export class Server {
   private readonly cookieProvider: CookieProvider;
 
   private addressRepository: AddressRepository;
+  private billRepository: BillRepository;
+  private branchRepository: BranchRepository;
   private machineRepository: MachineRepository;
+  private machinePartRepository: MachinePartRepository;
+  private maintenanceLogRepository: MaintenanceLogRepository;
+  private maintenancePartRepository: MaintenancePartRepository;
   private orderRepository: OrderRepository;
   private staffRepository: StaffRepository;
   private zoneRepository: ZoneRepository;
@@ -66,7 +81,18 @@ export class Server {
     const cachingDatabase = await this.databaseConnector.getCachingDatabase();
 
     this.addressRepository = new DefaultAddressRepository(defaultDatabase, cachingDatabase);
+    this.billRepository = new DefaultBillRepository(defaultDatabase, cachingDatabase);
+    this.branchRepository = new DefaultBranchRepository(defaultDatabase, cachingDatabase);
     this.machineRepository = new DefaultMachineRepository(defaultDatabase, cachingDatabase);
+    this.machinePartRepository = new DefaultMachinePartRepository(defaultDatabase, cachingDatabase);
+    this.maintenanceLogRepository = new DefaultMaintenanceLogRepository(
+      defaultDatabase,
+      cachingDatabase,
+    );
+    this.maintenancePartRepository = new DefaultMaintenancePartRepository(
+      defaultDatabase,
+      cachingDatabase,
+    );
     this.orderRepository = new DefaultOrderRepository(defaultDatabase, cachingDatabase);
     this.staffRepository = new DefaultStaffRepository(defaultDatabase, cachingDatabase);
     this.zoneRepository = new DefaultZoneRepository(defaultDatabase, cachingDatabase);
