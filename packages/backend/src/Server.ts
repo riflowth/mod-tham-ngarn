@@ -10,6 +10,14 @@ import { AuthController } from '@/controllers/AuthController';
 import { AuthService } from '@/services/AuthService';
 import { StaffRepository } from '@/repositories/staff/StaffRepository';
 import { DefaultStaffRepository } from '@/repositories/staff/DefaultStaffRepository';
+import { AddressRepository } from '@/repositories/address/AddressRepository';
+import { MachineRepository } from '@/repositories/machine/MachineRepository';
+import { OrderRepository } from '@/repositories/order/OrderRepository';
+import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
+import { DefaultAddressRepository } from '@/repositories/address/DefaultAddressRepository';
+import { DefaultMachineRepository } from '@/repositories/machine/DefaultMachineRepository';
+import { DefaultOrderRepository } from '@/repositories/order/DefaultOrderRepository';
+import { DefaultZoneRepository } from '@/repositories/zone/DefaultZoneRepository';
 
 export class Server {
 
@@ -20,7 +28,11 @@ export class Server {
   private readonly controllerRegistry: ControllerRegistry;
   private readonly cookieProvider: CookieProvider;
 
+  private addressRepository: AddressRepository;
+  private machineRepository: MachineRepository;
+  private orderRepository: OrderRepository;
   private staffRepository: StaffRepository;
+  private zoneRepository: ZoneRepository;
 
   private authService: AuthService;
 
@@ -53,7 +65,11 @@ export class Server {
     const defaultDatabase = await this.databaseConnector.getDefaultDatabase();
     const cachingDatabase = await this.databaseConnector.getCachingDatabase();
 
+    this.addressRepository = new DefaultAddressRepository(defaultDatabase, cachingDatabase);
+    this.machineRepository = new DefaultMachineRepository(defaultDatabase, cachingDatabase);
+    this.orderRepository = new DefaultOrderRepository(defaultDatabase, cachingDatabase);
     this.staffRepository = new DefaultStaffRepository(defaultDatabase, cachingDatabase);
+    this.zoneRepository = new DefaultZoneRepository(defaultDatabase, cachingDatabase);
   }
 
   private async registerServices(): Promise<void> {
