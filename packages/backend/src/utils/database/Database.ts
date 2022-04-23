@@ -1,12 +1,12 @@
+import { MySqlClient } from '@/utils/database/connectors/MySqlConnector';
 import { RedisClient } from '@/utils/database/connectors/RedisConnector';
-import { Pool } from 'mysql2/promise';
 
 export class Database {
 
-  private readonly defaultDatabase: Pool;
+  private readonly defaultDatabase: MySqlClient;
   private readonly cachingDatabase: RedisClient;
 
-  public constructor(defaultDatabase: Pool, cachingDatabase) {
+  public constructor(defaultDatabase: MySqlClient, cachingDatabase: RedisClient) {
     this.defaultDatabase = defaultDatabase;
     this.cachingDatabase = cachingDatabase;
   }

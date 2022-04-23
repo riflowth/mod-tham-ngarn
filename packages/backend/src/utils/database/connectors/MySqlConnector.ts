@@ -1,5 +1,7 @@
 import { createPool, Pool } from 'mysql2/promise';
 
+export type MySqlClient = Pool;
+
 export class MySqlConnector {
 
   private readonly host: string;
@@ -8,7 +10,7 @@ export class MySqlConnector {
   private readonly password: string;
   private readonly database: string;
 
-  private connection: Pool;
+  private connection: MySqlClient;
 
   public constructor(
     host: string,
@@ -24,7 +26,7 @@ export class MySqlConnector {
     this.database = database;
   }
 
-  public async getConnection(): Promise<Pool> | never {
+  public async getConnection(): Promise<MySqlClient> | never {
     if (!this.connection) {
       this.connection = createPool({
         host: this.host,

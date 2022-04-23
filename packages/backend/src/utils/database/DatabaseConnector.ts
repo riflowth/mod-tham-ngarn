@@ -1,7 +1,6 @@
 import { DatabaseException } from '@/exceptions/DatabaseException';
-import { MySqlConnector } from '@/utils/database/connectors/MySqlConnector';
+import { MySqlClient, MySqlConnector } from '@/utils/database/connectors/MySqlConnector';
 import { RedisClient, RedisConnector } from '@/utils/database/connectors/RedisConnector';
-import { Pool } from 'mysql2/promise';
 
 export class DatabaseConnector {
 
@@ -59,7 +58,7 @@ export class DatabaseConnector {
     return true;
   }
 
-  public async getDefaultDatabase(): Promise<Pool> {
+  public async getDefaultDatabase(): Promise<MySqlClient> {
     return this.defaultConnector.getConnection();
   }
 
