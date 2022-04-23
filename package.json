@@ -3,7 +3,8 @@
   "private": true,
   "workspaces": ["packages/*"],
   "scripts": {
-    "dev": "lerna run dev --stream"
+    "dev": "lerna run dev --stream",
+    "test": "lerna run test --stream"
   },
   "devDependencies": {
     "lerna": "3.22.1"
