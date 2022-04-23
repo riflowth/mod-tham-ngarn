@@ -13,7 +13,7 @@ export class DefaultBranchRepository extends Database implements BranchRepositor
     };
 
     try {
-      const result: any = await this.query('INSERT INTO Branch SET ?', [parameter]);
+      const result: any = await this.getSqlBuilder().insert('Branch', parameter);
       return branch.setBranchId(result[0].insertId);
     } catch (e) {
       return null;
@@ -21,27 +21,14 @@ export class DefaultBranchRepository extends Database implements BranchRepositor
   }
 
   public async read(branch: Branch, readOptions?: ReadOptions): Promise<Branch[]> {
-    const { limit, offset } = readOptions || {};
-
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       branch_id: branch.getBranchId(),
       address: branch.getAddress(),
       postal_code: branch.getPostalCode(),
       tel_no: branch.getTelNo(),
-    }));
+    };
 
-    const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
-    const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
-    const offsetOption = (limitOption && offset > 0) ? `OFFSET ${offset}` : '';
-
-    const query = [
-      'SELECT * FROM Branch WHERE 1',
-      ...condition,
-      limitOption,
-      offsetOption,
-    ].join(' ');
-
-    const results: any = await this.query(query, Object.values(parameter));
+    const results: any = await this.getSqlBuilder().read('Branch', parameter, readOptions);
 
     const branches = results[0].map((result) => {
       return new Branch()
@@ -50,52 +37,38 @@ export class DefaultBranchRepository extends Database implements BranchRepositor
         .setPostalCode(result.postal_code)
         .setTelNo(result.tel_no);
     });
-    console.log(branches);
 
     return branches;
   }
 
   public async update(source: Branch, destination: Branch): Promise<number> {
-    const sourceParameter = JSON.parse(JSON.stringify({
+    const sourceParameter = {
       address: source.getAddress(),
       postal_code: source.getPostalCode(),
       tel_no: source.getTelNo(),
-    }));
+    };
 
-    const destinationParameter = JSON.parse(JSON.stringify({
+    const destinationParameter = {
       branch_id: destination.getBranchId(),
       address: destination.getAddress(),
       postal_code: destination.getPostalCode(),
       tel_no: destination.getTelNo(),
-    }));
+    };
 
-    const query = [
-      'UPDATE Branch SET ? WHERE 1',
-      ...Object.keys(destinationParameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(
-      query,
-      [sourceParameter, ...Object.values(destinationParameter)],
-    );
+    const result: any = await this.getSqlBuilder().update('Branch', sourceParameter, destinationParameter);
 
     return result[0].affectedRows;
   }
 
   public async delete(branch: Branch): Promise<number> {
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       branch_id: branch.getBranchId(),
       address: branch.getAddress(),
       postal_code: branch.getPostalCode(),
       tel_no: branch.getTelNo(),
-    }));
+    };
 
-    const query = [
-      'DELETE FROM Branch WHERE 1',
-      ...Object.keys(parameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(query, Object.values(parameter));
+    const result: any = await this.getSqlBuilder().delete('Branch', parameter);
 
     return result[0].affectedRows;
   }

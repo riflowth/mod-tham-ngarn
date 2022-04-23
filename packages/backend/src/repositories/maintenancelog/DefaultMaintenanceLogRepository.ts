@@ -18,7 +18,7 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
     };
 
     try {
-      const result: any = await this.query('INSERT INTO MaintenanceLog SET ?', [parameter]);
+      const result: any = await this.getSqlBuilder().insert('MaintenanceLog', parameter);
       return maintenanceLog.setMaintenanceId(result[0].insertId);
     } catch (e) {
       return null;
@@ -29,9 +29,8 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
     maintenanceLog: MaintenanceLog,
     readOptions?: ReadOptions,
   ): Promise<MaintenanceLog[]> {
-    const { limit, offset } = readOptions || {};
 
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       maintenance_id: maintenanceLog.getMaintenanceId(),
       machine_id: maintenanceLog.getMachineId(),
       reporter_id: maintenanceLog.getReporterId(),
@@ -40,20 +39,9 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
       maintenance_date: DateUtil.formatToSQL(maintenanceLog.getMaintenanceDate()),
       reason: maintenanceLog.getReason(),
       status: maintenanceLog.getStatus(),
-    }));
+    };
 
-    const condition = Object.keys(parameter).map((key) => `AND ${key} = ?`);
-    const limitOption = (limit && limit >= 0) ? `LIMIT ${limit}` : '';
-    const offsetOption = (limitOption && offset > 0) ? `OFFSET ${offset}` : '';
-
-    const query = [
-      'SELECT * FROM MaintenanceLog WHERE 1',
-      ...condition,
-      limitOption,
-      offsetOption,
-    ].join(' ');
-
-    const results: any = await this.query(query, Object.values(parameter));
+    const results: any = await this.getSqlBuilder().read('MaintenanceLog', parameter, readOptions);
 
     const maintenanceLogs = results[0].map((result) => {
       return new MaintenanceLog()
@@ -71,7 +59,7 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
   }
 
   public async update(source: MaintenanceLog, destination: MaintenanceLog): Promise<number> {
-    const sourceParameter = JSON.parse(JSON.stringify({
+    const sourceParameter = {
       machine_id: source.getMachineId(),
       reporter_id: source.getReporterId(),
       maintainer_id: source.getMaintainerId(),
@@ -79,9 +67,9 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
       maintenance_date: DateUtil.formatToSQL(source.getMaintenanceDate()),
       reason: source.getReason(),
       status: source.getStatus(),
-    }));
+    };
 
-    const destinationParameter = JSON.parse(JSON.stringify({
+    const destinationParameter = {
       maintenance_id: destination.getMaintenanceId(),
       machine_id: destination.getMachineId(),
       reporter_id: destination.getReporterId(),
@@ -90,23 +78,15 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
       maintenance_date: DateUtil.formatToSQL(destination.getMaintenanceDate()),
       reason: destination.getReason(),
       status: destination.getStatus(),
-    }));
+    };
 
-    const query = [
-      'UPDATE MaintenanceLog SET ? WHERE 1',
-      ...Object.keys(destinationParameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(
-      query,
-      [sourceParameter, ...Object.values(destinationParameter)],
-    );
+    const result: any = await this.getSqlBuilder().update('MaintenanceLog', sourceParameter, destinationParameter);
 
     return result[0].affectedRows;
   }
 
   public async delete(maintenanceLog: MaintenanceLog): Promise<number> {
-    const parameter = JSON.parse(JSON.stringify({
+    const parameter = {
       maintenance_id: maintenanceLog.getMaintenanceId(),
       machine_id: maintenanceLog.getMachineId(),
       reporter_id: maintenanceLog.getReporterId(),
@@ -115,14 +95,9 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
       maintenance_date: DateUtil.formatToSQL(maintenanceLog.getMaintenanceDate()),
       reason: maintenanceLog.getReason(),
       status: maintenanceLog.getStatus(),
-    }));
+    };
 
-    const query = [
-      'DELETE FROM MaintenanceLog WHERE 1',
-      ...Object.keys(parameter).map((key) => `AND ${key} = ?`),
-    ].join(' ');
-
-    const result: any = await this.query(query, Object.values(parameter));
+    const result: any = await this.getSqlBuilder().delete('Address', parameter);
 
     return result[0].affectedRows;
   }
