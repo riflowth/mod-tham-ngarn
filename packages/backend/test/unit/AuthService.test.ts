@@ -1,4 +1,4 @@
-import { LoginException } from '@/exceptions/service/LoginException';
+import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { AuthService } from '@/services/AuthService';
 import { Cookie } from '@/utils/cookie/Cookie';
 import { MockSessionRepository } from '@test/unit/mocks/MockSessionRepository';
@@ -22,16 +22,16 @@ describe('Test implementation of Auth Service', () => {
   const invalidUsername = 'this_is_invalid_username';
   const invalidPassword = 'short';
 
-  it('should throw LoginException with username requirement not match', async () => {
+  it('should throw InvalidRequestException with username requirement not match', async () => {
     await expect(authService.login(invalidUsername, validPassword))
       .rejects
-      .toThrow(LoginException);
+      .toThrow(InvalidRequestException);
   });
 
-  it('should throw LoginException with password requirement not match', async () => {
+  it('should throw InvalidRequestException with password requirement not match', async () => {
     await expect(authService.login(validUsername, invalidPassword))
       .rejects
-      .toThrow(LoginException);
+      .toThrow(InvalidRequestException);
   });
 
   it('should return cookie when username and password are correct', async () => {
@@ -40,9 +40,9 @@ describe('Test implementation of Auth Service', () => {
       .toBeInstanceOf(Cookie);
   });
 
-  it('should throw LoginException with username or password is incorrect', async () => {
+  it('should throw InvalidRequestException with username or password is incorrect', async () => {
     await expect(authService.login(validUsername, incorrectPassword))
       .rejects
-      .toThrow(LoginException);
+      .toThrow(InvalidRequestException);
   });
 });
