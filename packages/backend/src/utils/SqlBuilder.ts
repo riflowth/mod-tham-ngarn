@@ -83,8 +83,6 @@ export class SqlBuilder {
     ].join(' ');
 
     const values = Object.values(cleanedParameter);
-    console.log(query);
-    console.log(values);
 
     return this.database.execute(query, values);
   }
