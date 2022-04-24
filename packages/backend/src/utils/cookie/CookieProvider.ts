@@ -18,11 +18,6 @@ export class CookieProvider {
    * @param cookie - A cookie instance that needs to be set
    */
   public setCookie(res: Response, cookie: Cookie): void {
-    cookie.setValue([
-      CookieProvider.SIGNED_SYMBOL,
-      this.sign(cookie.getValue()),
-    ].join(''));
-
     res.setHeader('Set-Cookie', cookie.serialize());
   }
 
@@ -33,6 +28,41 @@ export class CookieProvider {
    * @returns A cookie value from specific name or null if cookie is invalid
    */
   public getCookie(req: Request, name: string): string {
+    const header = req.headers.cookie;
+    let value = null;
+
+    if (header) {
+      const cookie = this.parseCookieHeader(header)[name];
+
+      if (cookie) {
+        value = cookie;
+      }
+    }
+
+    return value;
+  }
+
+  /**
+   * Set a signed cookie by HTTP reponse header
+   * @param res - A http response instance
+   * @param cookie - A cookie instance that needs to be set
+   */
+  public setSignedCookie(res: Response, cookie: Cookie): void {
+    cookie.setValue([
+      CookieProvider.SIGNED_SYMBOL,
+      this.sign(cookie.getValue()),
+    ].join(''));
+
+    res.setHeader('Set-Cookie', cookie.serialize());
+  }
+
+  /**
+   * Get a signed cookie by a specific cookie name which verified by the signature
+   * @param req - A http request instance
+   * @param name - A cookie name which needs value
+   * @returns A cookie value from specific name or null if cookie is invalid
+   */
+  public getSignedCookie(req: Request, name: string): string {
     const header = req.headers.cookie;
     let value = null;
 

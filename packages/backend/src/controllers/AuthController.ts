@@ -27,22 +27,22 @@ export class AuthController extends Controller {
     const cookie = await this.authService.login(username, password);
 
     if (cookie) {
-      this.cookieProvider.setCookie(res, cookie);
+      this.cookieProvider.setSignedCookie(res, cookie);
 
       res.status(200).json({
-        message: 'logged in successfully',
+        message: 'Logged in successfully',
       });
     }
   }
 
   @RouteMapping('/logout', Methods.GET)
   private async logoutRoute(req: Request, res: Response): Promise<void> {
-    const sessionId = this.cookieProvider.getCookie(req, 'sid');
+    const sessionId = this.cookieProvider.getSignedCookie(req, 'sid');
 
     await this.authService.logout(sessionId);
 
     res.status(200).json({
-      message: 'logged out successfully',
+      message: 'Logged out successfully',
     });
   }
 
