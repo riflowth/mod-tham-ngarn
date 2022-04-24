@@ -1,4 +1,3 @@
-import React from "react";
 import {
   BarChart,
   Bar,
@@ -53,6 +52,7 @@ const data = [
     amt: 2100,
   },
 ];
+
 const TwoBarChart = () => {
   return (
     <>

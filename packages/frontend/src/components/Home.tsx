@@ -1,9 +1,7 @@
-import React from "react";
-import Chart from "./AreaChart";
-import ErrorLog from "./ErrorLogs/ErrorLog";
-
-import Progressbar from "./Progressbar";
-import TwoBarChart from "./TwoBarChart";
+import Chart from '@components/AreaChart';
+import ErrorLog from '@components/ErrorLogs/ErrorLog';
+import Progressbar from '@components/Progressbar';
+import TwoBarChart from '@components/TwoBarChart';
 
 const Home = () => {
   return (

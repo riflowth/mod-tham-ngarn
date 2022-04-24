@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/alt-text */
 import Image from "next/image";
 import axios from "axios";
 import React, { useState } from "react";
@@ -70,6 +69,7 @@ const Login = () => {
             layout="fill"
             objectFit="cover"
             className="rounded-l-xl"
+            alt=""
           />
         </div>
         {/* Right Form */}

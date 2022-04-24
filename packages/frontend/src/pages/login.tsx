@@ -1,7 +1,7 @@
-import Login from "@components/Login";
-import React from "react";
+import Login from '@components/Login';
+import { NextPage } from 'next';
 
-function login() {
+const LoginPage: NextPage = () => {
   return (
     <div>
       <Login />
@@ -9,4 +9,4 @@ function login() {
   );
 }
 
-export default login;
+export default LoginPage;

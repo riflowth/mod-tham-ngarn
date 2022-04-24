@@ -1,7 +1,8 @@
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+
 const Progressbar = () => {
   const [value1, setValue1] = useState(0);
   const [value2, setValue2] = useState(36);
