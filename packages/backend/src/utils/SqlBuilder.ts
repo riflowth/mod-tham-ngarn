@@ -26,9 +26,14 @@ export class SqlBuilder {
     const { limit, offset } = readOptions || {};
 
     if (limit || offset) {
+      const isIntegerOptions = Number.isInteger(limit) && Number.isInteger(offset);
+      if (!isIntegerOptions) {
+        throw new Error('limit and offset must be integer');
+      }
+
       const isValidReadOptions = limit > 0 && (!offset || offset >= 0);
       if (!isValidReadOptions) {
-        throw new Error('Invalid limit or offset');
+        throw new Error('Invalid relationship limit or offset');
       }
     }
 
