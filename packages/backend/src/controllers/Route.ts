@@ -1,3 +1,4 @@
+import { Role } from '@/decorators/AuthenticationDecorator';
 import { NextFunction, Request, Response } from 'express';
 
 export enum Methods {
@@ -18,5 +19,5 @@ export type Route = {
 export type RouteMetadata = {
   path: string,
   method: Methods,
-  authentication?: boolean,
+  authentication?: Role[],
 };

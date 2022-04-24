@@ -17,7 +17,7 @@ export class StaffController extends Controller {
     this.staffRepository = staffRepository;
   }
 
-  @Authentication
+  @Authentication()
   @RouteMapping('/', Methods.GET)
   private async getInfo(req: Request, res: Response): Promise<void> {
     const expectedStaff = new Staff().setStaffId(req.session.staffId);

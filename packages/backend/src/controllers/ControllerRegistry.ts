@@ -1,11 +1,15 @@
 import { Controller } from '@/controllers/Controller';
 import { RouteHandler } from '@/controllers/Route';
+import { Role } from '@/decorators/AuthenticationDecorator';
 import { Session } from '@/entities/Session';
+import { Staff } from '@/entities/Staff';
 import { DuplicatedControllerException } from '@/exceptions/controller/DuplicatedControllerException';
 import { UnavailableControllerException } from '@/exceptions/controller/UnavailableControllerException';
 import { ErrorHandler } from '@/exceptions/ErrorHandler';
+import { ForbiddenException } from '@/exceptions/ForbiddenException';
 import { UnauthorizedException } from '@/exceptions/UnauthorizedException';
 import { SessionRepository } from '@/repositories/session/SessionRepository';
+import { StaffRepository } from '@/repositories/staff/StaffRepository';
 import { Cookie } from '@/utils/cookie/Cookie';
 import { CookieProvider } from '@/utils/cookie/CookieProvider';
 import {
@@ -18,15 +22,18 @@ export class ControllerRegistry {
   private readonly app: Application;
   private readonly cookieProvider: CookieProvider;
   private readonly sessionRepository: SessionRepository;
+  private readonly staffRepository: StaffRepository;
 
   public constructor(
     app: Application,
     cookieProvider: CookieProvider,
     sessionRepository: SessionRepository,
+    staffRepository: StaffRepository,
   ) {
     this.app = app;
     this.cookieProvider = cookieProvider;
     this.sessionRepository = sessionRepository;
+    this.staffRepository = staffRepository;
   }
 
   /**
@@ -67,7 +74,8 @@ export class ControllerRegistry {
         const routeHandler = route.handler;
 
         if (routeMetadata.authentication) {
-          router.use(routePath, ErrorHandler.wrap(this.getAuthMiddleware()));
+          const authMiddleware = this.getAuthMiddleware(routeMetadata.authentication);
+          router.use(routePath, ErrorHandler.wrap(authMiddleware));
         }
 
         router[routeMethod](routePath, ErrorHandler.wrap(routeHandler));
@@ -89,9 +97,10 @@ export class ControllerRegistry {
 
   /**
    * Returns the middleware for authentication and populate session id in the request
+   * @param role - An array of {@link Role} for authorization
    * @returns An Authentication middleware
    */
-  private getAuthMiddleware(): RouteHandler {
+  private getAuthMiddleware(role: Role[]): RouteHandler {
     return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const sessionId = this.cookieProvider.getSignedCookie(req, 'sid');
 
@@ -111,6 +120,17 @@ export class ControllerRegistry {
 
         this.cookieProvider.setCookie(res, removingCookie);
         throw new UnauthorizedException('Session expired');
+      }
+
+      const expectedStaff = new Staff().setStaffId(session.getStaffId());
+      const [staff] = await this.staffRepository.read(expectedStaff);
+
+      const isAuthorized = role.length === 0
+        ? true
+        : Object.values<string>(role).includes(staff.getPosition());
+
+      if (!isAuthorized) {
+        throw new ForbiddenException('Do not have permission to access');
       }
 
       req.session = {

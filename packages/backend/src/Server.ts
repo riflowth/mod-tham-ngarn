@@ -106,6 +106,7 @@ export class Server {
       this.app,
       this.cookieProvider,
       this.sessionRepository,
+      this.staffRepository,
     );
 
     this.controllerRegistry.loadControllers([
