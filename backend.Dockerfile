@@ -25,6 +25,9 @@ ENV NODE_ENV production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 app
 
+RUN --mount=type=secret,id=dotenv \
+  cat /run/secrets/dotenv > ./.env
+
 COPY --from=builder /opt/webserver/package.json .
 COPY --from=builder --chown=app:nodejs /opt/webserver/dist ./dist
 

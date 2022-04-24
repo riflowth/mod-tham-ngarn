@@ -1,7 +1,4 @@
-import { RouteHandler } from '@/controllers/Route';
-import { RouteMetadata } from '@/decorators/RouteDecorator';
-import { ErrorHandler } from '@/exceptions/ErrorHandler';
-import { Router } from 'express';
+import { Route } from '@/controllers/Route';
 
 export class Controller {
 
@@ -9,7 +6,6 @@ export class Controller {
    * Injected with {@link ControllerDecorator} on class declaration
    */
   private readonly path: string;
-  private readonly router: Router = Router();
   private readonly hasAvailable: boolean;
 
   /**
@@ -28,19 +24,21 @@ export class Controller {
   }
 
   /**
-   * Returns the modular express router of the controller instance
-   * @returns The express {@link Router} instance
+   * Returns the router structure with handler and metadata of the controller
+   * for converting to the modular express router
+   * @returns The router structure (array of {@link Route})
    */
-  public getRouter(): Router {
+  public getRouter(): Route[] {
     const routes = Reflect.getMetadataKeys(this);
 
-    routes.forEach((route) => {
-      const routeHandler: RouteHandler = ErrorHandler.wrap(this[route]);
-      const routeProperty: RouteMetadata = Reflect.getMetadata(route, this);
-      this.router[routeProperty.method.toLowerCase()](routeProperty.path, routeHandler);
+    const router: Route[] = routes.map((route) => {
+      return {
+        handler: this[route].bind(this),
+        metadata: Reflect.getMetadata(route, this),
+      };
     });
 
-    return this.router;
+    return router;
   }
 
 }

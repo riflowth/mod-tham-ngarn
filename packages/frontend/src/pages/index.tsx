@@ -1,9 +1,12 @@
-import type { NextPage } from 'next';
+import Home from '@components/Home';
+import Navbar from '@components/Navbar/Navbar';
+import { NextPage } from 'next';
 
 const IndexPage: NextPage = () => {
   return (
-    <div className="flex justify-center items-center h-screen bg-black">
-      <h1 className="text-2xl font-bold text-white">Mod Tham Ngarn</h1>  
+    <div className="h-screen bg-[#22202e]">
+      <Navbar />
+      <Home />
     </div>
   );
 };

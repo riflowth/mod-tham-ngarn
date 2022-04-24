@@ -1,10 +1,5 @@
 import { Methods } from '@/controllers/Route';
 
-export type RouteMetadata = {
-  path: string,
-  method: Methods,
-};
-
 export const RouteMapping = (path: string, method: Methods): MethodDecorator => {
   return (
     target: Object,
@@ -16,7 +11,5 @@ export const RouteMapping = (path: string, method: Methods): MethodDecorator => 
       path,
       method,
     }, target);
-
-    return descriptor;
   };
 };
