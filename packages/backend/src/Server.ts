@@ -30,15 +30,19 @@ import { DefaultStaffRepository } from '@/repositories/staff/DefaultStaffReposit
 import { DefaultZoneRepository } from '@/repositories/zone/DefaultZoneRepository';
 import { SessionRepository } from '@/repositories/session/SessionRepository';
 import { DefaultSessionRepository } from '@/repositories/session/DefaultSessionRepository';
+import { StaffController } from '@/controllers/StaffController';
+import { SessionProvider } from '@/utils/SessionProvider';
 
 export class Server {
 
   private readonly app: Application;
   private readonly port: number;
 
-  private readonly databaseConnector: DatabaseConnector;
-  private readonly controllerRegistry: ControllerRegistry;
-  private readonly cookieProvider: CookieProvider;
+  private databaseConnector: DatabaseConnector;
+  private controllerRegistry: ControllerRegistry;
+
+  private cookieProvider: CookieProvider;
+  private sessionProvider: SessionProvider;
 
   private addressRepository: AddressRepository;
   private billRepository: BillRepository;
@@ -48,7 +52,7 @@ export class Server {
   private maintenanceLogRepository: MaintenanceLogRepository;
   private maintenancePartRepository: MaintenancePartRepository;
   private orderRepository: OrderRepository;
-  private sesionRepository: SessionRepository;
+  private sessionRepository: SessionRepository;
   private staffRepository: StaffRepository;
   private zoneRepository: ZoneRepository;
 
@@ -58,8 +62,6 @@ export class Server {
     this.app = express();
     this.port = port;
     this.databaseConnector = new DatabaseConnector();
-    this.controllerRegistry = new ControllerRegistry(this.app);
-    this.cookieProvider = new CookieProvider('this-is-the-secret');
   }
 
   public async run(): Promise<http.Server> {
@@ -91,19 +93,29 @@ export class Server {
     this.maintenanceLogRepository = new DefaultMaintenanceLogRepository(defaultDb, cachingDb);
     this.maintenancePartRepository = new DefaultMaintenancePartRepository(defaultDb, cachingDb);
     this.orderRepository = new DefaultOrderRepository(defaultDb, cachingDb);
-    this.sesionRepository = new DefaultSessionRepository(defaultDb, cachingDb);
+    this.sessionRepository = new DefaultSessionRepository(defaultDb, cachingDb);
     this.staffRepository = new DefaultStaffRepository(defaultDb, cachingDb);
     this.zoneRepository = new DefaultZoneRepository(defaultDb, cachingDb);
   }
 
   private async registerServices(): Promise<void> {
-    this.authService = new AuthService(this.staffRepository, this.sesionRepository);
+    this.authService = new AuthService(this.staffRepository, this.sessionRepository);
   }
 
   private async loadControllers(): Promise<void> {
+    this.cookieProvider = new CookieProvider('this-is-the-secret-just-keep-it');
+    this.sessionProvider = new SessionProvider(this.sessionRepository);
+
+    this.controllerRegistry = new ControllerRegistry(
+      this.app,
+      this.cookieProvider,
+      this.sessionProvider,
+    );
+
     this.controllerRegistry.loadControllers([
       new IndexController(),
       new AuthController(this.cookieProvider, this.authService),
+      new StaffController(),
     ]);
 
     const controllerCount = this.controllerRegistry.size();

@@ -8,4 +8,15 @@ export enum Methods {
   DELETE = 'DELETE',
 }
 
-export type RouteHandler = (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export type RouteHandler = (req: Request, res: Response, next?: NextFunction) => Promise<void>;
+
+export type Route = {
+  handler: RouteHandler,
+  metadata: RouteMetadata,
+};
+
+export type RouteMetadata = {
+  path: string,
+  method: Methods,
+  authentication?: boolean,
+};
