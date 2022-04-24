@@ -24,6 +24,14 @@ export class SqlBuilder {
 
   public read(table: string, parameter: Object, readOptions?: ReadOptions) {
     const { limit, offset } = readOptions || {};
+
+    if (limit || offset) {
+      const isValidReadOptions = limit > 0 && (!offset || offset >= 0);
+      if (!isValidReadOptions) {
+        throw new Error('Invalid limit or offset');
+      }
+    }
+
     const cleanedParameter: Object = JSON.parse(JSON.stringify(parameter));
 
     const condition = Object
@@ -75,6 +83,8 @@ export class SqlBuilder {
     ].join(' ');
 
     const values = Object.values(cleanedParameter);
+    console.log(query);
+    console.log(values);
 
     return this.database.execute(query, values);
   }
