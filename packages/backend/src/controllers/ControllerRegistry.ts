@@ -1,10 +1,13 @@
 import { Controller } from '@/controllers/Controller';
+import { RouteHandler } from '@/controllers/Route';
+import { Session } from '@/entities/Session';
 import { DuplicatedControllerException } from '@/exceptions/controller/DuplicatedControllerException';
 import { UnavailableControllerException } from '@/exceptions/controller/UnavailableControllerException';
 import { ErrorHandler } from '@/exceptions/ErrorHandler';
 import { UnauthorizedException } from '@/exceptions/UnauthorizedException';
+import { SessionRepository } from '@/repositories/session/SessionRepository';
+import { Cookie } from '@/utils/cookie/Cookie';
 import { CookieProvider } from '@/utils/cookie/CookieProvider';
-import { SessionProvider } from '@/utils/SessionProvider';
 import {
   Application, NextFunction, Request, Response, Router,
 } from 'express';
@@ -14,16 +17,16 @@ export class ControllerRegistry {
   private readonly controllerByPath: Map<String, Controller> = new Map();
   private readonly app: Application;
   private readonly cookieProvider: CookieProvider;
-  private readonly sessionProvider: SessionProvider;
+  private readonly sessionRepository: SessionRepository;
 
   public constructor(
     app: Application,
     cookieProvider: CookieProvider,
-    sessionProvider: SessionProvider,
+    sessionRepository: SessionRepository,
   ) {
     this.app = app;
     this.cookieProvider = cookieProvider;
-    this.sessionProvider = sessionProvider;
+    this.sessionRepository = sessionRepository;
   }
 
   /**
@@ -64,7 +67,7 @@ export class ControllerRegistry {
         const routeHandler = route.handler;
 
         if (routeMetadata.authentication) {
-          router.use(routePath, this.getAuthMiddleware());
+          router.use(routePath, ErrorHandler.wrap(this.getAuthMiddleware()));
         }
 
         router[routeMethod](routePath, ErrorHandler.wrap(routeHandler));
@@ -88,15 +91,33 @@ export class ControllerRegistry {
    * Returns the middleware for authentication and populate session id in the request
    * @returns An Authentication middleware
    */
-  private getAuthMiddleware() {
-    return (req: Request, res: Response, next: NextFunction) => {
+  private getAuthMiddleware(): RouteHandler {
+    return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const sessionId = this.cookieProvider.getSignedCookie(req, 'sid');
 
       if (!sessionId) {
         throw new UnauthorizedException('Login required');
       }
 
-      req.session = sessionId;
+      const expectedSession = new Session().setSessionId(sessionId);
+      const [session] = await this.sessionRepository.read(expectedSession);
+
+      if (!session) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const removingCookie = new Cookie('sid', 'i-will-destory-your-cookies')
+          .setExpiryDate(yesterday);
+
+        this.cookieProvider.setCookie(res, removingCookie);
+        throw new UnauthorizedException('Session expired');
+      }
+
+      req.session = {
+        sessionId: session.getSessionId(),
+        staffId: session.getStaffId(),
+      };
+
       next();
     };
   }

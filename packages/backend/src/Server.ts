@@ -31,7 +31,6 @@ import { DefaultZoneRepository } from '@/repositories/zone/DefaultZoneRepository
 import { SessionRepository } from '@/repositories/session/SessionRepository';
 import { DefaultSessionRepository } from '@/repositories/session/DefaultSessionRepository';
 import { StaffController } from '@/controllers/StaffController';
-import { SessionProvider } from '@/utils/SessionProvider';
 
 export class Server {
 
@@ -40,9 +39,7 @@ export class Server {
 
   private databaseConnector: DatabaseConnector;
   private controllerRegistry: ControllerRegistry;
-
   private cookieProvider: CookieProvider;
-  private sessionProvider: SessionProvider;
 
   private addressRepository: AddressRepository;
   private billRepository: BillRepository;
@@ -104,18 +101,17 @@ export class Server {
 
   private async loadControllers(): Promise<void> {
     this.cookieProvider = new CookieProvider('this-is-the-secret-just-keep-it');
-    this.sessionProvider = new SessionProvider(this.sessionRepository);
 
     this.controllerRegistry = new ControllerRegistry(
       this.app,
       this.cookieProvider,
-      this.sessionProvider,
+      this.sessionRepository,
     );
 
     this.controllerRegistry.loadControllers([
       new IndexController(),
       new AuthController(this.cookieProvider, this.authService),
-      new StaffController(),
+      new StaffController(this.staffRepository),
     ]);
 
     const controllerCount = this.controllerRegistry.size();

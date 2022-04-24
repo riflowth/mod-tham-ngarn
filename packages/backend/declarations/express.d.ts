@@ -1,5 +1,8 @@
 declare namespace Express {
   export interface Request {
-    session?: string
+    session?: {
+      sessionId: string,
+      staffId: number,
+    }
   }
 }
