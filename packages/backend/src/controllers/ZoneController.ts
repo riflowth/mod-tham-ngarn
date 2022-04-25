@@ -45,7 +45,7 @@ export class ZoneController extends Controller {
 
     const zone = await this.zoneService.getZoneByZoneId(parseZoneId);
 
-    res.status(200).json({ data: [zone] });
+    res.status(200).json({ data: zone });
   }
 
   @Authentication(Role.MANAGER, Role.CEO)

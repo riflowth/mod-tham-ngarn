@@ -46,7 +46,7 @@ export class BranchController extends Controller {
 
     const branch = await this.branchService.getBranchByBranchId(parseBranchId);
 
-    res.status(200).json({ data: [branch] });
+    res.status(200).json({ data: branch });
   }
 
   @Authentication(Role.CEO)

@@ -29,11 +29,9 @@ export class BranchService {
     return this.branchRepository.read(branchToRead, readOptions);
   }
 
-  public async getBranchByBranchId(branchId: number): Promise<Branch> {
+  public async getBranchByBranchId(branchId: number): Promise<Branch[]> {
     const branchToRead = new Branch().setBranchId(branchId);
-    const [branch] = await this.branchRepository.read(branchToRead);
-
-    return branch;
+    return this.branchRepository.read(branchToRead);
   }
 
   public async addBranch(newBranch: Branch): Promise<Branch> {

@@ -37,7 +37,7 @@ export class AddressController extends Controller {
   @RouteMapping('/:postalCode', Methods.GET)
   private async getAddressByPostalCode(req: Request, res: Response): Promise<void> {
     const address = await this.addressService.getAddressByPostalCode(req.params.postalCode);
-    res.status(200).json({ data: [address] });
+    res.status(200).json({ data: address });
   }
 
   @Authentication(Role.CEO)

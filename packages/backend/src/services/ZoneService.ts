@@ -29,11 +29,9 @@ export class ZoneService {
     return this.zoneRepository.read(zoneToRead, readOptions);
   }
 
-  public async getZoneByZoneId(zoneId: number): Promise<Zone> {
+  public async getZoneByZoneId(zoneId: number): Promise<Zone[]> {
     const zoneToRead = new Zone().setZoneId(zoneId);
-    const [zone] = await this.zoneRepository.read(zoneToRead);
-
-    return zone;
+    return this.zoneRepository.read(zoneToRead);
   }
 
   public async getZonesByBranchId(branchId: number, readOptions: ReadOptions): Promise<Zone[]> {

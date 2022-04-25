@@ -136,6 +136,8 @@ export class ControllerRegistry {
       req.session = {
         sessionId: session.getSessionId(),
         staffId: session.getStaffId(),
+        zoneId: staff.getZoneId(),
+        branchId: staff.getBranchId(),
       };
 
       next();
