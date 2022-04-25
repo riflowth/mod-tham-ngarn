@@ -65,9 +65,9 @@ export class ZoneController extends Controller {
       .setTimeToStart(timeToStart)
       .setTimeToEnd(timeToEnd);
 
-    const createdZone = await this.zoneService.addZone(newZone);
+    const createdField = await this.zoneService.addZone(newZone);
 
-    res.status(200).json({ data: { createdZone } });
+    res.status(200).json({ data: { createdField } });
   }
 
   @Authentication(Role.MANAGER, Role.CEO)
@@ -105,9 +105,9 @@ export class ZoneController extends Controller {
       throw new InvalidRequestException('ZoneId must be a positive integer');
     }
 
-    const deletedZone = await this.zoneService.deleteZone(parseZoneId);
+    const deletedField = await this.zoneService.deleteZone(parseZoneId);
 
-    res.status(200).json({ data: { deletedZone } });
+    res.status(200).json({ data: { deletedField } });
   }
 
 }
