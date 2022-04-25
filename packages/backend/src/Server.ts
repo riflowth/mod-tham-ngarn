@@ -30,6 +30,8 @@ import { DefaultZoneRepository } from '@/repositories/zone/DefaultZoneRepository
 import { SessionRepository } from '@/repositories/session/SessionRepository';
 import { DefaultSessionRepository } from '@/repositories/session/DefaultSessionRepository';
 import { StaffController } from '@/controllers/StaffController';
+import { BranchService } from '@/services/BranchService';
+import { BranchController } from '@/controllers/BranchController';
 import { AddressService } from './services/AddressService';
 import { AddressController } from './controllers/AddressController';
 
@@ -55,6 +57,7 @@ export class Server {
   private zoneRepository: ZoneRepository;
 
   private addressService: AddressService;
+  private branchService: BranchService;
   private authService: AuthService;
 
   public constructor(port: number) {
@@ -102,6 +105,11 @@ export class Server {
       this.addressRepository,
       this.branchRepository,
     );
+    this.branchService = new BranchService(
+      this.addressRepository,
+      this.branchRepository,
+      this.zoneRepository,
+    );
     this.authService = new AuthService(this.staffRepository, this.sessionRepository);
   }
 
@@ -118,6 +126,7 @@ export class Server {
     this.controllerRegistry.loadControllers([
       new AddressController(this.addressService),
       new AuthController(this.cookieProvider, this.authService),
+      new BranchController(this.branchService),
       new StaffController(this.staffRepository),
     ]);
 
