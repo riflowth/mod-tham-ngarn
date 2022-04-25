@@ -115,7 +115,7 @@ export class ControllerRegistry {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
 
-        const removingCookie = new Cookie('sid', 'i-will-destory-your-cookies')
+        const removingCookie = new Cookie('sid', 'i-will-destroy-your-cookies')
           .setExpiryDate(yesterday);
 
         this.cookieProvider.setCookie(res, removingCookie);
