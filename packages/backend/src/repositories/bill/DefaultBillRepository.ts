@@ -2,13 +2,14 @@ import { Bill } from '@/entities/Bill';
 import { BillRepository } from '@/repositories/bill/BillRepository';
 import { Database } from '@/utils/database/Database';
 import { ReadOptions } from '@/repositories/ReadOptions';
+import { DateUtil } from '@/utils/DateUtil';
 
 export class DefaultBillRepository extends Database implements BillRepository {
 
   public async create(bill: Bill): Promise<Bill> {
     const parameter = {
       store_name: bill.getStoreName(),
-      bill_date: bill.getOrderDate(),
+      bill_date: DateUtil.formatToSQL(bill.getOrderDate()),
       order_by: bill.getOrderBy(),
     };
 
@@ -24,7 +25,7 @@ export class DefaultBillRepository extends Database implements BillRepository {
     const parameter = {
       bill_id: bill.getBillId(),
       store_name: bill.getStoreName(),
-      bill_date: bill.getOrderDate(),
+      bill_date: DateUtil.formatToSQL(bill.getOrderDate()),
       order_by: bill.getOrderBy(),
     };
 
@@ -34,7 +35,7 @@ export class DefaultBillRepository extends Database implements BillRepository {
       return new Bill()
         .setBillId(result.bill_id)
         .setStoreName(result.store_name)
-        .setOrderDate(result.bill_date)
+        .setOrderDate(DateUtil.formatFromSQL(result.bill_date))
         .setOrderBy(result.order_by);
     });
 
@@ -44,14 +45,14 @@ export class DefaultBillRepository extends Database implements BillRepository {
   public async update(source: Bill, destination: Bill): Promise<number> {
     const sourceParameter = {
       store_name: source.getStoreName(),
-      bill_date: source.getOrderDate(),
+      bill_date: DateUtil.formatToSQL(source.getOrderDate()),
       order_by: source.getOrderBy(),
     };
 
     const destinationParameter = {
       bill_id: source.getBillId(),
       store_name: destination.getStoreName(),
-      bill_date: destination.getOrderDate(),
+      bill_date: DateUtil.formatToSQL(destination.getOrderDate()),
       order_by: destination.getOrderBy(),
     };
 
@@ -64,7 +65,7 @@ export class DefaultBillRepository extends Database implements BillRepository {
     const parameter = {
       bill_id: bill.getBillId(),
       store_name: bill.getStoreName(),
-      bill_date: bill.getOrderDate(),
+      bill_date: DateUtil.formatToSQL(bill.getOrderDate()),
       order_by: bill.getOrderBy(),
     };
 
