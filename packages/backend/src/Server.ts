@@ -30,6 +30,8 @@ import { DefaultZoneRepository } from '@/repositories/zone/DefaultZoneRepository
 import { SessionRepository } from '@/repositories/session/SessionRepository';
 import { DefaultSessionRepository } from '@/repositories/session/DefaultSessionRepository';
 import { StaffController } from '@/controllers/StaffController';
+import { ZoneService } from '@/services/ZoneService';
+import { ZoneController } from '@/controllers/ZoneController';
 import { BranchService } from '@/services/BranchService';
 import { BranchController } from '@/controllers/BranchController';
 import { AddressService } from './services/AddressService';
@@ -56,9 +58,10 @@ export class Server {
   private staffRepository: StaffRepository;
   private zoneRepository: ZoneRepository;
 
+  private authService: AuthService;
   private addressService: AddressService;
   private branchService: BranchService;
-  private authService: AuthService;
+  private zoneService: ZoneService;
 
   public constructor(port: number) {
     this.app = express();
@@ -105,12 +108,17 @@ export class Server {
       this.addressRepository,
       this.branchRepository,
     );
+    this.authService = new AuthService(this.staffRepository, this.sessionRepository);
     this.branchService = new BranchService(
       this.addressRepository,
       this.branchRepository,
       this.zoneRepository,
     );
-    this.authService = new AuthService(this.staffRepository, this.sessionRepository);
+    this.zoneService = new ZoneService(
+      this.branchRepository,
+      this.machineRepository,
+      this.zoneRepository,
+    );
   }
 
   private async loadControllers(): Promise<void> {
@@ -128,6 +136,7 @@ export class Server {
       new AuthController(this.cookieProvider, this.authService),
       new BranchController(this.branchService),
       new StaffController(this.staffRepository),
+      new ZoneController(this.zoneService),
     ]);
 
     const controllerCount = this.controllerRegistry.size();
