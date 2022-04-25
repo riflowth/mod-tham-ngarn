@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import http from 'http';
 import express, { Application } from 'express';
-import { IndexController } from '@/controllers/IndexController';
 import { ControllerRegistry } from '@/controllers/ControllerRegistry';
 import { DatabaseConnector } from '@/utils/database/DatabaseConnector';
 import { DatabaseException } from '@/exceptions/DatabaseException';
@@ -31,6 +30,8 @@ import { DefaultZoneRepository } from '@/repositories/zone/DefaultZoneRepository
 import { SessionRepository } from '@/repositories/session/SessionRepository';
 import { DefaultSessionRepository } from '@/repositories/session/DefaultSessionRepository';
 import { StaffController } from '@/controllers/StaffController';
+import { AddressService } from './services/AddressService';
+import { AddressController } from './controllers/AddressController';
 
 export class Server {
 
@@ -53,6 +54,7 @@ export class Server {
   private staffRepository: StaffRepository;
   private zoneRepository: ZoneRepository;
 
+  private addressService: AddressService;
   private authService: AuthService;
 
   public constructor(port: number) {
@@ -96,6 +98,10 @@ export class Server {
   }
 
   private async registerServices(): Promise<void> {
+    this.addressService = new AddressService(
+      this.addressRepository,
+      this.branchRepository,
+    );
     this.authService = new AuthService(this.staffRepository, this.sessionRepository);
   }
 
@@ -110,7 +116,7 @@ export class Server {
     );
 
     this.controllerRegistry.loadControllers([
-      new IndexController(),
+      new AddressController(this.addressService),
       new AuthController(this.cookieProvider, this.authService),
       new StaffController(this.staffRepository),
     ]);
