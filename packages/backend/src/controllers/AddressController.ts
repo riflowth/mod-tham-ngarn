@@ -21,6 +21,13 @@ export class AddressController extends Controller {
   }
 
   @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @RouteMapping('/me', Methods.GET)
+  private async getAddressByRequester(req: Request, res: Response): Promise<void> {
+    const address = await this.addressService.getAddressByBranchId(req.session?.branchId);
+    res.status(200).json({ data: address });
+  }
+
+  @Authentication(Role.MANAGER, Role.CEO)
   @RouteMapping('/', Methods.GET)
   private async getAllAddresses(req: Request, res: Response): Promise<void> {
     const readOptions: ReadOptions = {
@@ -33,7 +40,7 @@ export class AddressController extends Controller {
     res.status(200).json({ data: addresses });
   }
 
-  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @Authentication(Role.MANAGER, Role.CEO)
   @RouteMapping('/:postalCode', Methods.GET)
   private async getAddressByPostalCode(req: Request, res: Response): Promise<void> {
     const address = await this.addressService.getAddressByPostalCode(req.params.postalCode);

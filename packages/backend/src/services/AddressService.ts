@@ -29,6 +29,18 @@ export class AddressService {
     return this.addressRepository.read(addressToRead);
   }
 
+  public async getAddressByBranchId(branchId: number): Promise<Address[]> {
+    const relatedBranchToRead = new Branch().setBranchId(branchId);
+    const [relatedBranch] = await this.branchRepository.read(relatedBranchToRead);
+
+    if (!relatedBranch) {
+      return null;
+    }
+
+    const addressToRead = new Address().setPostalCode(relatedBranch.getPostalCode());
+    return this.addressRepository.read(addressToRead);
+  }
+
   public async addAddress(newAddress: Address): Promise<Address> {
     const addressToAdd = new Address().setPostalCode(newAddress.getPostalCode());
     const existedAddress = await this.addressRepository.read(addressToAdd);
