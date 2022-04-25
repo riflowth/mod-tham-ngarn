@@ -24,11 +24,9 @@ export class AddressService {
     return this.addressRepository.read(addressToRead, readOptions);
   }
 
-  public async getAddressByPostalCode(postalCode: string): Promise<Address> {
+  public async getAddressByPostalCode(postalCode: string): Promise<Address[]> {
     const addressToRead = new Address().setPostalCode(postalCode);
-    const [address] = await this.addressRepository.read(addressToRead);
-
-    return address;
+    return this.addressRepository.read(addressToRead);
   }
 
   public async addAddress(newAddress: Address): Promise<Address> {
