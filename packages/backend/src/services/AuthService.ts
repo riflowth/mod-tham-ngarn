@@ -42,6 +42,7 @@ export class AuthService {
     const sessionId = crypto.randomUUID();
     const cookie = new Cookie('sid', sessionId)
       .setMaxAge(1000 * 60 * 60 * 24 * 15)
+      .setPath('/')
       .setHttpOnly(true);
     const session = new Session()
       .setSessionId(sessionId)
