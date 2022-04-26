@@ -54,7 +54,7 @@ export class MachinePartService {
 
   public async addMachinePart(newMachinePart: MachinePart): Promise<MachinePart> {
     const relatedMachineToRead = new Machine().setMachineId(newMachinePart.getMachineId());
-    const relatedMachine = await this.machineRepository.read(relatedMachineToRead);
+    const [relatedMachine] = await this.machineRepository.read(relatedMachineToRead);
 
     if (!relatedMachine) {
       throw new InvalidRequestException('MachineId related to zone does nor existed');
@@ -64,8 +64,8 @@ export class MachinePartService {
   }
 
   public async editMachinePart(partId: number, newMachinePart: MachinePart): Promise<MachinePart> {
-    const machinPartToEdit = new MachinePart().setPartId(partId);
-    const targetMachinePart = await this.machinePartRepository.read(machinPartToEdit);
+    const machinePartToEdit = new MachinePart().setPartId(partId);
+    const [targetMachinePart] = await this.machinePartRepository.read(machinePartToEdit);
 
     if (!targetMachinePart) {
       throw new NotFoundException('Target machinePart does not exist');
@@ -75,7 +75,7 @@ export class MachinePartService {
 
     if (newMachineId) {
       const relatedMachineToEdit = new Machine().setMachineId(newMachineId);
-      const relatedMachine = await this.machineRepository.read(relatedMachineToEdit);
+      const [relatedMachine] = await this.machineRepository.read(relatedMachineToEdit);
 
       if (!relatedMachine) {
         throw new InvalidRequestException('machineId related to machinePart does not exist.');
@@ -84,7 +84,7 @@ export class MachinePartService {
 
     const affectedRowAmount = await this.machinePartRepository.update(
       newMachinePart,
-      machinPartToEdit,
+      machinePartToEdit,
     );
 
     return affectedRowAmount === 1 ? newMachinePart.setPrimaryKey(partId) : null;
