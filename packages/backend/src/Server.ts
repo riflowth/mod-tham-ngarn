@@ -39,6 +39,10 @@ import { MachineController } from '@/controllers/MachineController';
 import { StaffService } from '@/services/StaffService';
 import { AddressService } from '@/services/AddressService';
 import { AddressController } from '@/controllers/AddressController';
+import { MaintenanceLogService } from '@/services/MaintenanceLogService';
+import { MaintenanceLogController } from '@/controllers/MaintenanceLogController';
+import { MaintenancePartService } from '@/services/MaintenancePartService';
+import { MaintenancePartController } from '@/controllers/MaintenancePartController';
 
 export class Server {
 
@@ -64,6 +68,8 @@ export class Server {
   private authService: AuthService;
   private addressService: AddressService;
   private branchService: BranchService;
+  private maintenanceLogService: MaintenanceLogService;
+  private maintenancePartService: MaintenancePartService;
   private zoneService: ZoneService;
   private machineService: MachineService;
   private staffService: StaffService;
@@ -119,6 +125,17 @@ export class Server {
       this.branchRepository,
       this.zoneRepository,
     );
+    this.maintenanceLogService = new MaintenanceLogService(
+      this.machineRepository,
+      this.maintenanceLogRepository,
+      this.maintenancePartRepository,
+    );
+    this.maintenancePartService = new MaintenancePartService(
+      this.machinePartRepository,
+      this.maintenanceLogRepository,
+      this.maintenancePartRepository,
+      this.orderRepository,
+    );
     this.zoneService = new ZoneService(
       this.branchRepository,
       this.machineRepository,
@@ -152,6 +169,8 @@ export class Server {
       new AddressController(this.addressService),
       new AuthController(this.cookieProvider, this.authService),
       new BranchController(this.branchService),
+      new MaintenanceLogController(this.maintenanceLogService),
+      new MaintenancePartController(this.maintenancePartService),
       new StaffController(this.staffService),
       new ZoneController(this.zoneService),
       new MachineController(this.machineService),
