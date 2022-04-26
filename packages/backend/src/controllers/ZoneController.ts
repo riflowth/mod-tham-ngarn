@@ -35,6 +35,13 @@ export class ZoneController extends Controller {
   }
 
   @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @RouteMapping('/me', Methods.GET)
+  private async getZoneByRequester(req: Request, res: Response): Promise<void> {
+    const zone = await this.zoneService.getZoneByZoneId(req.session?.zoneId);
+    res.status(200).json({ data: zone });
+  }
+
+  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/:zoneId', Methods.GET)
   private async getZoneByZoneId(req: Request, res: Response): Promise<void> {
     const parseZoneId = NumberUtils.parsePositiveInteger(req.params.zoneId);

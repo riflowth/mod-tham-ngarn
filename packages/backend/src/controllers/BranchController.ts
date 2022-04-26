@@ -22,6 +22,13 @@ export class BranchController extends Controller {
   }
 
   @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @RouteMapping('/me', Methods.GET)
+  private async getBranchByRequester(req: Request, res: Response): Promise<void> {
+    const branch = await this.branchService.getBranchByBranchId(req.session?.branchId);
+    res.status(200).json({ data: branch });
+  }
+
+  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/', Methods.GET)
   private async getALlBranches(req: Request, res: Response): Promise<void> {
     const readOptions: ReadOptions = {
