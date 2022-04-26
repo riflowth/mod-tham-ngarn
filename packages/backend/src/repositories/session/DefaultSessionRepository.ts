@@ -3,6 +3,7 @@ import { SessionRepository } from '@/repositories/session/SessionRepository';
 import { Database } from '@/utils/database/Database';
 import { DateUtil } from '@/utils/DateUtil';
 import { ReadOptions } from '@/repositories/ReadOptions';
+import { RequestSession } from '@/controllers/Route';
 
 export class DefaultSessionRepository extends Database implements SessionRepository {
 
@@ -19,6 +20,10 @@ export class DefaultSessionRepository extends Database implements SessionReposit
     } catch (e) {
       return null;
     }
+  }
+
+  public async cacheSession(sesionId: string, session: RequestSession): Promise<void> {
+    await this.setCache(sesionId, JSON.stringify(session));
   }
 
   public async read(session: Session, readOptions?: ReadOptions): Promise<Session[]> {
@@ -38,6 +43,17 @@ export class DefaultSessionRepository extends Database implements SessionReposit
     });
 
     return sessions;
+  }
+
+  public async getCachedSession(sessionId: string): Promise<RequestSession> {
+    const session = await this.getCache(sessionId);
+
+    if (session) {
+      const parsedSession: RequestSession = JSON.parse(session);
+      return { ...parsedSession };
+    }
+
+    return null;
   }
 
   public async update(source: Session, destination: Session): Promise<number> {

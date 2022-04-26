@@ -109,22 +109,35 @@ export class ControllerRegistry {
         throw new UnauthorizedException('Login required');
       }
 
-      const expectedSession = new Session().setSessionId(sessionId);
-      const [session] = await this.sessionRepository.read(expectedSession);
+      const cachedSession = await this.sessionRepository.getCachedSession(sessionId);
 
-      if (!session) {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
+      let session = new Session()
+        .setSessionId(cachedSession.sessionId)
+        .setStaffId(cachedSession.staffId);
+      let staff = new Staff()
+        .setStaffId(cachedSession.staffId)
+        .setPosition(cachedSession.role)
+        .setZoneId(cachedSession.zoneId)
+        .setBranchId(cachedSession.branchId);
 
-        const removingCookie = new Cookie('sid', 'i-will-destroy-your-cookies')
-          .setExpiryDate(yesterday);
+      if (!cachedSession) {
+        const expectedSession = new Session().setSessionId(sessionId);
+        [session] = await this.sessionRepository.read(expectedSession);
 
-        this.cookieProvider.setCookie(res, removingCookie);
-        throw new UnauthorizedException('Session expired');
+        if (!session) {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+
+          const removingCookie = new Cookie('sid', 'i-will-destroy-your-cookies')
+            .setExpiryDate(yesterday);
+
+          this.cookieProvider.setCookie(res, removingCookie);
+          throw new UnauthorizedException('Session expired');
+        }
+
+        const expectedStaff = new Staff().setStaffId(session.getStaffId());
+        [staff] = await this.staffRepository.read(expectedStaff);
       }
-
-      const expectedStaff = new Staff().setStaffId(session.getStaffId());
-      const [staff] = await this.staffRepository.read(expectedStaff);
 
       const isAuthorized = role.length === 0
         ? true
