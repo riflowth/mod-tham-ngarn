@@ -34,6 +34,8 @@ import { ZoneService } from '@/services/ZoneService';
 import { ZoneController } from '@/controllers/ZoneController';
 import { BranchService } from '@/services/BranchService';
 import { BranchController } from '@/controllers/BranchController';
+import { MachineService } from '@/services/MachineService';
+import { MachineController } from '@/controllers/MachineController';
 import { AddressService } from './services/AddressService';
 import { AddressController } from './controllers/AddressController';
 
@@ -62,6 +64,7 @@ export class Server {
   private addressService: AddressService;
   private branchService: BranchService;
   private zoneService: ZoneService;
+  private machineService: MachineService;
 
   public constructor(port: number) {
     this.app = express();
@@ -119,6 +122,10 @@ export class Server {
       this.machineRepository,
       this.zoneRepository,
     );
+    this.machineService = new MachineService(
+      this.machineRepository,
+      this.zoneRepository,
+    );
   }
 
   private async loadControllers(): Promise<void> {
@@ -137,6 +144,7 @@ export class Server {
       new BranchController(this.branchService),
       new StaffController(this.staffRepository),
       new ZoneController(this.zoneService),
+      new MachineController(this.machineService),
     ]);
 
     const controllerCount = this.controllerRegistry.size();
