@@ -9,6 +9,8 @@ export enum Methods {
   DELETE = 'DELETE',
 }
 
+export type RequestSession = Express.Request['session'];
+
 export type RouteHandler = (req: Request, res: Response, next?: NextFunction) => Promise<void>;
 
 export type Route = {

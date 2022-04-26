@@ -50,6 +50,14 @@ export class AuthService {
       .setExpiryDate(cookie.getExpiryDate());
 
     await this.sessionRepository.create(session);
+    await this.sessionRepository.cacheSession(sessionId, {
+      sessionId,
+      staffId: Number(username),
+      role: staff.getPosition(),
+      zoneId: staff.getZoneId(),
+      branchId: staff.getBranchId(),
+    });
+
     return cookie;
   }
 
