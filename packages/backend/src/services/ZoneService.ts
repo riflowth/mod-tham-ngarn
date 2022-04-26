@@ -1,11 +1,13 @@
 import { Branch } from '@/entities/Branch';
 import { Machine } from '@/entities/Machine';
+import { Staff } from '@/entities/Staff';
 import { Zone } from '@/entities/Zone';
 import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { BranchRepository } from '@/repositories/branch/BranchRepository';
 import { MachineRepository } from '@/repositories/machine/MachineRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
+import { StaffRepository } from '@/repositories/staff/StaffRepository';
 import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
 
 export class ZoneService {
@@ -13,15 +15,18 @@ export class ZoneService {
   private readonly branchRepository: BranchRepository;
   private readonly machineRepository: MachineRepository;
   private readonly zoneRepository: ZoneRepository;
+  private readonly staffRepository: StaffRepository;
 
   public constructor(
     branchRepository: BranchRepository,
     machineRepository: MachineRepository,
     zoneRepository: ZoneRepository,
+    staffRepository: StaffRepository,
   ) {
     this.branchRepository = branchRepository;
     this.machineRepository = machineRepository;
     this.zoneRepository = zoneRepository;
+    this.staffRepository = staffRepository;
   }
 
   public async getAllZones(readOptions: ReadOptions): Promise<Zone[]> {
@@ -89,6 +94,13 @@ export class ZoneService {
 
     if (relatedMachine.length > 0) {
       throw new InvalidRequestException('Target zone to delete has related machine.');
+    }
+
+    const relatedStaffToRead = new Staff().setZoneId(zoneId);
+    const relatedStaff = await this.staffRepository.read(relatedStaffToRead);
+
+    if (relatedStaff.length > 0) {
+      throw new InvalidRequestException('Target zone to delete has related staff.');
     }
 
     const affectedRowsAmount = await this.zoneRepository.delete(zoneToDelete);
