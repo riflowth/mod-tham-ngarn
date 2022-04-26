@@ -33,4 +33,8 @@ export class MockSessionRepository implements SessionRepository {
     throw new Error('Method not implemented.');
   }
 
+  public async removeCachedSession(sessionId: string): Promise<void> {
+    this.cache.delete(sessionId);
+  }
+
 }

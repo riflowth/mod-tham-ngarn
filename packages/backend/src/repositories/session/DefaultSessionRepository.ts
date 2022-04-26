@@ -85,4 +85,8 @@ export class DefaultSessionRepository extends Database implements SessionReposit
     return result[0].affectedRows;
   }
 
+  public async removeCachedSession(sessionId: string): Promise<void> {
+    await this.removeCache(sessionId);
+  }
+
 }
