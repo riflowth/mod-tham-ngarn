@@ -12,7 +12,7 @@ export class DefaultMachineRepository extends Database implements MachineReposit
       name: machine.getName(),
       serial: machine.getSerial(),
       manufacturer: machine.getManufacturer(),
-      registration_date: DateUtil.formatToSQL(machine.getRetiredDate()),
+      registration_date: DateUtil.formatToSQL(machine.getRegistrationDate()),
       retired_date: DateUtil.formatToSQL(machine.getRetiredDate()),
     };
 
