@@ -8,4 +8,6 @@ export interface SessionRepository extends Repository<Session> {
 
   getCachedSession(sessionId: string): Promise<RequestSession>;
 
+  removeCachedSession(sessionId: string): Promise<void>
+
 }
