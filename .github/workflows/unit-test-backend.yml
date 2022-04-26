@@ -1,8 +1,9 @@
 name: Unit test the backend
 
 on:
-  pull_request:
-    types: [ opened, synchronize ]
+  push:
+    branches:
+      - '**'
     paths:
       - 'packages/backend/**'
   workflow_dispatch:
