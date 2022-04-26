@@ -9,8 +9,8 @@ import { MaintainerAction, MaintenanceLogService, MaintenanceLogStatus } from '@
 import { EnumUtils } from '@/utils/EnumUtils';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { Request, Response } from 'express';
-import { Controller } from './Controller';
-import { Methods } from './Route';
+import { Controller } from '@/controllers/Controller';
+import { Methods } from '@/controllers/Route';
 
 @ControllerMapping('/maintenance')
 export class MaintenanceLogController extends Controller {

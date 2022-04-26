@@ -8,8 +8,8 @@ import { ReadOptions } from '@/repositories/ReadOptions';
 import { MaintenancePartService } from '@/services/MaintenancePartService';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { Request, Response } from 'express';
-import { Controller } from './Controller';
-import { Methods } from './Route';
+import { Controller } from '@/controllers/Controller';
+import { Methods } from '@/controllers/Route';
 
 @ControllerMapping('/maintenance')
 export class MaintenancePartController extends Controller {

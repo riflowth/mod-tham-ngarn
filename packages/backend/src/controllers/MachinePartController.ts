@@ -9,7 +9,7 @@ import { ReadOptions } from '@/repositories/ReadOptions';
 import { MachinePartService } from '@/services/MachinePartService';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { Request, Response } from 'express';
-import { Methods } from './Route';
+import { Methods } from '@/controllers/Route';
 
 @ControllerMapping('/part')
 export class MachinePartController extends Controller {

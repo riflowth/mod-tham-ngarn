@@ -8,8 +8,8 @@ import { ReadOptions } from '@/repositories/ReadOptions';
 import { BranchService } from '@/services/BranchService';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { Request, Response } from 'express';
-import { Controller } from './Controller';
-import { Methods } from './Route';
+import { Controller } from '@/controllers/Controller';
+import { Methods } from '@/controllers/Route';
 
 @ControllerMapping('/branch')
 export class BranchController extends Controller {

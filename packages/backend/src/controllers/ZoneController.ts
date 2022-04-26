@@ -9,7 +9,7 @@ import { ReadOptions } from '@/repositories/ReadOptions';
 import { ZoneService } from '@/services/ZoneService';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { Request, Response } from 'express';
-import { Methods } from './Route';
+import { Methods } from '@/controllers/Route';
 
 @ControllerMapping('/zone')
 export class ZoneController extends Controller {

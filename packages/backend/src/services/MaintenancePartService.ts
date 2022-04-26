@@ -8,7 +8,7 @@ import { MaintenanceLogRepository } from '@/repositories/maintenancelog/Maintena
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
-import { MaintenanceLogStatus } from './MaintenanceLogService';
+import { MaintenanceLogStatus } from '@/services/MaintenanceLogService';
 
 export enum MaintenancePartStatus {
   ORDERING = 'ORDERING',
