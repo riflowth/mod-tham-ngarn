@@ -31,8 +31,8 @@ export class DefaultMachineRepository extends Database implements MachineReposit
       name: machine.getName(),
       serial: machine.getSerial(),
       manufacturer: machine.getManufacturer(),
-      registration_date: machine.getRegistrationDate(),
-      retired_date: machine.getRetiredDate(),
+      registration_date: DateUtil.formatToSQL(machine.getRegistrationDate()),
+      retired_date: DateUtil.formatToSQL(machine.getRetiredDate()),
     };
 
     const results: any = await this.getSqlBuilder().read('Machine', parameter, readOptions);
@@ -43,6 +43,7 @@ export class DefaultMachineRepository extends Database implements MachineReposit
         .setZoneId(result.zone_id)
         .setName(result.name)
         .setSerial(result.serial)
+        .setManufacturer(result.manufacturer)
         .setRegistrationDate(DateUtil.formatFromSQL(result.registration_date))
         .setRetiredDate(DateUtil.formatFromSQL(result.retired_date));
     });
@@ -56,8 +57,8 @@ export class DefaultMachineRepository extends Database implements MachineReposit
       name: source.getName(),
       serial: source.getSerial(),
       manufacturer: source.getManufacturer(),
-      registration_date: source.getRegistrationDate(),
-      retired_date: source.getRetiredDate(),
+      registration_date: DateUtil.formatToSQL(source.getRegistrationDate()),
+      retired_date: DateUtil.formatToSQL(source.getRetiredDate()),
     };
 
     const destinationParameter = {
@@ -66,8 +67,8 @@ export class DefaultMachineRepository extends Database implements MachineReposit
       name: destination.getName(),
       serial: destination.getSerial(),
       manufacturer: destination.getManufacturer(),
-      registration_date: destination.getRegistrationDate(),
-      retired_date: destination.getRetiredDate(),
+      registration_date: DateUtil.formatToSQL(destination.getRegistrationDate()),
+      retired_date: DateUtil.formatToSQL(destination.getRetiredDate()),
     };
 
     const result: any = await this.getSqlBuilder().update('Machine', sourceParameter, destinationParameter);
@@ -82,8 +83,8 @@ export class DefaultMachineRepository extends Database implements MachineReposit
       name: machine.getName(),
       serial: machine.getSerial(),
       manufacturer: machine.getManufacturer(),
-      registration_date: machine.getRegistrationDate(),
-      retired_date: machine.getRetiredDate(),
+      registration_date: DateUtil.formatToSQL(machine.getRegistrationDate()),
+      retired_date: DateUtil.formatToSQL(machine.getRetiredDate()),
     };
 
     const result: any = await this.getSqlBuilder().delete('Machine', parameter);
