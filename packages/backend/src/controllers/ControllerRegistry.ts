@@ -68,17 +68,18 @@ export class ControllerRegistry {
       const routes = controller.getRouter();
 
       routes.forEach((route) => {
+        const routeHandler = ErrorHandler.wrap(route.handler);
         const routeMetadata = route.metadata;
         const routeMethod = routeMetadata.method.toLowerCase();
         const routePath = routeMetadata.path;
-        const routeHandler = route.handler;
+        const permission = routeMetadata.authentication;
 
-        if (routeMetadata.authentication) {
-          const authMiddleware = this.getAuthMiddleware(routeMetadata.authentication);
-          router.use(routePath, ErrorHandler.wrap(authMiddleware));
+        if (permission) {
+          const authMiddleware = this.getAuthMiddleware(permission);
+          router[routeMethod](routePath, ErrorHandler.wrap(authMiddleware), routeHandler);
+        } else {
+          router[routeMethod](routePath, routeHandler);
         }
-
-        router[routeMethod](routePath, ErrorHandler.wrap(routeHandler));
       });
 
       this.app.use(controller.getPath(), router);
