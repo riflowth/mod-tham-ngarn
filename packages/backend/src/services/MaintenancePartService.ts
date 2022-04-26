@@ -165,10 +165,7 @@ export class MaintenancePartService {
     return affectedRowsAmount === 1 ? newMaintenancePart.setPrimaryKey(primaryKey) : null;
   }
 
-  public async deleteMaintenancePart(
-    primaryKey: [number, number],
-    maintainerId: number,
-  ): Promise<MaintenancePart> {
+  public async deleteMaintenancePart(primaryKey: [number, number]): Promise<MaintenancePart> {
     const expectedMaintenancePart = new MaintenancePart().setPrimaryKey(primaryKey);
     const [targetMaintenancePart] = await this.maintenancePartRepository
       .read(expectedMaintenancePart);
