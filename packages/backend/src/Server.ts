@@ -36,8 +36,9 @@ import { BranchService } from '@/services/BranchService';
 import { BranchController } from '@/controllers/BranchController';
 import { MachineService } from '@/services/MachineService';
 import { MachineController } from '@/controllers/MachineController';
-import { AddressService } from './services/AddressService';
-import { AddressController } from './controllers/AddressController';
+import { StaffService } from '@/services/StaffService';
+import { AddressService } from '@/services/AddressService';
+import { AddressController } from '@/controllers/AddressController';
 
 export class Server {
 
@@ -65,6 +66,7 @@ export class Server {
   private branchService: BranchService;
   private zoneService: ZoneService;
   private machineService: MachineService;
+  private staffService: StaffService;
 
   public constructor(port: number) {
     this.app = express();
@@ -121,10 +123,18 @@ export class Server {
       this.branchRepository,
       this.machineRepository,
       this.zoneRepository,
+      this.staffRepository,
     );
     this.machineService = new MachineService(
       this.machineRepository,
       this.zoneRepository,
+    );
+    this.staffService = new StaffService(
+      this.staffRepository,
+      this.zoneRepository,
+      this.branchRepository,
+      this.maintenanceLogRepository,
+      this.billRepository,
     );
   }
 
@@ -142,7 +152,7 @@ export class Server {
       new AddressController(this.addressService),
       new AuthController(this.cookieProvider, this.authService),
       new BranchController(this.branchService),
-      new StaffController(this.staffRepository),
+      new StaffController(this.staffService),
       new ZoneController(this.zoneService),
       new MachineController(this.machineService),
     ]);
