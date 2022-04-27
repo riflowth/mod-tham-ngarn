@@ -48,54 +48,27 @@ export class MaintenancePartService {
     newMaintenancePart: MaintenancePart,
     maintainerId: number,
   ): Promise<MaintenancePart> {
-    const expectedPartToMaintain = new MachinePart().setMachineId(newMaintenancePart.getPartId());
-    const [machinePartToMaintain] = await this.machinePartRepository
-      .read(expectedPartToMaintain);
+    const machinePartToMaintain = await this.getMachinePartById(newMaintenancePart.getPartId());
 
     if (!machinePartToMaintain) {
       throw new InvalidRequestException('Machine part to maintain not found');
     }
 
-    const expectedMaintenanceLogToBind = new MaintenanceLog()
-      .setMaintenanceId(newMaintenancePart.getMaintenanceId());
-
-    const [targetMaintenanceLogToBind] = await this.maintenanceLogRepository
-      .read(expectedMaintenanceLogToBind);
-
-    if (!targetMaintenanceLogToBind) {
-      throw new InvalidRequestException('Maintenance log not found');
-    }
-
-    if (targetMaintenanceLogToBind.getMachineId() !== machinePartToMaintain.getMachineId()) {
-      throw new InvalidRequestException('Machine part to maintain is not related to maintenance log');
-    }
-
-    if (targetMaintenanceLogToBind.getMaintainerId() !== maintainerId) {
-      throw new InvalidRequestException('You cannot add the maintenance that not belong to you');
-    }
-
-    if (
-      targetMaintenanceLogToBind.getStatus() === MaintenanceLogStatus.SUCCESS
-      || targetMaintenanceLogToBind.getStatus() === MaintenanceLogStatus.SUCCESS
-    ) {
-      throw new InvalidRequestException('Cannot add maintenance part to finished maintenance log');
-    }
-
-    if (targetMaintenanceLogToBind.getStatus() === MaintenanceLogStatus.OPENED) {
-      throw new InvalidRequestException('Cannot add maintenance part to maintenance log that don\t have maintainer');
-    }
+    await this.validateMaintenanceLog(
+      newMaintenancePart.getMaintenanceId(),
+      machinePartToMaintain.getMachineId(),
+      maintainerId,
+    );
 
     const relatedOrderId = newMaintenancePart.getOrderId();
     if (relatedOrderId) {
       await this.validateOrder(relatedOrderId);
     }
 
-    const expectedExistedMaintenancePart = new MaintenancePart()
-      .setMaintenanceId(newMaintenancePart.getMaintenanceId())
-      .setPartId(newMaintenancePart.getPartId());
-
-    const [existedMaintenancePart] = await this.maintenancePartRepository
-      .read(expectedExistedMaintenancePart);
+    const existedMaintenancePart = await this.getMaintenancePartByPrimaryKey([
+      newMaintenancePart.getMaintenanceId(),
+      newMaintenancePart.getPartId(),
+    ]);
 
     if (existedMaintenancePart) {
       throw new InvalidRequestException('Maintenance part already exists');
@@ -109,10 +82,7 @@ export class MaintenancePartService {
     newMaintenancePart: MaintenancePart,
     maintainerId: number,
   ): Promise<MaintenancePart> {
-    const expectedMaintenancePart = new MaintenancePart().setPrimaryKey(primaryKey);
-
-    const [targetMaintenancePart] = await this.maintenancePartRepository
-      .read(expectedMaintenancePart);
+    const targetMaintenancePart = await this.getMaintenancePartByPrimaryKey(primaryKey);
 
     if (!targetMaintenancePart) {
       throw new InvalidRequestException('Maintenance part to edit not found');
@@ -120,38 +90,13 @@ export class MaintenancePartService {
 
     const relatedPartId = newMaintenancePart.getPartId();
     if (relatedPartId) {
-      const expectedMachineToValidate = new MachinePart().setPartId(relatedPartId);
-      const [machineToValidate] = await this.machinePartRepository.read(expectedMachineToValidate);
-      const machineIdToValidate = machineToValidate.getMachineId();
+      const machineToValidate = await this.getMachinePartById(relatedPartId);
 
-      const expectedMaintenanceLog = new MaintenanceLog()
-        .setMaintenanceId(newMaintenancePart.getMaintenanceId());
-
-      const [targetMaintenanceLogToBind] = await this.maintenanceLogRepository
-        .read(expectedMaintenanceLog);
-
-      if (!targetMaintenanceLogToBind) {
-        throw new InvalidRequestException('Maintenance log not found');
-      }
-
-      if (targetMaintenanceLogToBind.getMachineId() !== machineIdToValidate) {
-        throw new InvalidRequestException('Machine part to maintain is not related to maintenance log');
-      }
-
-      if (targetMaintenanceLogToBind.getMaintainerId() !== maintainerId) {
-        throw new InvalidRequestException('You cannot edit the maintenance that not belong to you');
-      }
-
-      if (
-        targetMaintenanceLogToBind.getStatus() === MaintenanceLogStatus.SUCCESS
-        || targetMaintenanceLogToBind.getStatus() === MaintenanceLogStatus.SUCCESS
-      ) {
-        throw new InvalidRequestException('Cannot edit maintenance part to finished maintenance log');
-      }
-
-      if (targetMaintenanceLogToBind.getStatus() === MaintenanceLogStatus.OPENED) {
-        throw new InvalidRequestException('Cannot edit maintenance part to maintenance log that don\t have maintainer');
-      }
+      await this.validateMaintenanceLog(
+        newMaintenancePart.getMaintenanceId(),
+        machineToValidate.getMachineId(),
+        maintainerId,
+      );
     }
 
     const relatedOrderId = newMaintenancePart.getOrderId();
@@ -159,19 +104,20 @@ export class MaintenancePartService {
       await this.validateOrder(relatedOrderId);
     }
 
+    const expectedMaintenancePartToEdit = new MaintenancePart().setPrimaryKey(primaryKey);
+
     const affectedRowsAmount = await this.maintenancePartRepository
-      .update(newMaintenancePart, expectedMaintenancePart);
+      .update(newMaintenancePart, expectedMaintenancePartToEdit);
 
     return affectedRowsAmount === 1 ? newMaintenancePart.setPrimaryKey(primaryKey) : null;
   }
 
   public async deleteMaintenancePart(primaryKey: [number, number]): Promise<MaintenancePart> {
     const expectedMaintenancePart = new MaintenancePart().setPrimaryKey(primaryKey);
-    const [targetMaintenancePart] = await this.maintenancePartRepository
-      .read(expectedMaintenancePart);
+    const targetMaintenancePart = await this.getMaintenancePartByPrimaryKey(primaryKey);
 
     if (!targetMaintenancePart) {
-      throw new InvalidRequestException('Maintenance part to delete not found');
+      throw new InvalidRequestException('MaintenanceId or partId to delete not found');
     }
 
     const affectedRowsAmount = await this.maintenancePartRepository.delete(expectedMaintenancePart);
@@ -197,6 +143,61 @@ export class MaintenancePartService {
     if (maintenancePartRelatedToOrder) {
       throw new InvalidRequestException('Order related to maintenance part has other maintenance part to bind');
     }
+  }
+
+  private async validateMaintenanceLog(
+    maintenanceId: number,
+    machineId: number,
+    maintainerId: number,
+  ): Promise<void> {
+    const maintenanceLogToBind = await this.getMaintenanceLogById(maintenanceId);
+
+    if (!maintenanceLogToBind) {
+      throw new InvalidRequestException('Maintenance log not found');
+    }
+
+    if (maintenanceLogToBind.getMachineId() !== machineId) {
+      throw new InvalidRequestException('Machine part to maintain is not related to maintenance log');
+    }
+
+    if (maintenanceLogToBind.getMaintainerId() !== maintainerId) {
+      throw new InvalidRequestException('You cannot edit/add the maintenance that not belong to you');
+    }
+
+    if (
+      maintenanceLogToBind.getStatus() === MaintenanceLogStatus.SUCCESS
+      || maintenanceLogToBind.getStatus() === MaintenanceLogStatus.SUCCESS
+    ) {
+      throw new InvalidRequestException('Cannot edit/add maintenance part to finished maintenance log');
+    }
+
+    if (maintenanceLogToBind.getStatus() === MaintenanceLogStatus.OPENED) {
+      throw new InvalidRequestException('Cannot edit/add maintenance part to maintenance log that don\t have maintainer');
+    }
+  }
+
+  private async getMachinePartById(machinePartId: number): Promise<MachinePart> {
+    const expectedMachinePart = new MachinePart().setMachineId(machinePartId);
+    const [machinePart] = await this.machinePartRepository.read(expectedMachinePart);
+
+    return machinePart;
+  }
+
+  private async getMaintenanceLogById(maintenanceId: number): Promise<MaintenanceLog> {
+    const expectedMaintenanceLog = new MaintenanceLog().setMaintenanceId(maintenanceId);
+    const [maintenanceLog] = await this.maintenanceLogRepository.read(expectedMaintenanceLog);
+
+    return maintenanceLog;
+  }
+
+  private async getMaintenancePartByPrimaryKey(
+    primaryKey: [number, number],
+  ): Promise<MaintenancePart> {
+    console.log(primaryKey);
+    const expectedMaintenancePart = new MaintenancePart().setPrimaryKey(primaryKey);
+    const [maintenancePart] = await this.maintenancePartRepository.read(expectedMaintenancePart);
+
+    return maintenancePart;
   }
 
 }
