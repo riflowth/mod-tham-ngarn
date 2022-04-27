@@ -57,15 +57,21 @@ export class OrderService {
 
     const billId = newOrder.getBillId();
     if (billId) {
-      await this.validateBill(newOrder.getBillId(), ordererId);
+      const billToValidate = await this.getBillById(billId);
+      await this.validateBill(billToValidate, ordererId);
     }
 
     if (machineId) {
-      await this.validateMachine(machineId, ordererZoneId);
+      const machineToValidate = await this.getMachineById(machineId);
+      await this.validateMachine(machineToValidate, ordererZoneId);
     }
 
     if (partId) {
-      await this.validateMachinePart(partId, ordererZoneId);
+      const partToValidate = await this.getMachinePartById(partId);
+      await this.validateMachinePart(partToValidate, ordererZoneId);
+
+      const machineByPartToValidate = await this.getMachineById(partToValidate.getMachineId());
+      await this.validateMachine(machineByPartToValidate, ordererZoneId);
     }
 
     return this.orderRepository.create(newOrder);
@@ -76,7 +82,8 @@ export class OrderService {
     newOrder: Order,
     ordererId: number,
   ): Promise<Order> {
-    await this.validateOrder(orderId, ordererId);
+    const orderToValidate = await this.getOrderById(orderId);
+    await this.validateOrder(orderToValidate, ordererId);
 
     const expectedOrderToEdit = new Order().setOrderId(orderId);
 
@@ -87,7 +94,8 @@ export class OrderService {
   }
 
   public async deleteOrder(orderId: number, ordererId: number): Promise<Order> {
-    await this.validateOrder(orderId, ordererId);
+    const orderToValidate = await this.getOrderById(orderId);
+    await this.validateOrder(orderToValidate, ordererId);
 
     const expectedOrderToDelete = new Order().setOrderId(orderId);
 
@@ -137,9 +145,7 @@ export class OrderService {
     return part;
   }
 
-  private async validateBill(billId: number, ordererId: number): Promise<void> {
-    const billToValidate = await this.getBillById(billId);
-
+  private async validateBill(billToValidate: Bill, ordererId: number): Promise<void> {
     if (!billToValidate) {
       throw new InvalidRequestException('Bill does not exist');
     }
@@ -150,11 +156,9 @@ export class OrderService {
   }
 
   private async validateMachine(
-    machineId: number,
+    machineToValidate: Machine,
     ordererZoneId: number,
   ): Promise<void> {
-    const machineToValidate = await this.getMachineById(machineId);
-
     if (!machineToValidate) {
       throw new InvalidRequestException('Machine does not exist');
     }
@@ -165,20 +169,15 @@ export class OrderService {
   }
 
   private async validateMachinePart(
-    partId: number,
+    partToValidate: MachinePart,
     ordererZoneId: number,
   ): Promise<void> {
-    const partToValidate = await this.getMachinePartById(partId);
-
     if (!partToValidate) {
       throw new InvalidRequestException('Part does not exist');
     }
-
-    await this.validateMachine(partToValidate.getMachineId(), ordererZoneId);
   }
 
-  private async validateOrder(orderId: number, ordererId: number): Promise<void> {
-    const orderToValidate = await this.getOrderById(orderId);
+  private async validateOrder(orderToValidate: Order, ordererId: number): Promise<void> {
     if (!orderToValidate) {
       throw new InvalidRequestException('Order does not exist');
     }
