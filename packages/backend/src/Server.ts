@@ -43,6 +43,8 @@ import { MaintenanceLogService } from '@/services/MaintenanceLogService';
 import { MaintenanceLogController } from '@/controllers/MaintenanceLogController';
 import { MaintenancePartService } from '@/services/MaintenancePartService';
 import { MaintenancePartController } from '@/controllers/MaintenancePartController';
+import { OrderService } from '@/services/OrderService';
+import { OrderController } from '@/controllers/OrderController';
 
 export class Server {
 
@@ -72,6 +74,7 @@ export class Server {
   private maintenancePartService: MaintenancePartService;
   private zoneService: ZoneService;
   private machineService: MachineService;
+  private orderService: OrderService;
   private staffService: StaffService;
 
   public constructor(port: number) {
@@ -146,6 +149,13 @@ export class Server {
       this.machineRepository,
       this.zoneRepository,
     );
+    this.orderService = new OrderService(
+      this.billRepository,
+      this.machineRepository,
+      this.machinePartRepository,
+      this.maintenancePartRepository,
+      this.orderRepository,
+    );
     this.staffService = new StaffService(
       this.staffRepository,
       this.zoneRepository,
@@ -171,6 +181,7 @@ export class Server {
       new BranchController(this.branchService),
       new MaintenanceLogController(this.maintenanceLogService),
       new MaintenancePartController(this.maintenancePartService),
+      new OrderController(this.orderService),
       new StaffController(this.staffService),
       new ZoneController(this.zoneService),
       new MachineController(this.machineService),
