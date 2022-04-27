@@ -25,7 +25,7 @@ export class MachinePartController extends Controller {
   @RouteMapping('/', Methods.GET)
   private async getAllMachinePart(req: Request, res: Response): Promise<void> {
     const readOptions: ReadOptions = {
-      limit: Number(req.query.limt),
+      limit: Number(req.query.limit),
       offset: Number(req.query.offset),
     };
 
