@@ -50,12 +50,21 @@ export class AuthService {
       .setExpiryDate(cookie.getExpiryDate());
 
     await this.sessionRepository.create(session);
+    await this.sessionRepository.cacheSession(sessionId, {
+      sessionId,
+      staffId: Number(username),
+      role: staff.getPosition(),
+      zoneId: staff.getZoneId(),
+      branchId: staff.getBranchId(),
+    });
+
     return cookie;
   }
 
   public async logout(sessionId: string): Promise<void> {
     const expectedSession = new Session().setSessionId(sessionId);
-    this.sessionRepository.delete(expectedSession);
+    await this.sessionRepository.delete(expectedSession);
+    await this.sessionRepository.removeCachedSession(sessionId);
   }
 
 }

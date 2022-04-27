@@ -39,7 +39,7 @@ export class DefaultMaintenancePartRepository
 
     const maintenanceParts = results[0].map((result) => {
       return new MaintenancePart()
-        .setPrimaryKey([result.part_id, result.machine_id])
+        .setPrimaryKey([result.maintenance_part, result.part_id])
         .setType(result.type)
         .setStatus(result.status)
         .setOrderId(result.order_id);

@@ -7,8 +7,8 @@ import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { AddressService } from '@/services/AddressService';
 import { Request, Response } from 'express';
-import { Controller } from './Controller';
-import { Methods } from './Route';
+import { Controller } from '@/controllers/Controller';
+import { Methods } from '@/controllers/Route';
 
 @ControllerMapping('/address')
 export class AddressController extends Controller {

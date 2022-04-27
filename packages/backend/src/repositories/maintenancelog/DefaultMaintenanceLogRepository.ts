@@ -97,7 +97,7 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
       status: maintenanceLog.getStatus(),
     };
 
-    const result: any = await this.getSqlBuilder().delete('Address', parameter);
+    const result: any = await this.getSqlBuilder().delete('MaintenanceLog', parameter);
 
     return result[0].affectedRows;
   }

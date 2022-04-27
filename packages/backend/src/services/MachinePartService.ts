@@ -8,6 +8,11 @@ import { MachinePartRepository } from '@/repositories/machinePart/MachinePartRep
 import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
 
+export enum MachinePartStatus {
+  AVAILABLE = 'AVAILABLE',
+  UNAVAILABLE = 'UNAVAILABLE',
+}
+
 export class MachinePartService {
 
   private readonly machineRepository: MachineRepository;

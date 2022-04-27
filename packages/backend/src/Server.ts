@@ -36,8 +36,13 @@ import { BranchService } from '@/services/BranchService';
 import { BranchController } from '@/controllers/BranchController';
 import { MachineService } from '@/services/MachineService';
 import { MachineController } from '@/controllers/MachineController';
-import { AddressService } from './services/AddressService';
-import { AddressController } from './controllers/AddressController';
+import { StaffService } from '@/services/StaffService';
+import { AddressService } from '@/services/AddressService';
+import { AddressController } from '@/controllers/AddressController';
+import { MaintenanceLogService } from '@/services/MaintenanceLogService';
+import { MaintenanceLogController } from '@/controllers/MaintenanceLogController';
+import { MaintenancePartService } from '@/services/MaintenancePartService';
+import { MaintenancePartController } from '@/controllers/MaintenancePartController';
 
 export class Server {
 
@@ -63,8 +68,11 @@ export class Server {
   private authService: AuthService;
   private addressService: AddressService;
   private branchService: BranchService;
+  private maintenanceLogService: MaintenanceLogService;
+  private maintenancePartService: MaintenancePartService;
   private zoneService: ZoneService;
   private machineService: MachineService;
+  private staffService: StaffService;
 
   public constructor(port: number) {
     this.app = express();
@@ -117,14 +125,33 @@ export class Server {
       this.branchRepository,
       this.zoneRepository,
     );
+    this.maintenanceLogService = new MaintenanceLogService(
+      this.machineRepository,
+      this.maintenanceLogRepository,
+      this.maintenancePartRepository,
+    );
+    this.maintenancePartService = new MaintenancePartService(
+      this.machinePartRepository,
+      this.maintenanceLogRepository,
+      this.maintenancePartRepository,
+      this.orderRepository,
+    );
     this.zoneService = new ZoneService(
       this.branchRepository,
       this.machineRepository,
       this.zoneRepository,
+      this.staffRepository,
     );
     this.machineService = new MachineService(
       this.machineRepository,
       this.zoneRepository,
+    );
+    this.staffService = new StaffService(
+      this.staffRepository,
+      this.zoneRepository,
+      this.branchRepository,
+      this.maintenanceLogRepository,
+      this.billRepository,
     );
   }
 
@@ -142,7 +169,9 @@ export class Server {
       new AddressController(this.addressService),
       new AuthController(this.cookieProvider, this.authService),
       new BranchController(this.branchService),
-      new StaffController(this.staffRepository),
+      new MaintenanceLogController(this.maintenanceLogService),
+      new MaintenancePartController(this.maintenancePartService),
+      new StaffController(this.staffService),
       new ZoneController(this.zoneService),
       new MachineController(this.machineService),
     ]);

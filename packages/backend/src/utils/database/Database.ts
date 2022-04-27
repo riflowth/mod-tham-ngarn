@@ -14,6 +14,18 @@ export class Database {
     this.sqlBuilder = new SqlBuilder(defaultDatabase);
   }
 
+  public async setCache(key: string, value: string): Promise<void> {
+    await this.cachingDatabase.set(key, value);
+  }
+
+  public async getCache(key: string): Promise<string> {
+    return this.cachingDatabase.get(key);
+  }
+
+  public async removeCache(key: string): Promise<void> {
+    await this.cachingDatabase.del(key);
+  }
+
   public query(sql: string, values: any) {
     return this.defaultDatabase.query(sql, values);
   }
