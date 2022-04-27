@@ -58,20 +58,20 @@ export class OrderService {
     const billId = newOrder.getBillId();
     if (billId) {
       const billToValidate = await this.getBillById(billId);
-      await this.validateBill(billToValidate, ordererId);
+      this.validateBillRelation(billToValidate, ordererId);
     }
 
     if (machineId) {
       const machineToValidate = await this.getMachineById(machineId);
-      await this.validateMachine(machineToValidate, ordererZoneId);
+      await this.validateMachineRelation(machineToValidate, ordererZoneId);
     }
 
     if (partId) {
       const partToValidate = await this.getMachinePartById(partId);
-      await this.validateMachinePart(partToValidate, ordererZoneId);
+      await this.validateMachinePartRelation(partToValidate, ordererZoneId);
 
       const machineByPartToValidate = await this.getMachineById(partToValidate.getMachineId());
-      await this.validateMachine(machineByPartToValidate, ordererZoneId);
+      await this.validateMachineRelation(machineByPartToValidate, ordererZoneId);
     }
 
     return this.orderRepository.create(newOrder);
@@ -83,19 +83,42 @@ export class OrderService {
     ordererId: number,
   ): Promise<Order> {
     const orderToValidate = await this.getOrderById(orderId);
-    await this.validateOrder(orderToValidate, ordererId);
+    this.validateOrderRelation(orderToValidate, ordererId);
+
+    const billToValidate = await this.getBillById(orderToValidate.getBillId());
+    this.validateBillRelation(billToValidate, ordererId);
+
+    const newStatus = newOrder.getStatus();
+
+    switch (newStatus) {
+      case OrderStatus.SHIPPING:
+        this.validateChangeOrderStatusToShipping(orderToValidate);
+        break;
+      case OrderStatus.DELIVERED:
+        this.validateChangeOrderStatusToDelivered(orderToValidate);
+        break;
+      case OrderStatus.CANCELED:
+        this.validateChangeOrderStatusToCanceled(orderToValidate);
+        break;
+      default:
+        this.validateChangeOrderData(orderToValidate);
+    }
 
     const expectedOrderToEdit = new Order().setOrderId(orderId);
 
     const affectedRowsAmount = await this.orderRepository.update(newOrder, expectedOrderToEdit);
 
     return affectedRowsAmount === 1 ? newOrder.setPrimaryKey(orderId) : null;
-
   }
 
   public async deleteOrder(orderId: number, ordererId: number): Promise<Order> {
     const orderToValidate = await this.getOrderById(orderId);
-    await this.validateOrder(orderToValidate, ordererId);
+    this.validateOrderRelation(orderToValidate, ordererId);
+
+    const billToValidate = await this.getBillById(orderToValidate.getBillId());
+    this.validateBillRelation(billToValidate, ordererId);
+
+    this.validateChangeOrderData(orderToValidate);
 
     const expectedOrderToDelete = new Order().setOrderId(orderId);
 
@@ -145,20 +168,10 @@ export class OrderService {
     return part;
   }
 
-  private async validateBill(billToValidate: Bill, ordererId: number): Promise<void> {
-    if (!billToValidate) {
-      throw new InvalidRequestException('Bill does not exist');
-    }
-
-    if (billToValidate.getOrderBy() !== ordererId) {
-      throw new InvalidRequestException('Bill does not belong to the current user');
-    }
-  }
-
-  private async validateMachine(
+  private validateMachineRelation(
     machineToValidate: Machine,
     ordererZoneId: number,
-  ): Promise<void> {
+  ): void {
     if (!machineToValidate) {
       throw new InvalidRequestException('Machine does not exist');
     }
@@ -168,34 +181,57 @@ export class OrderService {
     }
   }
 
-  private async validateMachinePart(
+  private validateMachinePartRelation(
     partToValidate: MachinePart,
     ordererZoneId: number,
-  ): Promise<void> {
+  ): void {
     if (!partToValidate) {
       throw new InvalidRequestException('Part does not exist');
     }
   }
 
-  private async validateOrder(orderToValidate: Order, ordererId: number): Promise<void> {
+  private validateOrderRelation(orderToValidate: Order, ordererId: number): void {
     if (!orderToValidate) {
       throw new InvalidRequestException('Order does not exist');
     }
+  }
 
-    const relatedBill = await this.getBillById(orderToValidate.getBillId());
-    if (relatedBill.getBillId() !== orderToValidate.getBillId()) {
-      throw new InvalidRequestException('Order does not belong to the bill');
+  private validateBillRelation(billToValidate: Bill, ordererId: number): void {
+    if (!billToValidate) {
+      throw new InvalidRequestException('Bill does not exist');
     }
 
-    if (relatedBill.getOrderBy() !== ordererId) {
-      throw new InvalidRequestException('Order does not belong to the current user');
+    if (billToValidate.getOrderBy() !== ordererId) {
+      throw new InvalidRequestException('Bill does not belong to the current user');
     }
+  }
 
+  private validateChangeOrderData(orderToValidate: Order): void {
     if (
       orderToValidate.getStatus() === OrderStatus.DELIVERED
       || orderToValidate.getStatus() === OrderStatus.CANCELED
     ) {
       throw new InvalidRequestException('You cannot delete/edit order that finished');
+    }
+  }
+
+  private validateChangeOrderStatusToShipping(orderToUpdate: Order): void {
+    if (orderToUpdate.getStatus() === OrderStatus.SHIPPING) {
+      throw new InvalidRequestException('Order status is already shipping');
+    } else {
+      throw new InvalidRequestException('Other status cannot be changed to shipping');
+    }
+  }
+
+  private validateChangeOrderStatusToDelivered(orderToUpdate: Order): void {
+    if (orderToUpdate.getStatus() !== OrderStatus.SHIPPING) {
+      throw new InvalidRequestException('Order status must be shipping to be changed to delivered');
+    }
+  }
+
+  private validateChangeOrderStatusToCanceled(orderToUpdate: Order): void {
+    if (orderToUpdate.getStatus() !== OrderStatus.SHIPPING) {
+      throw new InvalidRequestException('Order status must be shipping to be changed to canceled');
     }
   }
 

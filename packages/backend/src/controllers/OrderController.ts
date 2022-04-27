@@ -7,7 +7,8 @@ import { RouteMapping } from '@/decorators/RouteDecorator';
 import { Order } from '@/entities/Order';
 import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { ReadOptions } from '@/repositories/ReadOptions';
-import { OrderService } from '@/services/OrderService';
+import { OrderService, OrderStatus } from '@/services/OrderService';
+import { EnumUtils } from '@/utils/EnumUtils';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { Request, Response } from 'express';
 
@@ -123,6 +124,32 @@ export class OrderController extends Controller {
 
     const updatedField = await this.orderService
       .editOrder(parseOrderId, newOrder, ordererId);
+
+    res.status(200).json({ updatedField });
+  }
+
+  @Authentication(Role.PURCHASING)
+  @RouteMapping('/:billId/order/status', Methods.PUT)
+  @RequestBody('orderId', 'status')
+  private async updateOrderStatus(req: Request, res: Response): Promise<void> {
+    const { staffId: ordererId } = req.session;
+    const { orderId, status } = req.body;
+
+    const parseOrderId = NumberUtils.parsePositiveInteger(orderId);
+
+    if (!parseOrderId) {
+      throw new InvalidRequestException('OrderId must be a positive integer');
+    }
+
+    const isValidStatus = EnumUtils.isIncludesInEnum(status, OrderStatus);
+
+    if (!isValidStatus) {
+      throw new InvalidRequestException('Status to updated must be a SHIPPING, DELIVERED or CANCELLED');
+    }
+
+    const orderToUpdate = new Order().setStatus(status);
+
+    const updatedField = await this.orderService.editOrder(parseOrderId, orderToUpdate, ordererId);
 
     res.status(200).json({ updatedField });
   }
