@@ -126,16 +126,16 @@ export class MaintenancePartService {
   }
 
   private async validateOrder(relatedOrderId: number): Promise<void> {
-    const expectedRelatedOrder = new Order().setOrderId(relatedOrderId);
+    const expectedOrderToValidate = new Order().setOrderId(relatedOrderId);
 
-    const [relatedOrder] = await this.orderRepository.read(expectedRelatedOrder);
+    const [orderToValidate] = await this.orderRepository.read(expectedOrderToValidate);
 
-    if (!relatedOrder) {
+    if (!orderToValidate) {
       throw new InvalidRequestException('Order related to maintenance part does not existed');
     }
 
     const expectedMaintenancePartRelatedToOrder = new MaintenancePart()
-      .setOrderId(relatedOrder.getOrderId());
+      .setOrderId(orderToValidate.getOrderId());
 
     const maintenancePartRelatedToOrder = await this.maintenancePartRepository
       .read(expectedMaintenancePartRelatedToOrder);
@@ -150,28 +150,28 @@ export class MaintenancePartService {
     machineId: number,
     maintainerId: number,
   ): Promise<void> {
-    const maintenanceLogToBind = await this.getMaintenanceLogById(maintenanceId);
+    const maintenanceLogToValidate = await this.getMaintenanceLogById(maintenanceId);
 
-    if (!maintenanceLogToBind) {
+    if (!maintenanceLogToValidate) {
       throw new InvalidRequestException('Maintenance log not found');
     }
 
-    if (maintenanceLogToBind.getMachineId() !== machineId) {
+    if (maintenanceLogToValidate.getMachineId() !== machineId) {
       throw new InvalidRequestException('Machine part to maintain is not related to maintenance log');
     }
 
-    if (maintenanceLogToBind.getMaintainerId() !== maintainerId) {
+    if (maintenanceLogToValidate.getMaintainerId() !== maintainerId) {
       throw new InvalidRequestException('You cannot edit/add the maintenance that not belong to you');
     }
 
     if (
-      maintenanceLogToBind.getStatus() === MaintenanceLogStatus.SUCCESS
-      || maintenanceLogToBind.getStatus() === MaintenanceLogStatus.FAILED
+      maintenanceLogToValidate.getStatus() === MaintenanceLogStatus.SUCCESS
+      || maintenanceLogToValidate.getStatus() === MaintenanceLogStatus.FAILED
     ) {
       throw new InvalidRequestException('Cannot edit/add maintenance part to finished maintenance log');
     }
 
-    if (maintenanceLogToBind.getStatus() === MaintenanceLogStatus.OPENED) {
+    if (maintenanceLogToValidate.getStatus() === MaintenanceLogStatus.OPENED) {
       throw new InvalidRequestException('Cannot edit/add maintenance part to maintenance log that don\t have maintainer');
     }
   }
