@@ -110,17 +110,19 @@ export class ControllerRegistry {
       }
 
       const cachedSession = await this.sessionRepository.getCachedSession(sessionId);
+      let session;
+      let staff;
 
-      let session = new Session()
-        .setSessionId(cachedSession.sessionId)
-        .setStaffId(cachedSession.staffId);
-      let staff = new Staff()
-        .setStaffId(cachedSession.staffId)
-        .setPosition(cachedSession.role)
-        .setZoneId(cachedSession.zoneId)
-        .setBranchId(cachedSession.branchId);
-
-      if (!cachedSession) {
+      if (cachedSession) {
+        session = new Session()
+          .setSessionId(cachedSession.sessionId)
+          .setStaffId(cachedSession.staffId);
+        staff = new Staff()
+          .setStaffId(cachedSession.staffId)
+          .setPosition(cachedSession.role)
+          .setZoneId(cachedSession.zoneId)
+          .setBranchId(cachedSession.branchId);
+      } else {
         const expectedSession = new Session().setSessionId(sessionId);
         [session] = await this.sessionRepository.read(expectedSession);
 
@@ -137,6 +139,14 @@ export class ControllerRegistry {
 
         const expectedStaff = new Staff().setStaffId(session.getStaffId());
         [staff] = await this.staffRepository.read(expectedStaff);
+
+        await this.sessionRepository.cacheSession(sessionId, {
+          sessionId,
+          staffId: staff.getStaffId(),
+          role: staff.getPosition(),
+          zoneId: staff.getZoneId(),
+          branchId: staff.getBranchId(),
+        });
       }
 
       const isAuthorized = role.length === 0
