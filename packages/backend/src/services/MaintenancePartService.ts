@@ -166,7 +166,7 @@ export class MaintenancePartService {
 
     if (
       maintenanceLogToBind.getStatus() === MaintenanceLogStatus.SUCCESS
-      || maintenanceLogToBind.getStatus() === MaintenanceLogStatus.SUCCESS
+      || maintenanceLogToBind.getStatus() === MaintenanceLogStatus.FAILED
     ) {
       throw new InvalidRequestException('Cannot edit/add maintenance part to finished maintenance log');
     }
