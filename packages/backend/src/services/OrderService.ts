@@ -1,6 +1,7 @@
 import { Bill } from '@/entities/Bill';
 import { Machine } from '@/entities/Machine';
 import { MachinePart } from '@/entities/MachinePart';
+import { MaintenancePart } from '@/entities/MaintenancePart';
 import { Order } from '@/entities/Order';
 import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { BillRepository } from '@/repositories/bill/BillRepository';
@@ -90,6 +91,12 @@ export class OrderService {
 
     const expectedOrderToDelete = new Order().setOrderId(orderId);
 
+    const relatedMaintenancePart = await this.getMaintenancePartByOrderId(orderId);
+
+    if (relatedMaintenancePart) {
+      throw new InvalidRequestException('Order has related maintenance part');
+    }
+
     const affectedRowsAmount = await this.orderRepository.delete(expectedOrderToDelete);
 
     return affectedRowsAmount === 1 ? new Order().setPrimaryKey(orderId) : null;
@@ -119,6 +126,13 @@ export class OrderService {
   private async getMachinePartById(partId: number): Promise<MachinePart> {
     const expectedPart = new MachinePart().setPartId(partId);
     const [part] = await this.machinePartRepository.read(expectedPart);
+
+    return part;
+  }
+
+  private async getMaintenancePartByOrderId(orderId: number): Promise<MaintenancePart> {
+    const expectedPart = new MaintenancePart().setOrderId(orderId);
+    const [part] = await this.maintenancePartRepository.read(expectedPart);
 
     return part;
   }
