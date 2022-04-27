@@ -55,19 +55,16 @@ export class MaintenancePartController extends Controller {
     } = req.body;
 
     const parseMaintenanceId = NumberUtils.parsePositiveInteger(maintenanceId);
-
     if (!parseMaintenanceId) {
       throw new InvalidRequestException('MaintenanceId must be a positive integer');
     }
 
     const parsePartId = NumberUtils.parsePositiveInteger(partId);
-
     if (!parsePartId) {
       throw new InvalidRequestException('PartId must be a positive integer');
     }
 
     const parseOrderId = NumberUtils.parsePositiveInteger(orderId);
-
     if (orderId && !parseOrderId) {
       throw new InvalidRequestException('OrderId must be a positive integer');
     }
@@ -98,19 +95,16 @@ export class MaintenancePartController extends Controller {
     }
 
     const parsePartId = NumberUtils.parsePositiveInteger(partId);
-
     if (!parsePartId) {
       throw new InvalidRequestException('PartId must be a positive integer');
     }
 
     const parseOrderId = NumberUtils.parsePositiveInteger(orderId);
-
     if (orderId && !parseOrderId) {
       throw new InvalidRequestException('OrderId must be a positive integer');
     }
 
     const primaryKeyToUpdate: [number, number] = [parseMaintenanceId, parsePartId];
-
     const newMaintenancePart = new MaintenancePart()
       .setType(type)
       .setOrderId(parseOrderId);
