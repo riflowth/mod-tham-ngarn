@@ -193,7 +193,6 @@ export class MaintenancePartService {
   private async getMaintenancePartByPrimaryKey(
     primaryKey: [number, number],
   ): Promise<MaintenancePart> {
-    console.log(primaryKey);
     const expectedMaintenancePart = new MaintenancePart().setPrimaryKey(primaryKey);
     const [maintenancePart] = await this.maintenancePartRepository.read(expectedMaintenancePart);
 
