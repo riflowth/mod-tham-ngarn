@@ -33,21 +33,25 @@ export class BillService {
   }
 
   public async getBillsByBranchId(branchId: number, readOptions?: ReadOptions): Promise<Bill[]> {
+    await this.validateNumber(branchId, 'Branch id');
     return this.billRepository.readByBranchId(branchId, readOptions);
   }
 
   public async addBill(newBill: Bill): Promise<Bill> {
+    await this.validateNumber(newBill.getOrderBy(), 'Order by id');
     await this.validateStaff(newBill.getOrderBy());
 
     return this.billRepository.create(newBill);
   }
 
   public async editBill(billId: number, newBill: Bill, staffId: number): Promise<Bill> {
+    await this.validateNumber(billId, 'Bill id');
     const targetBill = await this.validateBill(billId, staffId);
 
     const newStaffId = newBill.getOrderBy();
 
-    if (newStaffId) {
+    if (newStaffId !== undefined) {
+      await this.validateNumber(newBill.getOrderBy(), 'Order by id');
       await this.validateStaff(newStaffId);
       await this.validateBill(billId, newStaffId);
     }
@@ -57,7 +61,8 @@ export class BillService {
     return affectedRowsAmount === 1 ? newBill.setBillId(billId) : null;
   }
 
-  public async deleteBill(billId: number, staffId: number) {
+  public async deleteBill(billId: number, staffId: number): Promise<Bill> {
+    await this.validateNumber(billId, 'Bill id');
     const targetBill = await this.validateBill(billId, staffId);
 
     const expectedRelatedOrders = new Order().setBillId(billId);
@@ -70,6 +75,12 @@ export class BillService {
     const affectedRowsAmount = await this.billRepository.delete(targetBill);
 
     return affectedRowsAmount === 1 ? targetBill : null;
+  }
+
+  private async validateNumber(numberToValidate: number, name: string): Promise<void> {
+    if (numberToValidate === null) {
+      throw new InvalidRequestException(`${name} must be a positive integer`);
+    }
   }
 
   private async validateStaff(staffId: number): Promise<void> {
@@ -99,7 +110,7 @@ export class BillService {
       targetOrderer.getBranchId() !== targetCurrentStaff.getBranchId()
       && targetCurrentStaff.getPosition() !== 'CEO'
     ) {
-      throw new ForbiddenException('This bill does not belong to your branch');
+      throw new ForbiddenException('Bill does not belong to the provided staff\'s branch');
     }
 
     return targetBill;
