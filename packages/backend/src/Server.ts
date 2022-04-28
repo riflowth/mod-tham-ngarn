@@ -45,6 +45,8 @@ import { MaintenancePartService } from '@/services/MaintenancePartService';
 import { MaintenancePartController } from '@/controllers/MaintenancePartController';
 import { OrderService } from '@/services/OrderService';
 import { OrderController } from '@/controllers/OrderController';
+import { BillService } from '@/services/BillService';
+import { BillController } from '@/controllers/BillController';
 
 export class Server {
 
@@ -69,6 +71,7 @@ export class Server {
 
   private authService: AuthService;
   private addressService: AddressService;
+  private billService: BillService;
   private branchService: BranchService;
   private maintenanceLogService: MaintenanceLogService;
   private maintenancePartService: MaintenancePartService;
@@ -163,6 +166,11 @@ export class Server {
       this.maintenanceLogRepository,
       this.billRepository,
     );
+    this.billService = new BillService(
+      this.billRepository,
+      this.staffRepository,
+      this.orderRepository,
+    );
   }
 
   private async loadControllers(): Promise<void> {
@@ -178,6 +186,7 @@ export class Server {
     this.controllerRegistry.loadControllers([
       new AddressController(this.addressService),
       new AuthController(this.cookieProvider, this.authService),
+      new BillController(this.billService),
       new BranchController(this.branchService),
       new MaintenanceLogController(this.maintenanceLogService),
       new MaintenancePartController(this.maintenancePartService),
