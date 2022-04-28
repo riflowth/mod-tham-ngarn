@@ -29,4 +29,8 @@ export class MockStaffRepository implements StaffRepository {
     throw new Error('Method not implemented.');
   }
 
+  public async readByStaffId(staffId: number): Promise<Staff> {
+    throw new Error('Method not implemented.');
+  }
+
 }
