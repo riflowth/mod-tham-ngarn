@@ -35,6 +35,10 @@ export class ZoneService {
   }
 
   public async getZoneByZoneId(zoneId: number): Promise<Zone[]> {
+    if (!zoneId) {
+      throw new InvalidRequestException('ZoneId must be a positive integer');
+    }
+
     const zoneToRead = new Zone().setZoneId(zoneId);
     return this.zoneRepository.read(zoneToRead);
   }
@@ -47,6 +51,11 @@ export class ZoneService {
   }
 
   public async addZone(newZone: Zone): Promise<Zone> {
+    const branchId = newZone.getBranchId();
+    if (!branchId) {
+      throw new InvalidRequestException('BranchId must be a positive integer');
+    }
+
     const relatedBranchToRead = new Branch().setBranchId(newZone.getBranchId());
     const [relatedBranch] = await this.branchRepository.read(relatedBranchToRead);
 
@@ -58,6 +67,18 @@ export class ZoneService {
   }
 
   public async editZone(zoneId: number, newZone: Zone): Promise<Zone> {
+    const timeToStart = newZone.getTimeToStart();
+    const timeToEnd = newZone.getTimeToEnd();
+    const branchId = newZone.getBranchId();
+
+    if (timeToStart === undefined && timeToEnd === undefined && branchId === undefined) {
+      throw new InvalidRequestException('No provided data to update');
+    }
+
+    if (!zoneId) {
+      throw new InvalidRequestException('ZoneId must be a positive integer');
+    }
+
     const zoneToEdit = new Zone().setZoneId(zoneId);
     const [targetZone] = await this.zoneRepository.read(zoneToEdit);
 
@@ -82,6 +103,10 @@ export class ZoneService {
   }
 
   public async deleteZone(zoneId: number): Promise<Zone> {
+    if (!zoneId) {
+      throw new InvalidRequestException('ZoneId must be a positive integer');
+    }
+
     const zoneToDelete = new Zone().setZoneId(zoneId);
     const [targetZone] = await this.zoneRepository.read(zoneToDelete);
 
