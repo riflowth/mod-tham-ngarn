@@ -150,6 +150,10 @@ export class Server {
     );
     this.machineService = new MachineService(
       this.machineRepository,
+      this.machinePartRepository,
+      this.maintenanceLogRepository,
+      this.orderRepository,
+      this.staffRepository,
       this.zoneRepository,
     );
     this.orderService = new OrderService(
