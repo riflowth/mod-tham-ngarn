@@ -6,96 +6,173 @@ import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { Zone } from '@/entities/Zone';
 import { NotFoundException } from '@/exceptions/NotFoundException';
-import { NumberUtils } from '@/utils/NumberUtils';
+import { Staff } from '@/entities/Staff';
+import { StaffRepository } from '@/repositories/staff/StaffRepository';
+import { ForbiddenException } from '@/exceptions/ForbiddenException';
+import { MachinePartRepository } from '@/repositories/machinePart/MachinePartRepository';
+import { OrderRepository } from '@/repositories/order/OrderRepository';
+import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
+import { MachinePart } from '@/entities/MachinePart';
+import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
+import { MaintenanceLog } from '@/entities/MaintenanceLog';
+import { Order } from '@/entities/Order';
 
 export class MachineService {
 
   private readonly machineRepository: MachineRepository;
+  private readonly machinePartRepository: MachinePartRepository;
+  private readonly maintenanceLogRepository: MaintenanceLogRepository;
+  private readonly orderRepository: OrderRepository;
+  private readonly staffRepository: StaffRepository;
   private readonly zoneRepository: ZoneRepository;
 
   public constructor(
     machineRepository: MachineRepository,
+    machinePartRepository: MachinePartRepository,
+    maintenanceLogRepository: MaintenanceLogRepository,
+    orderRepository: OrderRepository,
+    staffRepository: StaffRepository,
     zoneRepository: ZoneRepository,
   ) {
     this.machineRepository = machineRepository;
+    this.machinePartRepository = machinePartRepository;
+    this.maintenanceLogRepository = maintenanceLogRepository;
+    this.orderRepository = orderRepository;
+    this.staffRepository = staffRepository;
     this.zoneRepository = zoneRepository;
   }
 
   public async getAllMachines(readOptions?: ReadOptions): Promise<Machine[]> {
-    const machineToRead = new Machine();
-    return this.machineRepository.read(machineToRead, readOptions);
+    const expectedMachine = new Machine();
+    return this.machineRepository.read(expectedMachine, readOptions);
   }
 
-  public async getMachinesByZoneId(zoneId: number, readOptions: ReadOptions): Promise<Machine[]> {
-    const machineToRead = new Machine().setZoneId(zoneId);
-    return this.machineRepository.read(machineToRead, readOptions);
+  public async getMachinesByZoneId(
+    zoneId: number,
+    readOptions: ReadOptions,
+    staffId: number,
+  ): Promise<Machine[]> {
+    await this.validateNumber(zoneId, 'Zone id');
+    await this.validateZone(zoneId, staffId);
+
+    const expectedMachine = new Machine().setZoneId(zoneId);
+    return this.machineRepository.read(expectedMachine, readOptions);
   }
 
   public async getMachinesByBranchId(
     branchId: number,
     readOptions?: ReadOptions,
   ): Promise<Machine[]> {
-    const zoneToRead = new Zone().setBranchId(branchId);
-    const zones = await this.zoneRepository.read(zoneToRead);
-
-    const newReadOptions = readOptions;
-    const branchMachines: Array<Machine> = [];
-
-    if (NumberUtils.isPositiveInteger(readOptions.limit)) {
-      for (const zone of zones) {
-        if (newReadOptions.limit > 0) {
-          const machineToRead = new Machine().setZoneId(zone.getZoneId());
-          const machines = await this.machineRepository.read(machineToRead, newReadOptions);
-          newReadOptions.offset -= machines.length;
-          newReadOptions.offset = newReadOptions.offset > 0 ? newReadOptions.offset : 0;
-          newReadOptions.limit -= machines.length;
-          branchMachines.push(...machines);
-        }
-      }
-    } else {
-      await Promise.all(zones.map(async (zone) => {
-        const machineToRead = new Machine().setZoneId(zone.getZoneId());
-        const machines = await this.machineRepository.read(machineToRead, newReadOptions);
-        branchMachines.push(...machines);
-      }));
-    }
-
-    return branchMachines;
+    await this.validateNumber(branchId, 'Branch id');
+    return this.machineRepository.readByBranchId(branchId, readOptions);
   }
 
-  public async addMachine(newMachine: Machine): Promise<Machine> {
-    const relatedZoneToRead = new Zone().setZoneId(newMachine.getZoneId());
-    const [relatedZone] = await this.zoneRepository.read(relatedZoneToRead);
-
-    if (!relatedZone) {
-      throw new NotFoundException('Zone id related to machine does not exist');
-    }
+  public async addMachine(newMachine: Machine, staffId: number): Promise<Machine> {
+    await this.validateNumber(newMachine.getZoneId(), 'Zone id');
+    await this.validateZone(newMachine.getZoneId(), staffId);
 
     return this.machineRepository.create(newMachine);
   }
 
-  public async editMachine(machineId: number, newMachine: Machine): Promise<Machine> {
-    const machineToEdit = new Machine().setMachineId(machineId);
-    const [targetMachine] = await this.machineRepository.read(machineToEdit);
-
-    if (!targetMachine) {
-      throw new NotFoundException('Target machine to edit does not exist');
-    }
+  public async editMachine(
+    machineId: number,
+    newMachine: Machine,
+    staffId: number,
+  ): Promise<Machine> {
+    await this.validateNumber(machineId, 'Machine id');
+    const targetMachine = await this.validateMachine(machineId, staffId);
 
     const newZoneId = newMachine.getZoneId();
 
-    if (newZoneId) {
-      const relatedZoneToEdit = new Zone().setZoneId(newMachine.getZoneId());
-      const [targetZone] = await this.zoneRepository.read(relatedZoneToEdit);
-
-      if (!targetZone) {
-        throw new NotFoundException('Zone to edit does not exist');
-      }
+    if (newZoneId !== undefined) {
+      await this.validateNumber(newZoneId, 'Zone id');
+      await this.validateZone(newZoneId, staffId);
     }
 
     const affectedRowsAmount = await this.machineRepository.update(newMachine, targetMachine);
 
     return affectedRowsAmount === 1 ? newMachine.setMachineId(machineId) : null;
+  }
+
+  public async deleteMachine(machineId: number, staffId: number): Promise<Machine> {
+    await this.validateNumber(machineId, 'Machine id');
+    const targetMachine = await this.validateMachine(machineId, staffId);
+
+    const expectedRelatedMachineParts = new MachinePart().setMachineId(machineId);
+    const relatedMachineParts = await this.machinePartRepository.read(expectedRelatedMachineParts);
+
+    if (relatedMachineParts.length !== 0) {
+      throw new InvalidRequestException('There are machine parts still related to this machine');
+    }
+
+    const expectedRelatedMaintenanceLogs = new MaintenanceLog().setMachineId(machineId);
+    const relatedMaintenanceLogs = await this.maintenanceLogRepository.read(
+      expectedRelatedMaintenanceLogs,
+    );
+
+    if (relatedMaintenanceLogs.length !== 0) {
+      throw new InvalidRequestException('There are maintenance logs still related to this machine');
+    }
+
+    const expectedRelatedOrders = new Order().setMachineId(machineId);
+    const relatedOrders = await this.orderRepository.read(expectedRelatedOrders);
+
+    if (relatedOrders.length !== 0) {
+      throw new InvalidRequestException('There are orders still related to this machine');
+    }
+
+    const affectedRowsAmount = await this.machineRepository.delete(targetMachine);
+
+    return affectedRowsAmount === 1 ? targetMachine : null;
+  }
+
+  private async validateNumber(numberToValidate: number, name: string): Promise<void> {
+    if (!numberToValidate) {
+      throw new InvalidRequestException(`${name} must be a positive integer`);
+    }
+  }
+
+  private async validateZone(zoneId: number, staffId: number): Promise<void> {
+    const expectedRelatedZone = new Zone().setZoneId(zoneId);
+    const [expectedZone] = await this.zoneRepository.read(expectedRelatedZone);
+
+    const currentExpectedStaff = new Staff().setStaffId(staffId);
+    const [currentStaff] = await this.staffRepository.read(currentExpectedStaff);
+
+    if (!expectedZone) {
+      throw new NotFoundException('Zone related to machine does not exist');
+    }
+
+    if (
+      expectedZone.getBranchId() !== currentStaff.getBranchId()
+      && currentStaff.getPosition() !== 'CEO'
+    ) {
+      throw new ForbiddenException('Zone does not belong to young branch');
+    }
+  }
+
+  private async validateMachine(machineId: number, staffId: number): Promise<Machine> {
+    const machineToValidate = new Machine().setMachineId(machineId);
+    const [targetMachine] = await this.machineRepository.read(machineToValidate);
+
+    if (!targetMachine) {
+      throw new NotFoundException('Machine does not exist');
+    }
+
+    const zoneToValidate = new Zone().setZoneId(targetMachine.getZoneId());
+    const [targetZone] = await this.zoneRepository.read(zoneToValidate);
+
+    const currentStaffToValidate = new Staff().setStaffId(staffId);
+    const [targetCurrentStaff] = await this.staffRepository.read(currentStaffToValidate);
+
+    if (
+      targetZone.getBranchId() !== targetCurrentStaff.getBranchId()
+      && targetCurrentStaff.getPosition() !== 'CEO'
+    ) {
+      throw new ForbiddenException('Machine does not belong to the provided staff\'s branch');
+    }
+
+    return targetMachine;
   }
 
 }

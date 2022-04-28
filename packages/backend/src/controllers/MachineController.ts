@@ -5,6 +5,7 @@ import { ControllerMapping } from '@/decorators/ControllerDecorator';
 import { RequestBody } from '@/decorators/RequestDecorator';
 import { RouteMapping } from '@/decorators/RouteDecorator';
 import { Machine } from '@/entities/Machine';
+import { ForbiddenException } from '@/exceptions/ForbiddenException';
 import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { MachineService } from '@/services/MachineService';
@@ -34,8 +35,8 @@ export class MachineController extends Controller {
     res.status(200).json({ data: machines });
   }
 
-  @RouteMapping('/zone/:zoneId', Methods.GET)
   @Authentication(Role.MANAGER, Role.CEO, Role.PURCHASING, Role.TECHNICIAN, Role.OFFICER)
+  @RouteMapping('/zone/:zoneId', Methods.GET)
   private async getMachinesByZoneId(req: Request, res: Response): Promise<void> {
     const parseZoneId = NumberUtils.parsePositiveInteger(req.params.zoneId);
     const readOptions: ReadOptions = {
@@ -43,16 +44,20 @@ export class MachineController extends Controller {
       offset: Number(req.query.offset),
     };
 
-    if (!parseZoneId) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
+    if (req.session.role === 'OFFICER' && parseZoneId !== req.session.zoneId) {
+      throw new ForbiddenException('You do not belong in this zone');
     }
 
-    const machines = await this.machineService.getMachinesByZoneId(parseZoneId, readOptions);
+    const machines = await this.machineService.getMachinesByZoneId(
+      parseZoneId,
+      readOptions,
+      req.session.staffId,
+    );
 
     res.status(200).json({ data: machines });
   }
 
-  @Authentication(Role.MANAGER, Role.CEO, Role.TECHNICIAN)
+  @Authentication(Role.MANAGER, Role.CEO, Role.TECHNICIAN, Role.PURCHASING)
   @RouteMapping('/branch/:branchId', Methods.GET)
   private async getMachineByBranchId(req: Request, res: Response): Promise<void> {
     const parseBranchId = NumberUtils.parsePositiveInteger(req.params.branchId);
@@ -61,8 +66,8 @@ export class MachineController extends Controller {
       offset: Number(req.query.offset),
     };
 
-    if (!parseBranchId) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
+    if (parseBranchId !== req.session.branchId && req.session.role !== 'CEO') {
+      throw new ForbiddenException('This is not your branch');
     }
 
     const machines = await this.machineService.getMachinesByBranchId(parseBranchId, readOptions);
@@ -84,10 +89,6 @@ export class MachineController extends Controller {
     } = req.body;
     const parseZoneId = NumberUtils.parsePositiveInteger(zoneId);
 
-    if (!parseZoneId) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
-    }
-
     const newMachine = new Machine()
       .setZoneId(parseZoneId)
       .setName(name)
@@ -96,9 +97,9 @@ export class MachineController extends Controller {
       .setRegistrationDate(new Date(registrationDate))
       .setRetiredDate(new Date(retiredDate));
 
-    const createdMachine = await this.machineService.addMachine(newMachine);
+    const createdField = await this.machineService.addMachine(newMachine, req.session.staffId);
 
-    res.status(200).json({ data: { createdMachine } });
+    res.status(200).json({ data: { createdField } });
   }
 
   @Authentication(Role.MANAGER, Role.CEO, Role.PURCHASING, Role.TECHNICIAN)
@@ -107,8 +108,8 @@ export class MachineController extends Controller {
   private async editMachineByMachineId(req: Request, res: Response) :Promise<void> {
     const parseMachineId = NumberUtils.parsePositiveInteger(req.params.machineId);
 
-    if (!parseMachineId) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
+    if (Object.keys(req.body).length === 0) {
+      throw new InvalidRequestException('No provided data to update');
     }
 
     const {
@@ -120,29 +121,39 @@ export class MachineController extends Controller {
       retiredDate,
     } = req.body;
 
-    if (
-      zoneId === undefined
-      && name === undefined
-      && serial === undefined
-      && manufacturer === undefined
-      && manufacturer === undefined
-      && registrationDate === undefined
-      && retiredDate === undefined
-    ) {
-      throw new InvalidRequestException('No provided data to update');
+    let parseZoneId: number;
+    if (zoneId !== undefined) {
+      parseZoneId = NumberUtils.parsePositiveInteger(zoneId);
     }
 
     const newMachine = new Machine()
-      .setZoneId(zoneId)
+      .setZoneId(parseZoneId)
       .setName(name)
       .setSerial(serial)
       .setManufacturer(manufacturer)
-      .setRegistrationDate(!registrationDate ? undefined : new Date(registrationDate))
-      .setRetiredDate(!retiredDate ? undefined : new Date(retiredDate));
+      .setRegistrationDate(registrationDate ? new Date(registrationDate) : undefined)
+      .setRetiredDate(retiredDate ? new Date(retiredDate) : undefined);
 
-    const updatedField = await this.machineService.editMachine(parseMachineId, newMachine);
+    const updatedField = await this.machineService.editMachine(
+      parseMachineId,
+      newMachine,
+      req.session.staffId,
+    );
 
     res.status(200).json({ data: { updatedField } });
+  }
+
+  @Authentication(Role.MANAGER, Role.CEO, Role.PURCHASING, Role.TECHNICIAN)
+  @RouteMapping('/:machineId', Methods.DELETE)
+  private async deleteMachineByMachineId(req: Request, res: Response): Promise<void> {
+    const parseMachineId = NumberUtils.parsePositiveInteger(req.params.machineId);
+
+    const deletedField = await this.machineService.deleteMachine(
+      parseMachineId,
+      req.session.staffId,
+    );
+
+    res.status(200).json({ data: { deletedField } });
   }
 
 }

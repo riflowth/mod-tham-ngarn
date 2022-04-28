@@ -99,4 +99,44 @@ export class DefaultMachineRepository extends Database implements MachineReposit
     return machine;
   }
 
+  public async readByBranchId(branchId: number, readOptions?: ReadOptions): Promise<Machine[]> {
+    const { limit, offset } = readOptions || {};
+
+    if (limit || offset) {
+      const isIntegerOptions = Number.isInteger(limit) || Number.isInteger(offset);
+      if (!isIntegerOptions) {
+        throw new Error('limit and offset must be integer');
+      }
+
+      const isValidReadOptions = limit > 0 && (!offset || offset >= 0);
+      if (!isValidReadOptions) {
+        throw new Error('Invalid relationship limit or offset');
+      }
+    }
+
+    const limitOption = (limit && limit >= 0) && `LIMIT ${limit}`;
+    const offsetOption = (limitOption && offset > 0) && `OFFSET ${offset}`;
+
+    const query = [
+      'SELECT * FROM Machine WHERE zone_id IN (SELECT zone_id FROM Zone WHERE branch_id = ?)',
+      limitOption,
+      offsetOption,
+    ].filter(Boolean).join(' ');
+
+    const results: any = await this.execute(query, [branchId]);
+
+    const machines = results[0].map((result) => {
+      return new Machine()
+        .setMachineId(result.machine_id)
+        .setZoneId(result.zone_id)
+        .setName(result.name)
+        .setSerial(result.serial)
+        .setManufacturer(result.manufacturer)
+        .setRegistrationDate(DateUtil.formatFromSQL(result.registration_date))
+        .setRetiredDate(DateUtil.formatFromSQL(result.retired_date));
+    });
+
+    return machines;
+  }
+
 }
