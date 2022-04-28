@@ -162,6 +162,7 @@ export class ControllerRegistry {
         staffId: session.getStaffId(),
         zoneId: staff.getZoneId(),
         branchId: staff.getBranchId(),
+        role: staff.getPosition(),
       };
 
       next();
