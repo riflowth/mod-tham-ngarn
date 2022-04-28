@@ -1,7 +1,6 @@
 import { Bill } from '@/entities/Bill';
 import { Machine } from '@/entities/Machine';
 import { MachinePart } from '@/entities/MachinePart';
-import { MaintenancePart } from '@/entities/MaintenancePart';
 import { Order } from '@/entities/Order';
 import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { BillRepository } from '@/repositories/bill/BillRepository';
@@ -10,6 +9,8 @@ import { MachinePartRepository } from '@/repositories/machinePart/MachinePartRep
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
+import { EnumUtils } from '@/utils/EnumUtils';
+import { NumberUtils } from '@/utils/NumberUtils';
 
 export enum OrderStatus {
   SHIPPING = 'SHIPPING',
@@ -40,6 +41,10 @@ export class OrderService {
   }
 
   public async getOrdersByBillId(billId: number, readOptions?: ReadOptions): Promise<Order[]> {
+    if (!NumberUtils.isPositiveInteger(billId)) {
+      throw new InvalidRequestException('BillId must be a positive integer');
+    }
+
     const expectedOrders = new Order().setBillId(billId);
     return this.orderRepository.read(expectedOrders, readOptions);
   }
@@ -47,6 +52,37 @@ export class OrderService {
   public async addOrder(newOrder: Order, ordererId: number, ordererZoneId: number): Promise<Order> {
     const machineId = newOrder.getMachineId();
     const partId = newOrder.getPartId();
+    const billId = newOrder.getBillId();
+    const price = newOrder.getPrice();
+
+    const orderId = newOrder.getOrderId();
+    const arrivalDate = newOrder.getArrivalDate();
+    const status = newOrder.getStatus();
+
+    if (orderId || arrivalDate || status) {
+      throw new InvalidRequestException('OrderId, ArrivalDate and Status must not be set');
+    }
+
+    if (!NumberUtils.isPositiveInteger(ordererId)) {
+      throw new InvalidRequestException('OrdererId must be a non-negative number');
+    }
+
+    if (machineId && !NumberUtils.isPositiveInteger(machineId)) {
+      throw new InvalidRequestException('MachineId must be a positive integer');
+    }
+
+    if (partId && !NumberUtils.isPositiveInteger(partId)) {
+      throw new InvalidRequestException('PartId must be a positive integer');
+    }
+
+    if (billId && !NumberUtils.isPositiveInteger(billId)) {
+      throw new InvalidRequestException('BillId must be a positive integer');
+    }
+
+    if (price && !NumberUtils.isPositiveInteger(price)) {
+      throw new InvalidRequestException('Price must be a non-negative number');
+    }
+
     if (machineId && partId) {
       throw new InvalidRequestException('You can only order a machine or a machinePart, not both');
     }
@@ -55,40 +91,85 @@ export class OrderService {
       throw new InvalidRequestException('You must order at least machine or a machinePart');
     }
 
-    const billId = newOrder.getBillId();
     if (billId) {
-      const billToValidate = await this.getBillById(billId);
+      const billToValidate = await this.billRepository.readByBillId(billId);
       this.validateBillRelation(billToValidate, ordererId);
     }
 
     if (machineId) {
-      const machineToValidate = await this.getMachineById(machineId);
-      await this.validateMachineRelation(machineToValidate, ordererZoneId);
+      const machineToValidate = await this.machineRepository.readByMachineId(machineId);
+      this.validateMachineRelation(machineToValidate, ordererZoneId);
     }
 
     if (partId) {
-      const partToValidate = await this.getMachinePartById(partId);
-      await this.validateMachinePartRelation(partToValidate, ordererZoneId);
+      const partToValidate = await this.machinePartRepository.readByPartId(partId);
+      this.validateMachinePartRelation(partToValidate);
 
-      const machineByPartToValidate = await this.getMachineById(partToValidate.getMachineId());
-      await this.validateMachineRelation(machineByPartToValidate, ordererZoneId);
+      const machineByPartToValidate = await this.machineRepository
+        .readByMachineId(partToValidate.getMachineId());
+
+      this.validateMachineRelation(machineByPartToValidate, ordererZoneId);
     }
 
-    return this.orderRepository.create(newOrder);
+    return this.orderRepository.create(newOrder.setStatus(OrderStatus.SHIPPING));
   }
 
   public async editOrder(
     orderId: number,
     newOrder: Order,
+    billId: number,
     ordererId: number,
   ): Promise<Order> {
-    const orderToValidate = await this.getOrderById(orderId);
+    const newStatus = newOrder.getStatus();
+    const newMachineId = newOrder.getMachineId();
+    const newPartId = newOrder.getPartId();
+    const newPrice = newOrder.getPrice();
+
+    const newOrderId = newOrder.getOrderId();
+    const newBIllId = newOrder.getBillId();
+    const newArrivalDate = newOrder.getArrivalDate();
+
+    if (newOrderId || newBIllId || newArrivalDate) {
+      throw new InvalidRequestException('You cannot edit orderId, billId or arrivalDate');
+    }
+
+    if (!NumberUtils.parsePositiveInteger(orderId)) {
+      throw new InvalidRequestException('OrderId must be a positive integer');
+    }
+
+    if (!NumberUtils.parsePositiveInteger(billId)) {
+      throw new InvalidRequestException('BillId must be a positive integer');
+    }
+
+    if (!NumberUtils.parsePositiveInteger(ordererId)) {
+      throw new InvalidRequestException('OrdererId must be a positive integer');
+    }
+
+    if (newStatus && (newMachineId || newPartId || newPrice)) {
+      throw new InvalidRequestException('You can only update status or machineId, partId or price, not all');
+    }
+
+    if (newMachineId && !NumberUtils.isPositiveInteger(newMachineId)) {
+      throw new InvalidRequestException('MachineId must be a positive integer');
+    }
+
+    if (newPartId && !NumberUtils.isPositiveInteger(newPartId)) {
+      throw new InvalidRequestException('PartId must be a positive integer');
+    }
+
+    if (newPrice && !NumberUtils.isPositiveInteger(newPrice)) {
+      throw new InvalidRequestException('Price must be a non-negative number');
+    }
+
+    if (!EnumUtils.isIncludesInEnum(newStatus, OrderStatus)) {
+      throw new InvalidRequestException('Status to updated must be a SHIPPING, DELIVERED or CANCELLED');
+    }
+
+    const orderToValidate = await this.orderRepository.readByOrderId(orderId);
     this.validateOrderRelation(orderToValidate, ordererId);
 
-    const billToValidate = await this.getBillById(orderToValidate.getBillId());
+    const billToValidate = await this.billRepository.readByBillId(orderToValidate.getBillId());
     this.validateBillRelation(billToValidate, ordererId);
-
-    const newStatus = newOrder.getStatus();
 
     switch (newStatus) {
       case OrderStatus.SHIPPING:
@@ -111,18 +192,31 @@ export class OrderService {
     return affectedRowsAmount === 1 ? newOrder.setPrimaryKey(orderId) : null;
   }
 
-  public async deleteOrder(orderId: number, ordererId: number): Promise<Order> {
-    const orderToValidate = await this.getOrderById(orderId);
+  public async deleteOrder(orderId: number, billId: number, ordererId: number): Promise<Order> {
+    if (!NumberUtils.isPositiveInteger(orderId)) {
+      throw new InvalidRequestException('OrderId must be a positive integer');
+    }
+
+    if (!NumberUtils.isPositiveInteger(billId)) {
+      throw new InvalidRequestException('OrderId must be a positive integer');
+    }
+
+    if (!NumberUtils.isPositiveInteger(ordererId)) {
+      throw new InvalidRequestException('OrderId must be a positive integer');
+    }
+
+    const orderToValidate = await this.orderRepository.readByOrderId(orderId);
     this.validateOrderRelation(orderToValidate, ordererId);
 
-    const billToValidate = await this.getBillById(orderToValidate.getBillId());
+    const billToValidate = await this.billRepository.readByBillId(orderToValidate.getBillId());
     this.validateBillRelation(billToValidate, ordererId);
 
     this.validateChangeOrderData(orderToValidate);
 
     const expectedOrderToDelete = new Order().setOrderId(orderId);
 
-    const relatedMaintenancePart = await this.getMaintenancePartByOrderId(orderId);
+    const relatedMaintenancePart = await this.maintenancePartRepository
+      .readByOrderId(orderId);
 
     if (relatedMaintenancePart) {
       throw new InvalidRequestException('Order has related maintenance part');
@@ -131,41 +225,6 @@ export class OrderService {
     const affectedRowsAmount = await this.orderRepository.delete(expectedOrderToDelete);
 
     return affectedRowsAmount === 1 ? new Order().setPrimaryKey(orderId) : null;
-  }
-
-  private async getOrderById(orderId: number): Promise<Order> {
-    const expectedOrder = new Order().setOrderId(orderId);
-    const [order] = await this.orderRepository.read(expectedOrder);
-
-    return order;
-  }
-
-  private async getBillById(billId: number): Promise<Bill> {
-    const expectedBill = new Bill().setBillId(billId);
-    const [bill] = await this.billRepository.read(expectedBill);
-
-    return bill;
-  }
-
-  private async getMachineById(machineId: number): Promise<Machine> {
-    const expectedMachine = new Machine().setMachineId(machineId);
-    const [machine] = await this.machineRepository.read(expectedMachine);
-
-    return machine;
-  }
-
-  private async getMachinePartById(partId: number): Promise<MachinePart> {
-    const expectedPart = new MachinePart().setPartId(partId);
-    const [part] = await this.machinePartRepository.read(expectedPart);
-
-    return part;
-  }
-
-  private async getMaintenancePartByOrderId(orderId: number): Promise<MaintenancePart> {
-    const expectedPart = new MaintenancePart().setOrderId(orderId);
-    const [part] = await this.maintenancePartRepository.read(expectedPart);
-
-    return part;
   }
 
   private validateMachineRelation(
@@ -183,7 +242,6 @@ export class OrderService {
 
   private validateMachinePartRelation(
     partToValidate: MachinePart,
-    ordererZoneId: number,
   ): void {
     if (!partToValidate) {
       throw new InvalidRequestException('Part does not exist');

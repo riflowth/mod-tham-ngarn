@@ -5,11 +5,8 @@ import { ControllerMapping } from '@/decorators/ControllerDecorator';
 import { RequestBody } from '@/decorators/RequestDecorator';
 import { RouteMapping } from '@/decorators/RouteDecorator';
 import { Order } from '@/entities/Order';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { ReadOptions } from '@/repositories/ReadOptions';
-import { OrderService, OrderStatus } from '@/services/OrderService';
-import { EnumUtils } from '@/utils/EnumUtils';
-import { NumberUtils } from '@/utils/NumberUtils';
+import { OrderService } from '@/services/OrderService';
 import { Request, Response } from 'express';
 
 @ControllerMapping('/bill')
@@ -26,18 +23,13 @@ export class OrderController extends Controller {
   @RouteMapping('/:billId/order', Methods.GET)
   private async getOrdersByBillId(req: Request, res: Response): Promise<void> {
     const { billId } = req.params;
-    const parseBillId = NumberUtils.parsePositiveInteger(billId);
-
-    if (!parseBillId) {
-      throw new InvalidRequestException('BillId must be a positive integer');
-    }
 
     const readOptions: ReadOptions = {
       limit: Number(req.query.limit),
       offset: Number(req.query.offset),
     };
 
-    const orders = await this.orderService.getOrdersByBillId(parseBillId, readOptions);
+    const orders = await this.orderService.getOrdersByBillId(Number(billId), readOptions);
 
     res.status(200).json({ data: orders });
   }
@@ -50,31 +42,11 @@ export class OrderController extends Controller {
     const { machineId, partId, price } = req.body;
     const { billId } = req.params;
 
-    const parseBillId = NumberUtils.parsePositiveInteger(billId);
-    if (!parseBillId) {
-      throw new InvalidRequestException('BillId must be a positive integer');
-    }
-
-    const parseMachineId = NumberUtils.parsePositiveInteger(machineId);
-    if (machineId && !parseMachineId) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
-    }
-
-    const parseMachinePartId = NumberUtils.parsePositiveInteger(partId);
-    if (partId && !parseMachinePartId) {
-      throw new InvalidRequestException('PartId must be a positive integer');
-    }
-
-    const parsePrice = NumberUtils.parseNonNegativeNumber(price);
-    if (price && !parsePrice) {
-      throw new InvalidRequestException('Price must be a non-negative number');
-    }
-
     const newOrder = new Order()
-      .setBillId(parseBillId)
-      .setMachineId(parseMachineId)
-      .setPartId(parseMachinePartId)
-      .setPrice(parsePrice);
+      .setBillId(Number(billId))
+      .setMachineId(machineId)
+      .setPartId(partId)
+      .setPrice(price);
 
     const createdFields = await this.orderService.addOrder(newOrder, ordererId, ordererZoneId);
 
@@ -82,97 +54,39 @@ export class OrderController extends Controller {
   }
 
   @Authentication(Role.PURCHASING)
-  @RouteMapping('/:billId/order', Methods.PUT)
-  @RequestBody('orderId', '?machineId', '?partId', '?price')
+  @RouteMapping('/:billId/order/:orderId', Methods.PUT)
+  @RequestBody('?machineId', '?partId', '?price', '?status')
   private async editOrder(req: Request, res: Response): Promise<void> {
     const { staffId: ordererId } = req.session;
+    const { billId, orderId } = req.params;
     const {
-      orderId,
       machineId,
       partId,
       price,
+      status,
     } = req.body;
-    const { billId } = req.params;
-
-    const parseBillId = NumberUtils.parsePositiveInteger(billId);
-    if (!parseBillId) {
-      throw new InvalidRequestException('BillId must be a positive integer');
-    }
-
-    const parseOrderId = NumberUtils.parsePositiveInteger(orderId);
-    if (!parseOrderId) {
-      throw new InvalidRequestException('OrderId must be a positive integer');
-    }
-
-    const parseMachineId = NumberUtils.parsePositiveInteger(machineId);
-    if (machineId && !parseMachineId) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
-    }
-
-    const parseMachinePartId = NumberUtils.parsePositiveInteger(partId);
-    if (partId && !parseMachinePartId) {
-      throw new InvalidRequestException('PartId must be a positive integer');
-    }
-
-    const parsePrice = NumberUtils.parseNonNegativeNumber(price);
-    if (price && !parsePrice) {
-      throw new InvalidRequestException('Price must be a non-negative number');
-    }
 
     const newOrder = new Order()
-      .setPrice(parsePrice);
+      .setMachineId(machineId)
+      .setPartId(partId)
+      .setStatus(status)
+      .setPrice(price);
 
     const updatedField = await this.orderService
-      .editOrder(parseOrderId, newOrder, ordererId);
+      .editOrder(Number(orderId), newOrder, Number(billId), ordererId);
 
     res.status(200).json({ updatedField });
   }
 
   @Authentication(Role.PURCHASING)
-  @RouteMapping('/:billId/order/status', Methods.PUT)
-  @RequestBody('orderId', 'status')
-  private async updateOrderStatus(req: Request, res: Response): Promise<void> {
-    const { staffId: ordererId } = req.session;
-    const { orderId, status } = req.body;
-
-    const parseOrderId = NumberUtils.parsePositiveInteger(orderId);
-
-    if (!parseOrderId) {
-      throw new InvalidRequestException('OrderId must be a positive integer');
-    }
-
-    const isValidStatus = EnumUtils.isIncludesInEnum(status, OrderStatus);
-
-    if (!isValidStatus) {
-      throw new InvalidRequestException('Status to updated must be a SHIPPING, DELIVERED or CANCELLED');
-    }
-
-    const orderToUpdate = new Order().setStatus(status);
-
-    const updatedField = await this.orderService.editOrder(parseOrderId, orderToUpdate, ordererId);
-
-    res.status(200).json({ updatedField });
-  }
-
-  @Authentication(Role.PURCHASING)
-  @RouteMapping('/:billId/order', Methods.DELETE)
+  @RouteMapping('/:billId/order/:orderId', Methods.DELETE)
   @RequestBody('orderId')
   private async deleteOrder(req: Request, res: Response): Promise<void> {
     const { staffId: ordererId } = req.session;
-    const { orderId } = req.body;
-    const { billId } = req.params;
+    const { billId, orderId } = req.params;
 
-    const parseBillId = NumberUtils.parsePositiveInteger(billId);
-    if (!parseBillId) {
-      throw new InvalidRequestException('BillId must be a positive integer');
-    }
-
-    const parseOrderId = NumberUtils.parsePositiveInteger(orderId);
-    if (!parseOrderId) {
-      throw new InvalidRequestException('OrderId must be a positive integer');
-    }
-
-    const deletedField = await this.orderService.deleteOrder(parseOrderId, ordererId);
+    const deletedField = await this.orderService
+      .deleteOrder(Number(orderId), Number(billId), ordererId);
 
     res.status(200).json({ deletedField });
   }
