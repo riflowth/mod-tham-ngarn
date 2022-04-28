@@ -102,4 +102,11 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
     return result[0].affectedRows;
   }
 
+  public async readByStaffId(staffId: number): Promise<Staff> {
+    const expectedStaff = new Staff().setStaffId(staffId);
+    const [staff] = await this.read(expectedStaff);
+
+    return staff;
+  }
+
 }

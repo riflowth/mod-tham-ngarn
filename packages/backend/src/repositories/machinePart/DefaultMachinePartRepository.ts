@@ -74,4 +74,11 @@ export class DefaultMachinePartRepository extends Database implements MachinePar
     return result[0].affectedRows;
   }
 
+  public async readByPartId(partId: number): Promise<MachinePart> {
+    const expectedPart = new MachinePart().setPartId(partId);
+    const [part] = await this.read(expectedPart);
+
+    return part;
+  }
+
 }

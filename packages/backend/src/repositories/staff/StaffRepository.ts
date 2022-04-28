@@ -3,4 +3,6 @@ import { Repository } from '@/repositories/Repository';
 
 export interface StaffRepository extends Repository<Staff> {
 
+  readByStaffId(staffId: number): Promise<Staff>;
+
 }

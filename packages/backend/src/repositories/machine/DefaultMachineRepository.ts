@@ -92,4 +92,11 @@ export class DefaultMachineRepository extends Database implements MachineReposit
     return result[0].affectedRows;
   }
 
+  public async readByMachineId(machineId: number): Promise<Machine> {
+    const expectedMachine = new Machine().setMachineId(machineId);
+    const [machine] = await this.read(expectedMachine);
+
+    return machine;
+  }
+
 }

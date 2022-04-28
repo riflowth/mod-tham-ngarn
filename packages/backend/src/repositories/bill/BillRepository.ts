@@ -6,4 +6,6 @@ export interface BillRepository extends Repository<Bill> {
 
   readByBranchId(branchId: number, readOptions?: ReadOptions): Promise<Bill[]>
 
+  readByBillId(billId: number): Promise<Bill>
+
 }

@@ -3,4 +3,6 @@ import { Repository } from '@/repositories/Repository';
 
 export interface MachineRepository extends Repository<Machine> {
 
+  readByMachineId(machineId: number): Promise<Machine>
+
 }

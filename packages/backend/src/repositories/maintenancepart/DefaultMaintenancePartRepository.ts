@@ -82,4 +82,11 @@ export class DefaultMaintenancePartRepository
     return result[0].affectedRows;
   }
 
+  public async readByOrderId(orderId: number): Promise<MaintenancePart> {
+    const expectedMaintenancePart = new MaintenancePart().setOrderId(orderId);
+    const [maintenanceParts] = await this.read(expectedMaintenancePart);
+
+    return maintenanceParts;
+  }
+
 }

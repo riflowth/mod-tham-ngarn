@@ -93,4 +93,11 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
     return result[0].affectedRows;
   }
 
+  public async readByOrderId(orderId: number): Promise<Order> {
+    const expectedOrder = new Order().setOrderId(orderId);
+    const [order] = await this.read(expectedOrder);
+
+    return order;
+  }
+
 }

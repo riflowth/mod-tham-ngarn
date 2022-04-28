@@ -111,4 +111,11 @@ export class DefaultBillRepository extends Database implements BillRepository {
     return bills;
   }
 
+  public async readByBillId(billId: number): Promise<Bill> {
+    const expectedBill = new Bill().setBillId(billId);
+    const [bill] = await this.read(expectedBill);
+
+    return bill;
+  }
+
 }

@@ -3,4 +3,6 @@ import { Repository } from '@/repositories/Repository';
 
 export interface MaintenanceLogRepository extends Repository<MaintenanceLog> {
 
+  getInprogressMaintenanceByMachineId(machineId: number): Promise<MaintenanceLog>;
+
 }

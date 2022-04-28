@@ -102,4 +102,25 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
     return result[0].affectedRows;
   }
 
+  public async getInprogressMaintenanceByMachineId(machineId: number): Promise<MaintenanceLog> {
+    const query = 'SELECT * FROM MaintenanceLog WHERE machine_id = ? AND (status = \'OPENED\' OR status = \'PENDING\')';
+    const values = [machineId];
+
+    const results: any = await this.execute(query, values);
+
+    const maintenanceLogs = results[0].map((result) => {
+      return new MaintenanceLog()
+        .setMaintenanceId(result.maintenance_id)
+        .setMachineId(result.machine_id)
+        .setReporterId(result.reporter_id)
+        .setMaintainerId(result.maintainer_id)
+        .setReportDate(DateUtil.formatFromSQL(result.report_date))
+        .setMaintenanceDate(DateUtil.formatFromSQL(result.maintenance_date))
+        .setReason(result.reason)
+        .setStatus(result.status);
+    });
+
+    return maintenanceLogs;
+  }
+
 }
