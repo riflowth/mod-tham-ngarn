@@ -70,7 +70,7 @@ export class ZoneController extends Controller {
 
   @Authentication(Role.MANAGER, Role.CEO)
   @RouteMapping('/:zoneId', Methods.PUT)
-  @RequestBody('branchId', '?timeToStart', '?timeToEnd')
+  @RequestBody('?branchId', '?timeToStart', '?timeToEnd')
   private async editZoneByZoneId(req: Request, res: Response): Promise<void> {
     const { timeToStart, timeToEnd, branchId } = req.body;
     const { zoneId } = req.params;
