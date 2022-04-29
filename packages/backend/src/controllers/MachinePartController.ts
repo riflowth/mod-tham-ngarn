@@ -70,7 +70,7 @@ export class MachinePartController extends Controller {
 
   @Authentication(Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/', Methods.PUT)
-  @RequestBody('machineId', 'partName', 'status')
+  @RequestBody('?machineId', '?partName', '?status')
   private async editMachinePartByPartId(req: Request, res: Response): Promise<void> {
     const parsePartId = NumberUtils.parsePositiveInteger(req.params.partId);
 
@@ -95,7 +95,7 @@ export class MachinePartController extends Controller {
   }
 
   @Authentication(Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
-  @RouteMapping('/:machineId', Methods.GET)
+  @RouteMapping('/status/:machineId', Methods.GET)
   public async getStatusMachineByMachineId(req: Request, res: Response): Promise<void> {
     const parseMachineId = NumberUtils.parsePositiveInteger(req.params.machineId);
 
@@ -108,7 +108,7 @@ export class MachinePartController extends Controller {
   }
 
   @Authentication(Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
-  @RouteMapping('/:machineId', Methods.GET)
+  @RouteMapping('/costs/:machineId', Methods.GET)
   public async getCostMachineMaintenanceByMachineId(req: Request, res: Response): Promise<void> {
     const parseMachineId = NumberUtils.parsePositiveInteger(req.params.machineId);
 
