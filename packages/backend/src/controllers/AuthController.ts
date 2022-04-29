@@ -28,7 +28,6 @@ export class AuthController extends Controller {
 
     if (cookie) {
       this.cookieProvider.setSignedCookie(res, cookie);
-
       res.status(200).json({
         message: 'Logged in successfully',
       });
@@ -38,9 +37,7 @@ export class AuthController extends Controller {
   @RouteMapping('/logout', Methods.GET)
   private async logoutRoute(req: Request, res: Response): Promise<void> {
     const sessionId = this.cookieProvider.getSignedCookie(req, 'sid');
-
     await this.authService.logout(sessionId);
-
     res.status(200).json({
       message: 'Logged out successfully',
     });

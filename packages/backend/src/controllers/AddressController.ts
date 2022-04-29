@@ -23,7 +23,7 @@ export class AddressController extends Controller {
   @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/me', Methods.GET)
   private async getAddressByRequester(req: Request, res: Response): Promise<void> {
-    const address = await this.addressService.getAddressByBranchId(req.session?.branchId);
+    const address = await this.addressService.getAddressByBranchId(req.session.branchId);
     res.status(200).json({ data: address });
   }
 
@@ -34,9 +34,7 @@ export class AddressController extends Controller {
       limit: Number(req.query.limit),
       offset: Number(req.query.offset),
     };
-
     const addresses = await this.addressService.getAllAddresses(readOptions);
-
     res.status(200).json({ data: addresses });
   }
 
@@ -57,7 +55,6 @@ export class AddressController extends Controller {
       .setPostalCode(postalCode)
       .setRegion(region)
       .setCountry(country);
-
     const createdField = await this.addressService.addAddress(newAddress);
 
     res.status(200).json({ data: { createdField } });
@@ -76,7 +73,6 @@ export class AddressController extends Controller {
     const newAddress = new Address()
       .setRegion(region)
       .setCountry(country);
-
     const updatedField = await this.addressService.editAddress(req.params.postalCode, newAddress);
 
     res.status(200).json({ data: { updatedField } });
@@ -86,7 +82,6 @@ export class AddressController extends Controller {
   @RouteMapping('/:postalCode', Methods.DELETE)
   private async deleteAddressByPostalCode(req: Request, res: Response): Promise<void> {
     const deletedField = await this.addressService.deleteAddress(req.params.postalCode);
-
     res.status(200).json({ data: { deletedField } });
   }
 

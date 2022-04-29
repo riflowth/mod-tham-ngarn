@@ -29,7 +29,6 @@ export class StaffController extends Controller {
       offset: Number(req.query.offset),
     };
     const staffs = await this.staffService.getAllStaffs(readOptions);
-
     res.status(200).json({ data: staffs });
   }
 
@@ -37,13 +36,10 @@ export class StaffController extends Controller {
   @RouteMapping('/:staffId', Methods.GET)
   private async getStaffByStaffId(req: Request, res: Response): Promise<void> {
     const parseStaffId = NumberUtils.parsePositiveInteger(req.params.staffId);
-
     if (!parseStaffId) {
       throw new InvalidRequestException('StaffId must be a positive integer');
     }
-
     const staff = await this.staffService.getStaffByStaffId(parseStaffId);
-
     res.status(200).json({ data: staff });
   }
 
@@ -51,13 +47,10 @@ export class StaffController extends Controller {
   @RouteMapping('/:zoneId', Methods.GET)
   private async getStaffByZoneId(req: Request, res: Response): Promise<void> {
     const parseZoneId = NumberUtils.parsePositiveInteger(req.params.zoneId);
-
     if (!parseZoneId) {
       throw new InvalidRequestException('zoneId must be a positive integer');
     }
-
     const staff = await this.staffService.getStaffByZoneId(parseZoneId);
-
     res.status(200).json({ data: staff });
   }
 
@@ -65,13 +58,10 @@ export class StaffController extends Controller {
   @RouteMapping('/:branchId', Methods.GET)
   private async getStaffByBranchId(req: Request, res: Response): Promise<void> {
     const parseBranchId = NumberUtils.parsePositiveInteger(req.params.branchId);
-
     if (!parseBranchId) {
       throw new InvalidRequestException('branchId must be a positive integer');
     }
-
     const staff = await this.staffService.getStaffByBranchId(parseBranchId);
-
     res.status(200).json({ data: staff });
   }
 
@@ -91,13 +81,11 @@ export class StaffController extends Controller {
     } = req.body;
 
     const parseBranchId = NumberUtils.parsePositiveInteger(branchId);
-
     if (!parseBranchId) {
       throw new InvalidRequestException('BranchId must be a positive integer');
     }
 
     const parseZoneId = NumberUtils.parsePositiveInteger(zoneId);
-
     if (!parseZoneId) {
       throw new InvalidRequestException('ZoneId must be a positive integer');
     }
@@ -111,7 +99,6 @@ export class StaffController extends Controller {
       .setSalary(salary)
       .setPosition(position)
       .setDateOfBirth(new Date(dob));
-
     const createdField = await this.staffService.addStaff(newStaff);
 
     res.status(200).json({ data: { createdField } });
@@ -151,7 +138,6 @@ export class StaffController extends Controller {
       .setSalary(salary)
       .setPosition(position)
       .setDateOfBirth(new Date(dob));
-
     const updatedField = await this.staffService.editStaff(parseStaffId, newStaff);
 
     res.status(200).json({ data: { updatedField } });
@@ -161,13 +147,10 @@ export class StaffController extends Controller {
   @RouteMapping('/:staffId', Methods.DELETE)
   public async deleteStaffByStaffId(req: Request, res: Response): Promise<void> {
     const parseStaffId = NumberUtils.parsePositiveInteger(req.params.staffId);
-
     if (!parseStaffId) {
       throw new InvalidRequestException('StaffId must be a positive integer');
     }
-
     const deletedField = await this.staffService.deleteStaff(parseStaffId);
-
     res.status(200).json({ data: { deletedField } });
   }
 

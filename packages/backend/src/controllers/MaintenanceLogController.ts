@@ -26,8 +26,8 @@ export class MaintenanceLogController extends Controller {
   @RouteMapping('/', Methods.GET)
   private async getMaintenanceLogsByQuery(req: Request, res: Response): Promise<void> {
     const { machineId } = req.query;
-    const parseMachineId = NumberUtils.parsePositiveInteger(machineId);
 
+    const parseMachineId = NumberUtils.parsePositiveInteger(machineId);
     if (!parseMachineId) {
       throw new InvalidRequestException('MachineId must be a positive integer');
     }
@@ -36,7 +36,6 @@ export class MaintenanceLogController extends Controller {
       limit: Number(req.query.limit),
       offset: Number(req.query.offset),
     };
-
     const maintenanceLogs = await this.maintenanceLogService
       .getMaintenanceLogsByMachineId(parseMachineId, readOptions);
 
@@ -51,7 +50,6 @@ export class MaintenanceLogController extends Controller {
     const { staffId: reporterId, zoneId: reporterZoneId } = req.session;
 
     const parseMachineId = NumberUtils.parsePositiveInteger(machineId);
-
     if (!parseMachineId) {
       throw new InvalidRequestException('MachineId must be a positive integer');
     }
@@ -62,7 +60,6 @@ export class MaintenanceLogController extends Controller {
       .setReason(reason)
       .setStatus(MaintenanceLogStatus.OPENED)
       .setReportDate(new Date());
-
     const createdField = await this.maintenanceLogService
       .addMaintenanceLog(newMaintenanceLog, reporterZoneId);
 
@@ -78,13 +75,11 @@ export class MaintenanceLogController extends Controller {
     const { reason } = req.body;
 
     const parseMaintenanceId = NumberUtils.parsePositiveInteger(maintenanceId);
-
     if (!parseMaintenanceId) {
       throw new InvalidRequestException('MaintenanceId must be a positive integer');
     }
 
     const newMaintenanceLog = new MaintenanceLog().setReason(reason);
-
     const updatedField = await this.maintenanceLogService
       .editMaintenanceLog(parseMaintenanceId, newMaintenanceLog, reporterId);
 
@@ -98,7 +93,6 @@ export class MaintenanceLogController extends Controller {
     const { staffId } = req.session;
 
     const parseMaintenanceId = NumberUtils.parsePositiveInteger(maintenanceId);
-
     if (!parseMaintenanceId) {
       throw new InvalidRequestException('MachineId must be a positive integer');
     }
@@ -116,13 +110,11 @@ export class MaintenanceLogController extends Controller {
     const { maintenanceId, action } = req.body;
 
     const parseMaintenanceId = NumberUtils.parsePositiveInteger(maintenanceId);
-
     if (!parseMaintenanceId) {
       throw new InvalidRequestException('MaintenanceId must be a positive integer');
     }
 
     const isValidAction = EnumUtils.isIncludesInEnum(action, MaintainerAction);
-
     if (!isValidAction) {
       throw new InvalidRequestException('Action type is not valid');
     }

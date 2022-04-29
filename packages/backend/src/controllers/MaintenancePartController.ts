@@ -35,7 +35,6 @@ export class MaintenancePartController extends Controller {
       limit: Number(req.query.limit),
       offset: Number(req.query.offset),
     };
-
     const maintenanceParts = await this.maintenancePartService
       .getMaintenancePartsByMaintenanceId(parseMaintenanceId, readOptions);
 
@@ -75,7 +74,6 @@ export class MaintenancePartController extends Controller {
       .setType(type)
       .setStatus(status)
       .setOrderId(parseOrderId);
-
     const maintenancePart = await this.maintenancePartService
       .addMaintenancePart(newMaintenancePart, req.session.staffId);
 
@@ -108,7 +106,6 @@ export class MaintenancePartController extends Controller {
     const newMaintenancePart = new MaintenancePart()
       .setType(type)
       .setOrderId(parseOrderId);
-
     const updatedField = await this.maintenancePartService
       .editMaintenancePart(primaryKeyToUpdate, newMaintenancePart, req.session.staffId);
 
@@ -128,13 +125,11 @@ export class MaintenancePartController extends Controller {
     }
 
     const parsePartId = NumberUtils.parsePositiveInteger(partId);
-
     if (!parsePartId) {
       throw new InvalidRequestException('PartId must be a positive integer');
     }
 
     const primaryKeyToDelete: [number, number] = [parseMaintenanceId, parsePartId];
-
     const deletedField = await this.maintenancePartService
       .deleteMaintenancePart(primaryKeyToDelete);
 
