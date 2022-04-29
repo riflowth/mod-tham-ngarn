@@ -1,10 +1,12 @@
 import { Machine } from '@/entities/Machine';
 import { MachinePart } from '@/entities/MachinePart';
+import { MaintenancePart } from '@/entities/MaintenancePart';
 import { Order } from '@/entities/Order';
 import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { NotFoundException } from '@/exceptions/NotFoundException';
 import { MachineRepository } from '@/repositories/machine/MachineRepository';
 import { MachinePartRepository } from '@/repositories/machinePart/MachinePartRepository';
+import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
 
@@ -18,15 +20,18 @@ export class MachinePartService {
   private readonly machineRepository: MachineRepository;
   private readonly machinePartRepository: MachinePartRepository;
   private readonly orderRepository: OrderRepository;
+  private readonly maintenancePartRepository: MaintenancePartRepository;
 
   public constructor(
     machineRepository: MachineRepository,
     machinePartRepository: MachinePartRepository,
     orderRepository: OrderRepository,
+    maintenancePartRepository: MaintenancePartRepository,
   ) {
     this.machineRepository = machineRepository;
     this.machinePartRepository = machinePartRepository;
     this.orderRepository = orderRepository;
+    this.maintenancePartRepository = maintenancePartRepository;
   }
 
   public async getAllMachineParts(readOptions: ReadOptions): Promise<MachinePart[]> {
@@ -75,8 +80,15 @@ export class MachinePartService {
     if (!targetMachinePart) {
       throw new NotFoundException('Target machinePart does not exist');
     }
-
     const newMachineId = newMachinePart.getMachineId();
+
+    if (newMachinePart.getPartName() === null) {
+      newMachinePart.setPartName(undefined);
+    }
+
+    if (newMachinePart.getStatus() === null) {
+      newMachinePart.setStatus(undefined);
+    }
 
     if (newMachineId) {
       const relatedMachineToEdit = new Machine().setMachineId(newMachineId);
@@ -86,6 +98,7 @@ export class MachinePartService {
         throw new InvalidRequestException('machineId related to machinePart does not exist.');
       }
     }
+    this.validatedStatus(partId, targetMachinePart.getStatus());
 
     const affectedRowAmount = await this.machinePartRepository.update(
       newMachinePart,
@@ -93,6 +106,28 @@ export class MachinePartService {
     );
 
     return affectedRowAmount === 1 ? newMachinePart.setPrimaryKey(partId) : null;
+  }
+
+  private async validatedStatus(partId: number, status: String): Promise<void> {
+    const relatedMaintenancePart = new MaintenancePart().setPartId(partId);
+    const allMaintenancePartRelated = await this.maintenancePartRepository
+      .read(relatedMaintenancePart);
+    allMaintenancePartRelated.forEach((maintenancePart) => {
+      if (status === 'DISABLE') {
+        if (maintenancePart.getStatus() !== 'SUCCESS') {
+          throw new InvalidRequestException('Can not change status because MaintenancePart is not SUCCESS');
+        }
+      }
+    });
+    const relatedOrder = new Order().setPartId(partId);
+    const allOrder = await this.orderRepository.read(relatedOrder);
+    allOrder.forEach((order) => {
+      if (status === 'DISABLE') {
+        if (order.getStatus() !== 'DELIVERED') {
+          throw new InvalidRequestException('Can not change status because Order is not DELIVERED');
+        }
+      }
+    });
   }
 
   public async getMachineStatus(machineId: number): Promise<String> {
@@ -111,7 +146,7 @@ export class MachinePartService {
       return 'Disable';
     }
 
-    return 'Active ทำงานอยู่นะมุแง';
+    return 'Active';
   }
 
   public async getMachineMaintenanceCost(machineId: number): Promise<number> {
