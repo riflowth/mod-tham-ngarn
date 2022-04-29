@@ -18,10 +18,10 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js 16.14.2 (LTS)
+      - name: Setup Node.js 16.15.0 (LTS)
         uses: actions/setup-node@v3
         with:
-          node-version: '16.14.2'
+          node-version: '16.15.0'
 
       - working-directory: .
         run: cp yarn.lock ./packages/backend
