@@ -56,7 +56,7 @@ export class MaintenanceLogService {
     staffZoneIdToValidate: number,
     readOptions?: ReadOptions,
   ): Promise<MaintenanceLog[]> {
-    this.validatePositiveInteger(machineId, 'Machine id', true);
+    this.validatePositiveInteger(machineId, 'Machine id');
 
     const machineToValidate = await this.machineRepository.readByMachineId(machineId);
     this.validateMachineRelation(machineToValidate, staffZoneIdToValidate);
@@ -87,9 +87,9 @@ export class MaintenanceLogService {
     const newMaintenanceDate = newMaintenanceLog.getMaintenanceDate();
     const newStatus = newMaintenanceLog.getStatus();
 
-    this.validatePositiveInteger(newMachineId, 'Machine id', true);
-    this.validatePositiveInteger(newReporterId, 'reporter id', true);
-    this.validateNonEmptyString(newReason, 'reason', false);
+    this.validatePositiveInteger(newMachineId, 'Machine id');
+    this.validatePositiveInteger(newReporterId, 'reporter id');
+    if (newReason) this.validateNonEmptyString(newReason, 'reason');
 
     if (newMaintenanceId || newMaintainerId || newReportDate || newMaintenanceDate || newStatus) {
       throw new InvalidRequestException('You cannot add maintenance log with this data');
@@ -137,7 +137,7 @@ export class MaintenanceLogService {
     const newReportDate = newMaintenanceLog.getReportDate();
     const newMaintenanceDate = newMaintenanceLog.getMaintenanceDate();
 
-    this.validateNonEmptyString(newReason, 'reason', true);
+    this.validateNonEmptyString(newReason, 'reason');
 
     if (
       newMaintenanceId
@@ -174,8 +174,8 @@ export class MaintenanceLogService {
     statusToUpdate: string,
     maintainerIdToValidate: number,
   ): Promise<MaintenanceLog> {
-    this.validatePositiveInteger(maintenanceLogIdToEdit, 'Maintenance log id', true);
-    this.validatePositiveInteger(maintainerIdToValidate, 'Reporter id', true);
+    this.validatePositiveInteger(maintenanceLogIdToEdit, 'Maintenance log id');
+    this.validatePositiveInteger(maintainerIdToValidate, 'Reporter id');
 
     if (!EnumUtils.isIncludesInEnum(statusToUpdate, MaintenanceLogStatus)) {
       throw new InvalidRequestException('Invalid status');
@@ -232,8 +232,8 @@ export class MaintenanceLogService {
     claimerMaintainerId: number,
     claimerMaintainerRoleToValidate: string,
   ): Promise<MaintenanceLog> {
-    this.validatePositiveInteger(maintenanceLogIdToClaim, 'Maintenance log id', true);
-    this.validatePositiveInteger(claimerMaintainerId, 'Maintainer id', true);
+    this.validatePositiveInteger(maintenanceLogIdToClaim, 'Maintenance log id');
+    this.validatePositiveInteger(claimerMaintainerId, 'Maintainer id');
 
     if (claimerMaintainerRoleToValidate !== Role.TECHNICIAN) {
       throw new InvalidRequestException('You cannot claim maintenance log with this data');
@@ -268,8 +268,8 @@ export class MaintenanceLogService {
     maintenanceLogIdToUnclaim: number,
     unclaimerMaintainerId: number,
   ): Promise<MaintenanceLog> {
-    this.validatePositiveInteger(maintenanceLogIdToUnclaim, 'Maintenance log id', true);
-    this.validatePositiveInteger(unclaimerMaintainerId, 'Maintainer id', true);
+    this.validatePositiveInteger(maintenanceLogIdToUnclaim, 'Maintenance log id');
+    this.validatePositiveInteger(unclaimerMaintainerId, 'Maintainer id');
 
     const maintenanceLogToUnclaim = await this.maintenanceLogRepository
       .readByMaintenanceId(maintenanceLogIdToUnclaim);
@@ -302,8 +302,8 @@ export class MaintenanceLogService {
     staffIdToValidate: number,
     maintainerRoleToValidate: string,
   ): Promise<MaintenanceLog> {
-    this.validatePositiveInteger(maintenanceLogIdToDelete, 'maintenanceLogId', true);
-    this.validatePositiveInteger(staffIdToValidate, 'staffId', true);
+    this.validatePositiveInteger(maintenanceLogIdToDelete, 'maintenanceLogId');
+    this.validatePositiveInteger(staffIdToValidate, 'staffId');
 
     const maintenanceLogToValidate = await this.maintenanceLogRepository
       .readByMaintenanceId(maintenanceLogIdToDelete);
@@ -338,25 +338,18 @@ export class MaintenanceLogService {
   private validatePositiveInteger(
     numberToValidate: number,
     name: string,
-    isRequired: boolean,
   ): void {
-    const parseNumberToValidate = Number(numberToValidate);
-    if (isRequired && !NumberUtils.isPositiveInteger(parseNumberToValidate)) {
+    if (!NumberUtils.isPositiveInteger(Number(numberToValidate))) {
       throw new InvalidRequestException(`${name} must be a positive integer and cannot be null`);
-    } else if (parseNumberToValidate && !NumberUtils.isPositiveInteger(parseNumberToValidate)) {
-      throw new InvalidRequestException(`${name} must be a positive integer`);
     }
   }
 
   private validateNonEmptyString(
     stringToValidate: string,
     name: string,
-    isRequired: boolean,
   ): void {
-    if (isRequired && stringToValidate === '') {
+    if (stringToValidate === '') {
       throw new InvalidRequestException(`${name} must be a non empty string and cannot be null`);
-    } else if (stringToValidate && stringToValidate === '') {
-      throw new InvalidRequestException(`${name} must be a non empty string`);
     }
   }
 
@@ -402,28 +395,6 @@ export class MaintenanceLogService {
       && maintenanceLogToValidate.getStatus() !== MaintenanceLogStatus.PENDING
     ) {
       throw new InvalidRequestException('You cannot delete/edit maintenance that finished');
-    }
-  }
-
-  private validateChangeMaintenanceLogStatus(fromStatus: string, toStatus: string) {
-    if (fromStatus === MaintenanceLogStatus.SUCCESS || fromStatus === MaintenanceLogStatus.FAILED) {
-      throw new InvalidRequestException('You cannot change status from success or failed');
-    }
-
-    if (fromStatus === MaintenanceLogStatus.OPENED) {
-      if (toStatus !== MaintenanceLogStatus.PENDING) {
-        throw new InvalidRequestException('You cannot change status from opened to other than pending');
-      }
-    }
-
-    if (fromStatus === MaintenanceLogStatus.PENDING) {
-      if (toStatus !== MaintenanceLogStatus.SUCCESS && toStatus !== MaintenanceLogStatus.FAILED) {
-        throw new InvalidRequestException('You cannot change status from pending to other than success or failed');
-      }
-    }
-
-    if (toStatus === MaintenanceLogStatus.OPENED) {
-      throw new InvalidRequestException('You cannot change other status to opened');
     }
   }
 

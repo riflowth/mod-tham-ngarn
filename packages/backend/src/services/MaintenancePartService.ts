@@ -34,7 +34,7 @@ export class MaintenancePartService {
     maintenanceId: number,
     readOptions?: ReadOptions,
   ): Promise<MaintenancePart[]> {
-    this.validatePositiveInteger(maintenanceId, 'maintenanceId', true);
+    this.validatePositiveInteger(maintenanceId, 'maintenanceId');
 
     const expectedMaintenancePart = new MaintenancePart().setMaintenanceId(maintenanceId);
     return this.maintenancePartRepository.read(expectedMaintenancePart, readOptions);
@@ -50,10 +50,10 @@ export class MaintenancePartService {
     const newOrderId = newMaintenancePart.getOrderId();
     const newStatus = newMaintenancePart.getStatus();
 
-    this.validatePositiveInteger(newMaintenanceId, 'newMaintenanceId', false);
-    this.validatePositiveInteger(newPartId, 'newPartId', true);
-    this.validatePositiveInteger(newOrderId, 'newOrderId', false);
-    this.validateNonEmptyString(newType, 'newType', false);
+    this.validatePositiveInteger(newPartId, 'newPartId');
+    if (newMaintenanceId) this.validatePositiveInteger(newMaintenanceId, 'newMaintenanceId');
+    if (newOrderId) this.validatePositiveInteger(newOrderId, 'newOrderId');
+    if (newType) this.validateNonEmptyString(newType, 'newType');
 
     if (newStatus) {
       throw new InvalidRequestException('newStatus must be null');
@@ -114,11 +114,11 @@ export class MaintenancePartService {
     const newMaintenanceId = newMaintenancePart.getMaintenanceId();
     const newPartId = newMaintenancePart.getPartId();
 
-    this.validatePositiveInteger(maintenanceIdToSet, 'maintenanceIdToSet', true);
-    this.validatePositiveInteger(partIdToSet, 'partIdToSet', true);
-    this.validateNonEmptyString(newType, 'newType', false);
-    this.validatePositiveInteger(newOrderId, 'newOrderId', false);
-    this.validatePositiveInteger(newPartId, 'newPartId', false);
+    this.validatePositiveInteger(maintenanceIdToSet, 'maintenanceIdToSet');
+    this.validatePositiveInteger(partIdToSet, 'partIdToSet');
+    if (newType) this.validateNonEmptyString(newType, 'newType');
+    if (newOrderId) this.validatePositiveInteger(newOrderId, 'newOrderId');
+    if (newPartId) this.validatePositiveInteger(newPartId, 'newPartId');
 
     if (newMaintenanceId || newPartId || newStatus) {
       throw new InvalidRequestException('newMaintenanceId and newPartId must be null');
@@ -176,10 +176,10 @@ export class MaintenancePartService {
   ): Promise<MaintenancePart> {
     const maintenanceIdToSet = primaryKey[0];
     const partIdToSet = primaryKey[1];
-    this.validatePositiveInteger(maintenanceIdToSet, 'maintenanceIdToSet', true);
-    this.validatePositiveInteger(partIdToSet, 'partIdToSet', true);
-    this.validateNonEmptyString(newStatus, 'newStatus', true);
-    this.validatePositiveInteger(maintainerIdToValidate, 'maintainerId', true);
+    this.validatePositiveInteger(maintenanceIdToSet, 'maintenanceIdToSet');
+    this.validatePositiveInteger(partIdToSet, 'partIdToSet');
+    this.validateNonEmptyString(newStatus, 'newStatus');
+    this.validatePositiveInteger(maintainerIdToValidate, 'maintainerId');
 
     const maintenancePartToValidate = await this.maintenancePartRepository
       .readByPrimaryKey(maintenanceIdToSet, partIdToSet);
@@ -206,8 +206,8 @@ export class MaintenancePartService {
     const maintenanceIdToDelete = primaryKey[0];
     const partIdToDelete = primaryKey[1];
 
-    this.validatePositiveInteger(maintenanceIdToDelete, 'maintenanceIdToDelete', true);
-    this.validatePositiveInteger(partIdToDelete, 'partIdToDelete', true);
+    this.validatePositiveInteger(maintenanceIdToDelete, 'maintenanceIdToDelete');
+    this.validatePositiveInteger(partIdToDelete, 'partIdToDelete');
 
     const targetMaintenancePart = await this.maintenancePartRepository
       .readByPrimaryKey(maintenanceIdToDelete, partIdToDelete);
@@ -237,25 +237,18 @@ export class MaintenancePartService {
   private validatePositiveInteger(
     numberToValidate: number,
     name: string,
-    isRequired: boolean,
   ): void {
-    const parseNumberToValidate = Number(numberToValidate);
-    if (isRequired && !NumberUtils.isPositiveInteger(parseNumberToValidate)) {
+    if (!NumberUtils.isPositiveInteger(Number(numberToValidate))) {
       throw new InvalidRequestException(`${name} must be a positive integer and cannot be null`);
-    } else if (parseNumberToValidate && !NumberUtils.isPositiveInteger(parseNumberToValidate)) {
-      throw new InvalidRequestException(`${name} must be a positive integer`);
     }
   }
 
   private validateNonEmptyString(
     stringToValidate: string,
     name: string,
-    isRequired: boolean,
   ): void {
-    if (isRequired && stringToValidate === '') {
+    if (stringToValidate === '') {
       throw new InvalidRequestException(`${name} must be a non empty string and cannot be null`);
-    } else if (stringToValidate && stringToValidate === '') {
-      throw new InvalidRequestException(`${name} must be a non empty string`);
     }
   }
 

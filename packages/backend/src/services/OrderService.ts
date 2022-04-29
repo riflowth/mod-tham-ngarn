@@ -41,7 +41,7 @@ export class OrderService {
   }
 
   public async getOrdersByBillId(billId: number, readOptions?: ReadOptions): Promise<Order[]> {
-    this.validatePositiveInteger(billId, 'BillId', true);
+    this.validatePositiveInteger(billId, 'BillId');
 
     const expectedOrders = new Order().setBillId(billId);
     return this.orderRepository.read(expectedOrders, readOptions);
@@ -60,11 +60,11 @@ export class OrderService {
     const newArrivalDate = newOrder.getArrivalDate();
     const newStatus = newOrder.getStatus();
 
-    this.validatePositiveInteger(ordererIdToValidate, 'OrdererId', true);
-    this.validatePositiveInteger(newMachineId, 'MachineId', false);
-    this.validatePositiveInteger(newPartId, 'PartId', false);
-    this.validatePositiveInteger(newBillId, 'BillId', false);
-    this.validatePositiveInteger(newPrice, 'Price', false);
+    this.validatePositiveInteger(ordererIdToValidate, 'OrdererId');
+    if (newMachineId) this.validatePositiveInteger(newMachineId, 'MachineId');
+    if (newPartId) this.validatePositiveInteger(newPartId, 'PartId');
+    if (newBillId) this.validatePositiveInteger(newBillId, 'BillId');
+    if (newPrice) this.validatePositiveInteger(newPrice, 'Price');
 
     if (newOrderId || newArrivalDate || newStatus) {
       throw new InvalidRequestException('OrderId, ArrivalDate and Status must not be set');
@@ -115,11 +115,11 @@ export class OrderService {
     const newBIllId = newOrder.getBillId();
     const newArrivalDate = newOrder.getArrivalDate();
 
-    this.validatePositiveInteger(orderIdToEdit, 'OrderId', true);
-    this.validatePositiveInteger(ordererIdToValidate, 'OrdererId', true);
-    this.validatePositiveInteger(newMachineId, 'MachineId', false);
-    this.validatePositiveInteger(newPartId, 'PartId', false);
-    this.validatePositiveInteger(newPrice, 'Price', false);
+    this.validatePositiveInteger(orderIdToEdit, 'OrderId');
+    this.validatePositiveInteger(ordererIdToValidate, 'OrdererId');
+    if (newMachineId) this.validatePositiveInteger(newMachineId, 'MachineId');
+    if (newPartId) this.validatePositiveInteger(newPartId, 'PartId');
+    if (newPrice) this.validatePositiveInteger(newPrice, 'Price');
 
     if (newOrderId || newBIllId || newArrivalDate || newStatus) {
       throw new InvalidRequestException('You cannot edit orderId, billId or arrivalDate');
@@ -149,8 +149,8 @@ export class OrderService {
     billIdToValidate: number,
     ordererIdToValidate: number,
   ): Promise<Order> {
-    this.validatePositiveInteger(orderIdToEdit, 'OrderId', true);
-    this.validatePositiveInteger(ordererIdToValidate, 'OrdererId', true);
+    this.validatePositiveInteger(orderIdToEdit, 'OrderId');
+    this.validatePositiveInteger(ordererIdToValidate, 'OrdererId');
 
     if (!EnumUtils.isIncludesInEnum(statusToUpdate, OrderStatus)) {
       throw new InvalidRequestException('Status must be one of the following: SHIPPING, DELIVERED, CANCELED');
@@ -193,8 +193,8 @@ export class OrderService {
     billIdToValidate: number,
     ordererIdToValidate: number,
   ): Promise<Order> {
-    this.validatePositiveInteger(orderIdToDelete, 'OrderId', true);
-    this.validatePositiveInteger(ordererIdToValidate, 'OrdererId', true);
+    this.validatePositiveInteger(orderIdToDelete, 'OrderId');
+    this.validatePositiveInteger(ordererIdToValidate, 'OrdererId');
 
     const orderToValidate = await this.orderRepository.readByOrderId(orderIdToDelete);
     this.validateOrderRelation(orderToValidate);
@@ -224,13 +224,9 @@ export class OrderService {
   private validatePositiveInteger(
     numberToValidate: number,
     name: string,
-    isRequired: boolean,
   ): void {
-    const parseNumberToValidate = Number(numberToValidate);
-    if (isRequired && !NumberUtils.isPositiveInteger(parseNumberToValidate)) {
+    if (!NumberUtils.isPositiveInteger(Number(numberToValidate))) {
       throw new InvalidRequestException(`${name} must be a positive integer and cannot be null`);
-    } else if (parseNumberToValidate && !NumberUtils.isPositiveInteger(parseNumberToValidate)) {
-      throw new InvalidRequestException(`${name} must be a positive integer`);
     }
   }
 
