@@ -73,4 +73,11 @@ export class DefaultBranchRepository extends Database implements BranchRepositor
     return result[0].affectedRows;
   }
 
+  public async readByBranchId(branchId: number): Promise<Branch> {
+    const expectedBranch = new Branch().setBranchId(branchId);
+    const [branch] = await this.read(expectedBranch);
+
+    return branch;
+  }
+
 }

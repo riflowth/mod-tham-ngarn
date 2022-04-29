@@ -68,17 +68,18 @@ export class ControllerRegistry {
       const routes = controller.getRouter();
 
       routes.forEach((route) => {
+        const routeHandler = ErrorHandler.wrap(route.handler);
         const routeMetadata = route.metadata;
         const routeMethod = routeMetadata.method.toLowerCase();
         const routePath = routeMetadata.path;
-        const routeHandler = route.handler;
+        const permission = routeMetadata.authentication;
 
-        if (routeMetadata.authentication) {
-          const authMiddleware = this.getAuthMiddleware(routeMetadata.authentication);
-          router.use(routePath, ErrorHandler.wrap(authMiddleware));
+        if (permission) {
+          const authMiddleware = this.getAuthMiddleware(permission);
+          router[routeMethod](routePath, ErrorHandler.wrap(authMiddleware), routeHandler);
+        } else {
+          router[routeMethod](routePath, routeHandler);
         }
-
-        router[routeMethod](routePath, ErrorHandler.wrap(routeHandler));
       });
 
       this.app.use(controller.getPath(), router);
@@ -108,22 +109,45 @@ export class ControllerRegistry {
         throw new UnauthorizedException('Login required');
       }
 
-      const expectedSession = new Session().setSessionId(sessionId);
-      const [session] = await this.sessionRepository.read(expectedSession);
+      const cachedSession = await this.sessionRepository.getCachedSession(sessionId);
+      let session;
+      let staff;
 
-      if (!session) {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
+      if (cachedSession) {
+        session = new Session()
+          .setSessionId(cachedSession.sessionId)
+          .setStaffId(cachedSession.staffId);
+        staff = new Staff()
+          .setStaffId(cachedSession.staffId)
+          .setPosition(cachedSession.role)
+          .setZoneId(cachedSession.zoneId)
+          .setBranchId(cachedSession.branchId);
+      } else {
+        const expectedSession = new Session().setSessionId(sessionId);
+        [session] = await this.sessionRepository.read(expectedSession);
 
-        const removingCookie = new Cookie('sid', 'i-will-destory-your-cookies')
-          .setExpiryDate(yesterday);
+        if (!session) {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
 
-        this.cookieProvider.setCookie(res, removingCookie);
-        throw new UnauthorizedException('Session expired');
+          const removingCookie = new Cookie('sid', 'i-will-destroy-your-cookies')
+            .setExpiryDate(yesterday);
+
+          this.cookieProvider.setCookie(res, removingCookie);
+          throw new UnauthorizedException('Session expired');
+        }
+
+        const expectedStaff = new Staff().setStaffId(session.getStaffId());
+        [staff] = await this.staffRepository.read(expectedStaff);
+
+        await this.sessionRepository.cacheSession(sessionId, {
+          sessionId,
+          staffId: staff.getStaffId(),
+          role: staff.getPosition(),
+          zoneId: staff.getZoneId(),
+          branchId: staff.getBranchId(),
+        });
       }
-
-      const expectedStaff = new Staff().setStaffId(session.getStaffId());
-      const [staff] = await this.staffRepository.read(expectedStaff);
 
       const isAuthorized = role.length === 0
         ? true
@@ -136,6 +160,9 @@ export class ControllerRegistry {
       req.session = {
         sessionId: session.getSessionId(),
         staffId: session.getStaffId(),
+        zoneId: staff.getZoneId(),
+        branchId: staff.getBranchId(),
+        role: staff.getPosition(),
       };
 
       next();

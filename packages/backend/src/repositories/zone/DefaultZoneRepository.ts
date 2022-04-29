@@ -73,4 +73,11 @@ export class DefaultZoneRepository extends Database implements ZoneRepository {
     return result[0].affectedRows;
   }
 
+  public async readByZoneId(zoneId: number): Promise<Zone> {
+    const expectedZone = new Zone().setZoneId(zoneId);
+    const [zone] = await this.read(expectedZone);
+
+    return zone;
+  }
+
 }

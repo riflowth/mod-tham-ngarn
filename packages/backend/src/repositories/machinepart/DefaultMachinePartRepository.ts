@@ -1,5 +1,5 @@
 import { MachinePart } from '@/entities/MachinePart';
-import { MachinePartRepository } from '@/repositories/machinePart/MachinePartRepository';
+import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { Database } from '@/utils/database/Database';
 
@@ -72,6 +72,13 @@ export class DefaultMachinePartRepository extends Database implements MachinePar
     const result: any = await this.getSqlBuilder().delete('MachinePart', parameter);
 
     return result[0].affectedRows;
+  }
+
+  public async readByPartId(partId: number): Promise<MachinePart> {
+    const expectedPart = new MachinePart().setPartId(partId);
+    const [part] = await this.read(expectedPart);
+
+    return part;
   }
 
 }

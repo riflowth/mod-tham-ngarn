@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import http from 'http';
 import express, { Application } from 'express';
-import { IndexController } from '@/controllers/IndexController';
 import { ControllerRegistry } from '@/controllers/ControllerRegistry';
 import { DatabaseConnector } from '@/utils/database/DatabaseConnector';
 import { DatabaseException } from '@/exceptions/DatabaseException';
@@ -12,7 +11,7 @@ import { AddressRepository } from '@/repositories/address/AddressRepository';
 import { BillRepository } from '@/repositories/bill/BillRepository';
 import { BranchRepository } from '@/repositories/branch/BranchRepository';
 import { MachineRepository } from '@/repositories/machine/MachineRepository';
-import { MachinePartRepository } from '@/repositories/machinePart/MachinePartRepository';
+import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
 import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
@@ -22,7 +21,7 @@ import { DefaultAddressRepository } from '@/repositories/address/DefaultAddressR
 import { DefaultBillRepository } from '@/repositories/bill/DefaultBillRepository';
 import { DefaultBranchRepository } from '@/repositories/branch/DefaultBranchRepository';
 import { DefaultMachineRepository } from '@/repositories/machine/DefaultMachineRepository';
-import { DefaultMachinePartRepository } from '@/repositories/machinePart/DefaultMachinePartRepository';
+import { DefaultMachinePartRepository } from '@/repositories/machinepart/DefaultMachinePartRepository';
 import { DefaultMaintenanceLogRepository } from '@/repositories/maintenancelog/DefaultMaintenanceLogRepository';
 import { DefaultMaintenancePartRepository } from '@/repositories/maintenancepart/DefaultMaintenancePartRepository';
 import { DefaultOrderRepository } from '@/repositories/order/DefaultOrderRepository';
@@ -31,6 +30,26 @@ import { DefaultZoneRepository } from '@/repositories/zone/DefaultZoneRepository
 import { SessionRepository } from '@/repositories/session/SessionRepository';
 import { DefaultSessionRepository } from '@/repositories/session/DefaultSessionRepository';
 import { StaffController } from '@/controllers/StaffController';
+import { ZoneService } from '@/services/ZoneService';
+import { ZoneController } from '@/controllers/ZoneController';
+import { BranchService } from '@/services/BranchService';
+import { BranchController } from '@/controllers/BranchController';
+import { MachineService } from '@/services/MachineService';
+import { MachineController } from '@/controllers/MachineController';
+import { StaffService } from '@/services/StaffService';
+import { AddressService } from '@/services/AddressService';
+import { AddressController } from '@/controllers/AddressController';
+import { MaintenanceLogService } from '@/services/MaintenanceLogService';
+import { MaintenanceLogController } from '@/controllers/MaintenanceLogController';
+import { MaintenancePartService } from '@/services/MaintenancePartService';
+import { MaintenancePartController } from '@/controllers/MaintenancePartController';
+import { OrderService } from '@/services/OrderService';
+import { OrderController } from '@/controllers/OrderController';
+import { BillService } from '@/services/BillService';
+import { BillController } from '@/controllers/BillController';
+import { MachinePartService } from '@/services/MachinePartService';
+import { MachinePartController } from '@/controllers/MachinePartController';
+import { IndexController } from '@/controllers/IndexController';
 
 export class Server {
 
@@ -54,6 +73,16 @@ export class Server {
   private zoneRepository: ZoneRepository;
 
   private authService: AuthService;
+  private addressService: AddressService;
+  private billService: BillService;
+  private branchService: BranchService;
+  private machinePartService: MachinePartService;
+  private maintenanceLogService: MaintenanceLogService;
+  private maintenancePartService: MaintenancePartService;
+  private zoneService: ZoneService;
+  private machineService: MachineService;
+  private orderService: OrderService;
+  private staffService: StaffService;
 
   public constructor(port: number) {
     this.app = express();
@@ -96,7 +125,66 @@ export class Server {
   }
 
   private async registerServices(): Promise<void> {
+    this.addressService = new AddressService(
+      this.addressRepository,
+      this.branchRepository,
+    );
     this.authService = new AuthService(this.staffRepository, this.sessionRepository);
+    this.branchService = new BranchService(
+      this.addressRepository,
+      this.branchRepository,
+      this.zoneRepository,
+    );
+    this.maintenanceLogService = new MaintenanceLogService(
+      this.machineRepository,
+      this.maintenanceLogRepository,
+      this.maintenancePartRepository,
+    );
+    this.maintenancePartService = new MaintenancePartService(
+      this.machinePartRepository,
+      this.maintenanceLogRepository,
+      this.maintenancePartRepository,
+      this.orderRepository,
+    );
+    this.zoneService = new ZoneService(
+      this.branchRepository,
+      this.machineRepository,
+      this.zoneRepository,
+      this.staffRepository,
+    );
+    this.machineService = new MachineService(
+      this.machineRepository,
+      this.machinePartRepository,
+      this.maintenanceLogRepository,
+      this.orderRepository,
+      this.staffRepository,
+      this.zoneRepository,
+    );
+    this.orderService = new OrderService(
+      this.billRepository,
+      this.machineRepository,
+      this.machinePartRepository,
+      this.maintenancePartRepository,
+      this.orderRepository,
+    );
+    this.staffService = new StaffService(
+      this.staffRepository,
+      this.zoneRepository,
+      this.branchRepository,
+      this.maintenanceLogRepository,
+      this.billRepository,
+    );
+    this.billService = new BillService(
+      this.billRepository,
+      this.staffRepository,
+      this.orderRepository,
+    );
+    this.machinePartService = new MachinePartService(
+      this.machineRepository,
+      this.machinePartRepository,
+      this.orderRepository,
+      this.maintenancePartRepository,
+    );
   }
 
   private async loadControllers(): Promise<void> {
@@ -111,8 +199,17 @@ export class Server {
 
     this.controllerRegistry.loadControllers([
       new IndexController(),
+      new AddressController(this.addressService),
       new AuthController(this.cookieProvider, this.authService),
-      new StaffController(this.staffRepository),
+      new BillController(this.billService),
+      new BranchController(this.branchService),
+      new MaintenanceLogController(this.maintenanceLogService),
+      new MaintenancePartController(this.maintenancePartService),
+      new MachinePartController(this.machinePartService),
+      new OrderController(this.orderService),
+      new StaffController(this.staffService),
+      new ZoneController(this.zoneService),
+      new MachineController(this.machineService),
     ]);
 
     const controllerCount = this.controllerRegistry.size();

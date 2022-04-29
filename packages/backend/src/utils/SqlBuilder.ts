@@ -26,7 +26,7 @@ export class SqlBuilder {
     const { limit, offset } = readOptions || {};
 
     if (limit || offset) {
-      const isIntegerOptions = Number.isInteger(limit) && Number.isInteger(offset);
+      const isIntegerOptions = Number.isInteger(limit) || Number.isInteger(offset);
       if (!isIntegerOptions) {
         throw new Error('limit and offset must be integer');
       }

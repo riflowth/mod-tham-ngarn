@@ -10,7 +10,7 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
     const parameter = {
       order_id: order.getOrderId(),
       machine_id: order.getMachineId(),
-      part_id: order.getOrderId(),
+      part_id: order.getPartId(),
       bill_id: order.getBillId(),
       price: order.getPrice(),
       arrival_date: DateUtil.formatToSQL(order.getArrivalDate()),
@@ -18,7 +18,7 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
     };
 
     try {
-      const result: any = await this.getSqlBuilder().insert('Order', parameter);
+      const result: any = await this.getSqlBuilder().insert('`Order`', parameter);
       return order.setOrderId(result[0].insertId);
     } catch (e) {
       return null;
@@ -29,14 +29,14 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
     const parameter = {
       order_id: order.getOrderId(),
       machine_id: order.getMachineId(),
-      part_id: order.getOrderId(),
+      part_id: order.getPartId(),
       bill_id: order.getBillId(),
       price: order.getPrice(),
       arrival_date: DateUtil.formatToSQL(order.getArrivalDate()),
       status: order.getStatus(),
     };
 
-    const results: any = await this.getSqlBuilder().read('Order', parameter, readOptions);
+    const results: any = await this.getSqlBuilder().read('`Order`', parameter, readOptions);
 
     const orders = results[0].map((result) => {
       return new Order()
@@ -55,7 +55,7 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
   public async update(source: Order, destination: Order): Promise<number> {
     const sourceParameter = {
       machine_id: source.getMachineId(),
-      part_id: source.getOrderId(),
+      part_id: source.getPartId(),
       bill_id: source.getBillId(),
       price: source.getPrice(),
       arrival_date: DateUtil.formatToSQL(source.getArrivalDate()),
@@ -65,14 +65,14 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
     const destinationParameter = {
       order_id: destination.getOrderId(),
       machine_id: destination.getMachineId(),
-      part_id: destination.getOrderId(),
+      part_id: destination.getPartId(),
       bill_id: destination.getBillId(),
       price: destination.getPrice(),
       arrival_date: DateUtil.formatToSQL(destination.getArrivalDate()),
       status: destination.getStatus(),
     };
 
-    const result: any = await this.getSqlBuilder().update('Order', sourceParameter, destinationParameter);
+    const result: any = await this.getSqlBuilder().update('`Order`', sourceParameter, destinationParameter);
 
     return result[0].affectedRows;
   }
@@ -81,16 +81,23 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
     const parameter = {
       order_id: order.getOrderId(),
       machine_id: order.getMachineId(),
-      part_id: order.getOrderId(),
+      part_id: order.getPartId(),
       bill_id: order.getBillId(),
       price: order.getPrice(),
       arrival_date: DateUtil.formatToSQL(order.getArrivalDate()),
       status: order.getStatus(),
     };
 
-    const result: any = await this.getSqlBuilder().delete('Order', parameter);
+    const result: any = await this.getSqlBuilder().delete('`Order`', parameter);
 
     return result[0].affectedRows;
+  }
+
+  public async readByOrderId(orderId: number): Promise<Order> {
+    const expectedOrder = new Order().setOrderId(orderId);
+    const [order] = await this.read(expectedOrder);
+
+    return order;
   }
 
 }

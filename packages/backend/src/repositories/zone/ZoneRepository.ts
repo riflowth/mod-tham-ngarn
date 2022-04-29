@@ -3,4 +3,6 @@ import { Repository } from '@/repositories/Repository';
 
 export interface ZoneRepository extends Repository<Zone> {
 
+  readByZoneId(zoneId: number): Promise<Zone>;
+
 }

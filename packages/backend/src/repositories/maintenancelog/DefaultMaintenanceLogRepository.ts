@@ -97,9 +97,37 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
       status: maintenanceLog.getStatus(),
     };
 
-    const result: any = await this.getSqlBuilder().delete('Address', parameter);
+    const result: any = await this.getSqlBuilder().delete('MaintenanceLog', parameter);
 
     return result[0].affectedRows;
+  }
+
+  public async readByMaintenanceId(maintenanceId: number) {
+    const expectedMaintenanceLog = new MaintenanceLog().setMaintenanceId(maintenanceId);
+    const [maintenanceLog] = await this.read(expectedMaintenanceLog);
+
+    return maintenanceLog;
+  }
+
+  public async readInprogressMaintenanceByMachineId(machineId: number): Promise<MaintenanceLog> {
+    const query = 'SELECT * FROM MaintenanceLog WHERE machine_id = ? AND (status = \'OPENED\' OR status = \'PENDING\')';
+    const values = [machineId];
+
+    const results: any = await this.execute(query, values);
+
+    const [maintenanceLogs] = results[0].map((result) => {
+      return new MaintenanceLog()
+        .setMaintenanceId(result.maintenance_id)
+        .setMachineId(result.machine_id)
+        .setReporterId(result.reporter_id)
+        .setMaintainerId(result.maintainer_id)
+        .setReportDate(DateUtil.formatFromSQL(result.report_date))
+        .setMaintenanceDate(DateUtil.formatFromSQL(result.maintenance_date))
+        .setReason(result.reason)
+        .setStatus(result.status);
+    });
+
+    return maintenanceLogs;
   }
 
 }

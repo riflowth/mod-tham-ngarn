@@ -3,4 +3,6 @@ import { Repository } from '@/repositories/Repository';
 
 export interface BranchRepository extends Repository<Branch> {
 
+  readByBranchId(branchId: number): Promise<Branch>;
+
 }

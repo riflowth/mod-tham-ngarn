@@ -13,7 +13,7 @@ export class CookieProvider {
   }
 
   /**
-   * Set a cookie by HTTP reponse header
+   * Set a cookie by HTTP response header
    * @param res - A http response instance
    * @param cookie - A cookie instance that needs to be set
    */
@@ -43,7 +43,7 @@ export class CookieProvider {
   }
 
   /**
-   * Set a signed cookie by HTTP reponse header
+   * Set a signed cookie by HTTP response header
    * @param res - A http response instance
    * @param cookie - A cookie instance that needs to be set
    */

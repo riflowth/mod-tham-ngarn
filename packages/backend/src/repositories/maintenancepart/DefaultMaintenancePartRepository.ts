@@ -39,7 +39,7 @@ export class DefaultMaintenancePartRepository
 
     const maintenanceParts = results[0].map((result) => {
       return new MaintenancePart()
-        .setPrimaryKey([result.part_id, result.machine_id])
+        .setPrimaryKey([result.maintenance_id, result.part_id])
         .setType(result.type)
         .setStatus(result.status)
         .setOrderId(result.order_id);
@@ -80,6 +80,26 @@ export class DefaultMaintenancePartRepository
     const result: any = await this.getSqlBuilder().delete('MaintenancePart', parameter);
 
     return result[0].affectedRows;
+  }
+
+  public async readByOrderId(orderId: number): Promise<MaintenancePart> {
+    const expectedMaintenancePart = new MaintenancePart().setOrderId(orderId);
+    const [maintenanceParts] = await this.read(expectedMaintenancePart);
+
+    return maintenanceParts;
+  }
+
+  public async readByMaintenanceId(maintenanceId: number): Promise<MaintenancePart[]> {
+    const expectedMaintenancePart = new MaintenancePart().setMaintenanceId(maintenanceId);
+    return this.read(expectedMaintenancePart);
+  }
+
+  public async readByPrimaryKey(maintenanceId: number, partId: number): Promise<MaintenancePart> {
+    const expectedMaintenancePart = new MaintenancePart()
+      .setPrimaryKey([maintenanceId, partId]);
+    const [maintenancePart] = await this.read(expectedMaintenancePart);
+
+    return maintenancePart;
   }
 
 }
