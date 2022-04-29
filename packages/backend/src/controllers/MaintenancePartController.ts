@@ -46,7 +46,6 @@ export class MaintenancePartController extends Controller {
       .setPartId(partId)
       .setType(type)
       .setOrderId(orderId);
-
     const maintenancePart = await this.maintenancePartService
       .addMaintenancePart(newMaintenancePart, req.session.staffId);
 
@@ -65,7 +64,6 @@ export class MaintenancePartController extends Controller {
     const newMaintenancePart = new MaintenancePart()
       .setType(type)
       .setOrderId(orderId);
-
     const updatedField = await this.maintenancePartService
       .editMaintenancePart(primaryKeyToUpdate, newMaintenancePart, maintainerId);
 
@@ -91,10 +89,8 @@ export class MaintenancePartController extends Controller {
   @RouteMapping('/:maintenanceId/part/:partId', Methods.DELETE)
   private async deleteMaintenancePart(req: Request, res: Response): Promise<void> {
     const { maintenanceId, partId } = req.params;
-
     const deletedField = await this.maintenancePartService
       .deleteMaintenancePart([Number(maintenanceId), Number(partId)]);
-
     res.status(200).json({ deletedField });
   }
 
