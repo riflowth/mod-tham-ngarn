@@ -105,7 +105,7 @@ export class StaffController extends Controller {
   }
 
   @Authentication(Role.MANAGER, Role.CEO)
-  @RouteMapping('/:zoneId', Methods.PUT)
+  @RouteMapping('/:staffId', Methods.PUT)
   @RequestBody('?password', '?fullName', '?branchId', '?zoneId', '?telNo', '?salary', '?position', '?dob')
   private async editStaffByStaffId(req: Request, res: Response): Promise<void> {
     const parseStaffId = NumberUtils.parsePositiveInteger(req.params.staffId);

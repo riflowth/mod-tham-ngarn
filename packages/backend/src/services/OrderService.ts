@@ -112,7 +112,7 @@ export class OrderService {
     const newPartId = newOrder.getPartId();
     const newPrice = newOrder.getPrice();
     const newOrderId = newOrder.getOrderId();
-    const newBIllId = newOrder.getBillId();
+    const newBillId = newOrder.getBillId();
     const newArrivalDate = newOrder.getArrivalDate();
 
     this.validatePositiveInteger(orderIdToEdit, 'OrderId');
@@ -121,7 +121,7 @@ export class OrderService {
     if (newPartId) this.validatePositiveInteger(newPartId, 'PartId');
     if (newPrice) this.validatePositiveInteger(newPrice, 'Price');
 
-    if (newOrderId || newBIllId || newArrivalDate || newStatus) {
+    if (newOrderId || newBillId || newArrivalDate || newStatus) {
       throw new InvalidRequestException('You cannot edit orderId, billId or arrivalDate');
     }
 

@@ -125,7 +125,7 @@ export class MaintenancePartService {
     }
 
     if (!newOrderId && !newType) {
-      throw new InvalidRequestException('no provide data');
+      throw new InvalidRequestException('No provide data');
     }
 
     const targetMaintenancePart = await this.maintenancePartRepository
@@ -325,7 +325,7 @@ export class MaintenancePartService {
 
   private validateOrderProgress(orderRelatedToMaintenancePart: Order): void {
     if (orderRelatedToMaintenancePart.getStatus() === OrderStatus.SHIPPING) {
-      throw new InvalidRequestException('order is shipping so it cannot change');
+      throw new InvalidRequestException('Order is shipping so it cannot change');
     }
   }
 

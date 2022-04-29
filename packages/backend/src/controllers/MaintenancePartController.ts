@@ -19,7 +19,7 @@ export class MaintenancePartController extends Controller {
     this.maintenancePartService = maintenancePartService;
   }
 
-  @Authentication(Role.TECHNICIAN)
+  @Authentication(Role.TECHNICIAN, Role.MANAGER, Role.CEO)
   @RouteMapping('/:maintenanceId/part', Methods.GET)
   private async getAllMaintenancePartsByMaintenanceId(req: Request, res: Response): Promise<void> {
     const { maintenanceId } = req.params;
@@ -34,7 +34,7 @@ export class MaintenancePartController extends Controller {
     res.status(200).json({ data: maintenanceParts });
   }
 
-  @Authentication(Role.TECHNICIAN)
+  @Authentication(Role.TECHNICIAN, Role.MANAGER, Role.CEO)
   @RouteMapping('/:maintenanceId/part', Methods.POST)
   @RequestBody('partId', '?type', '?orderId')
   private async addMaintenancePart(req: Request, res: Response): Promise<void> {
@@ -52,7 +52,7 @@ export class MaintenancePartController extends Controller {
     res.status(200).json({ data: maintenancePart });
   }
 
-  @Authentication(Role.TECHNICIAN)
+  @Authentication(Role.TECHNICIAN, Role.MANAGER, Role.CEO)
   @RouteMapping('/:maintenanceId/part/:partId', Methods.PUT)
   @RequestBody('?type', '?orderId')
   private async editMaintenancePart(req: Request, res: Response): Promise<void> {
@@ -70,7 +70,7 @@ export class MaintenancePartController extends Controller {
     res.status(200).json({ data: updatedField });
   }
 
-  @Authentication(Role.TECHNICIAN)
+  @Authentication(Role.TECHNICIAN, Role.MANAGER, Role.CEO)
   @RouteMapping('/:maintenanceId/part/:partId/status', Methods.PUT)
   @RequestBody('status')
   private async updateMaintenancePartStatus(req: Request, res: Response): Promise<void> {
@@ -85,7 +85,7 @@ export class MaintenancePartController extends Controller {
     res.status(200).json({ data: updatedField });
   }
 
-  @Authentication(Role.TECHNICIAN)
+  @Authentication(Role.TECHNICIAN, Role.MANAGER, Role.CEO)
   @RouteMapping('/:maintenanceId/part/:partId', Methods.DELETE)
   private async deleteMaintenancePart(req: Request, res: Response): Promise<void> {
     const { maintenanceId, partId } = req.params;

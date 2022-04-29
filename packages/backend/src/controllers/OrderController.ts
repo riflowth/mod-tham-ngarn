@@ -33,7 +33,7 @@ export class OrderController extends Controller {
     res.status(200).json({ data: orders });
   }
 
-  @Authentication(Role.PURCHASING)
+  @Authentication(Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/:billId/order', Methods.POST)
   @RequestBody('?machineId', '?partId', '?price')
   private async addOrder(req: Request, res: Response): Promise<void> {
@@ -51,7 +51,7 @@ export class OrderController extends Controller {
     res.status(200).json({ createdFields });
   }
 
-  @Authentication(Role.PURCHASING)
+  @Authentication(Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/:billId/order/:orderId', Methods.PUT)
   @RequestBody('?machineId', '?partId', '?price')
   private async editOrder(req: Request, res: Response): Promise<void> {
@@ -69,7 +69,7 @@ export class OrderController extends Controller {
     res.status(200).json({ updatedField });
   }
 
-  @Authentication(Role.PURCHASING)
+  @Authentication(Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/:billId/order/:orderId/status', Methods.PUT)
   @RequestBody('status')
   private async updateOrderStatus(req: Request, res: Response): Promise<void> {
@@ -83,7 +83,7 @@ export class OrderController extends Controller {
     res.status(200).json({ updatedField });
   }
 
-  @Authentication(Role.PURCHASING)
+  @Authentication(Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/:billId/order/:orderId', Methods.DELETE)
   @RequestBody('orderId')
   private async deleteOrder(req: Request, res: Response): Promise<void> {

@@ -9,6 +9,7 @@ import { MachineRepository } from '@/repositories/machine/MachineRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { StaffRepository } from '@/repositories/staff/StaffRepository';
 import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
+import { NumberUtils } from '@/utils/NumberUtils';
 
 export class ZoneService {
 
@@ -75,7 +76,7 @@ export class ZoneService {
       throw new InvalidRequestException('No provided data to update');
     }
 
-    if (!zoneId) {
+    if (zoneId === null || (zoneId && !NumberUtils.parsePositiveInteger(zoneId))) {
       throw new InvalidRequestException('ZoneId must be a positive integer');
     }
 

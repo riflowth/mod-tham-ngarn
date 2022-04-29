@@ -11,6 +11,7 @@ import { MaintenanceLogRepository } from '@/repositories/maintenancelog/Maintena
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { StaffRepository } from '@/repositories/staff/StaffRepository';
 import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
+import { NumberUtils } from '@/utils/NumberUtils';
 
 export class StaffService {
 
@@ -106,6 +107,10 @@ export class StaffService {
 
     const newBranchId = newStaff.getBranchId();
 
+    if (newBranchId === null && (newBranchId && !NumberUtils.isPositiveInteger(newBranchId))) {
+      throw new InvalidRequestException('newBranch must be positive integer');
+    }
+
     if (newBranchId) {
       const relatedBranchToEdit = new Branch().setBranchId(newBranchId);
       const [relatedBranch] = await this.branchRepository.read(relatedBranchToEdit);
@@ -116,6 +121,10 @@ export class StaffService {
     }
 
     const newZoneId = newStaff.getZoneId();
+
+    if (newZoneId === null && (newZoneId && !NumberUtils.isPositiveInteger(newZoneId))) {
+      throw new InvalidRequestException('newZoneId must be positive integer');
+    }
 
     if (newZoneId) {
       const relatedZoneToEdit = new Zone().setZoneId(newZoneId);

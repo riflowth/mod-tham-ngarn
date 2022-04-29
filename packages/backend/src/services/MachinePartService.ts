@@ -9,6 +9,7 @@ import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRep
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
+import { NumberUtils } from '@/utils/NumberUtils';
 
 export enum MachinePartStatus {
   AVAILABLE = 'AVAILABLE',
@@ -81,6 +82,10 @@ export class MachinePartService {
       throw new NotFoundException('Target machinePart does not exist');
     }
     const newMachineId = newMachinePart.getMachineId();
+
+    if (newMachineId === null || (newMachineId && !NumberUtils.isPositiveInteger(newMachineId))) {
+      throw new InvalidRequestException('newMachine must be positive integer');
+    }
 
     if (newMachinePart.getPartName() === null) {
       newMachinePart.setPartName(undefined);
