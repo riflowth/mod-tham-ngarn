@@ -1,5 +1,5 @@
 import { MachinePart } from '@/entities/MachinePart';
-import { MachinePartRepository } from '@/repositories/machinePart/MachinePartRepository';
+import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { Database } from '@/utils/database/Database';
 

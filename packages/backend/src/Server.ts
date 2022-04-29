@@ -11,7 +11,7 @@ import { AddressRepository } from '@/repositories/address/AddressRepository';
 import { BillRepository } from '@/repositories/bill/BillRepository';
 import { BranchRepository } from '@/repositories/branch/BranchRepository';
 import { MachineRepository } from '@/repositories/machine/MachineRepository';
-import { MachinePartRepository } from '@/repositories/machinePart/MachinePartRepository';
+import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
 import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
@@ -21,7 +21,7 @@ import { DefaultAddressRepository } from '@/repositories/address/DefaultAddressR
 import { DefaultBillRepository } from '@/repositories/bill/DefaultBillRepository';
 import { DefaultBranchRepository } from '@/repositories/branch/DefaultBranchRepository';
 import { DefaultMachineRepository } from '@/repositories/machine/DefaultMachineRepository';
-import { DefaultMachinePartRepository } from '@/repositories/machinePart/DefaultMachinePartRepository';
+import { DefaultMachinePartRepository } from '@/repositories/machinepart/DefaultMachinePartRepository';
 import { DefaultMaintenanceLogRepository } from '@/repositories/maintenancelog/DefaultMaintenanceLogRepository';
 import { DefaultMaintenancePartRepository } from '@/repositories/maintenancepart/DefaultMaintenancePartRepository';
 import { DefaultOrderRepository } from '@/repositories/order/DefaultOrderRepository';

@@ -9,7 +9,7 @@ import { NotFoundException } from '@/exceptions/NotFoundException';
 import { Staff } from '@/entities/Staff';
 import { StaffRepository } from '@/repositories/staff/StaffRepository';
 import { ForbiddenException } from '@/exceptions/ForbiddenException';
-import { MachinePartRepository } from '@/repositories/machinePart/MachinePartRepository';
+import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
 import { MachinePart } from '@/entities/MachinePart';

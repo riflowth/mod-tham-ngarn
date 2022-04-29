@@ -2,7 +2,7 @@ import { MaintenanceLog } from '@/entities/MaintenanceLog';
 import { MaintenancePart } from '@/entities/MaintenancePart';
 import { Order } from '@/entities/Order';
 import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
-import { MachinePartRepository } from '@/repositories/machinePart/MachinePartRepository';
+import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
 import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';

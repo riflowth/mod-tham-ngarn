@@ -5,7 +5,7 @@ import { Order } from '@/entities/Order';
 import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { BillRepository } from '@/repositories/bill/BillRepository';
 import { MachineRepository } from '@/repositories/machine/MachineRepository';
-import { MachinePartRepository } from '@/repositories/machinePart/MachinePartRepository';
+import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
