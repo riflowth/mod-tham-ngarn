@@ -44,7 +44,7 @@ export class StaffController extends Controller {
   }
 
   @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
-  @RouteMapping('/:zoneId', Methods.GET)
+  @RouteMapping('/zone/:zoneId', Methods.GET)
   private async getStaffByZoneId(req: Request, res: Response): Promise<void> {
     const parseZoneId = NumberUtils.parsePositiveInteger(req.params.zoneId);
     if (!parseZoneId) {
@@ -55,7 +55,7 @@ export class StaffController extends Controller {
   }
 
   @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
-  @RouteMapping('/:branchId', Methods.GET)
+  @RouteMapping('/branch/:branchId', Methods.GET)
   private async getStaffByBranchId(req: Request, res: Response): Promise<void> {
     const parseBranchId = NumberUtils.parsePositiveInteger(req.params.branchId);
     if (!parseBranchId) {

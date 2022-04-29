@@ -1,4 +1,3 @@
-import { MachinePart } from '@/entities/MachinePart';
 import { MaintenanceLog } from '@/entities/MaintenanceLog';
 import { MaintenancePart } from '@/entities/MaintenancePart';
 import { Order } from '@/entities/Order';
@@ -8,14 +7,9 @@ import { MaintenanceLogRepository } from '@/repositories/maintenancelog/Maintena
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
-import { MaintenanceLogStatus } from '@/services/MaintenanceLogService';
-
-export enum MaintenancePartStatus {
-  ORDERING = 'ORDERING',
-  MAINTAINING = 'MAINTAINING',
-  SUCCESS = 'SUCCESS',
-  FAILED = 'FAILED',
-}
+import { MaintenanceLogStatus, MaintenancePartStatus } from '@/services/MaintenanceLogService';
+import { OrderStatus } from '@/services/OrderService';
+import { NumberUtils } from '@/utils/NumberUtils';
 
 export class MaintenancePartService {
 
@@ -40,6 +34,8 @@ export class MaintenancePartService {
     maintenanceId: number,
     readOptions?: ReadOptions,
   ): Promise<MaintenancePart[]> {
+    this.validatePositiveInteger(maintenanceId, 'maintenanceId', true);
+
     const expectedMaintenancePart = new MaintenancePart().setMaintenanceId(maintenanceId);
     return this.maintenancePartRepository.read(expectedMaintenancePart, readOptions);
   }
@@ -48,33 +44,60 @@ export class MaintenancePartService {
     newMaintenancePart: MaintenancePart,
     maintainerId: number,
   ): Promise<MaintenancePart> {
-    const machinePartToMaintain = await this.getMachinePartById(newMaintenancePart.getPartId());
+    const newMaintenanceId = newMaintenancePart.getMaintenanceId();
+    const newPartId = newMaintenancePart.getPartId();
+    const newType = newMaintenancePart.getType();
+    const newOrderId = newMaintenancePart.getOrderId();
+    const newStatus = newMaintenancePart.getStatus();
+
+    this.validatePositiveInteger(newMaintenanceId, 'newMaintenanceId', false);
+    this.validatePositiveInteger(newPartId, 'newPartId', true);
+    this.validatePositiveInteger(newOrderId, 'newOrderId', false);
+    this.validateNonEmptyString(newType, 'newType', false);
+
+    if (newStatus) {
+      throw new InvalidRequestException('newStatus must be null');
+    }
+
+    const machinePartToMaintain = await this.machinePartRepository.readByPartId(newPartId);
 
     if (!machinePartToMaintain) {
       throw new InvalidRequestException('Machine part to maintain not found');
     }
 
-    await this.validateMaintenanceLog(
-      newMaintenancePart.getMaintenanceId(),
-      machinePartToMaintain.getMachineId(),
+    const maintenanceLogToValidate = await this.maintenanceLogRepository
+      .readByMaintenanceId(newMaintenanceId);
+
+    this.validateChangeMaintenanceLogData(
+      maintenanceLogToValidate,
       maintainerId,
     );
 
-    const relatedOrderId = newMaintenancePart.getOrderId();
-    if (relatedOrderId) {
-      await this.validateOrder(relatedOrderId);
+    this.validateMachinePartRelation(
+      machinePartToMaintain.getMachineId(),
+      maintenanceLogToValidate,
+    );
+
+    if (newOrderId) {
+      const orderToValidate = await this.orderRepository.readByOrderId(newOrderId);
+      this.validateOrderRelation(orderToValidate);
+
+      const maintenancePart = await this.maintenancePartRepository
+        .readByOrderId(orderToValidate.getOrderId());
+
+      this.validateMaintenancePartRelation(maintenancePart);
     }
 
-    const existedMaintenancePart = await this.getMaintenancePartByPrimaryKey([
-      newMaintenancePart.getMaintenanceId(),
-      newMaintenancePart.getPartId(),
-    ]);
+    const existedMaintenancePart = await this.maintenancePartRepository
+      .readByPrimaryKey(newMaintenanceId, newPartId);
 
     if (existedMaintenancePart) {
       throw new InvalidRequestException('Maintenance part already exists');
     }
 
-    return this.maintenancePartRepository.create(newMaintenancePart);
+    return this.maintenancePartRepository.create(
+      newMaintenancePart.setStatus(MaintenancePartStatus.MAINTAINING),
+    );
   }
 
   public async editMaintenancePart(
@@ -82,29 +105,96 @@ export class MaintenancePartService {
     newMaintenancePart: MaintenancePart,
     maintainerId: number,
   ): Promise<MaintenancePart> {
-    const targetMaintenancePart = await this.getMaintenancePartByPrimaryKey(primaryKey);
+    const maintenanceIdToSet = primaryKey[0];
+    const partIdToSet = primaryKey[1];
+
+    const newType = newMaintenancePart.getType();
+    const newOrderId = newMaintenancePart.getOrderId();
+    const newStatus = newMaintenancePart.getStatus();
+    const newMaintenanceId = newMaintenancePart.getMaintenanceId();
+    const newPartId = newMaintenancePart.getPartId();
+
+    this.validatePositiveInteger(maintenanceIdToSet, 'maintenanceIdToSet', true);
+    this.validatePositiveInteger(partIdToSet, 'partIdToSet', true);
+    this.validateNonEmptyString(newType, 'newType', false);
+    this.validatePositiveInteger(newOrderId, 'newOrderId', false);
+    this.validatePositiveInteger(newPartId, 'newPartId', false);
+
+    if (newMaintenanceId || newPartId || newStatus) {
+      throw new InvalidRequestException('newMaintenanceId and newPartId must be null');
+    }
+
+    if (!newOrderId && !newType) {
+      throw new InvalidRequestException('no provide data');
+    }
+
+    const targetMaintenancePart = await this.maintenancePartRepository
+      .readByPrimaryKey(maintenanceIdToSet, partIdToSet);
 
     if (!targetMaintenancePart) {
       throw new InvalidRequestException('Maintenance part to edit not found');
     }
 
-    const relatedPartId = newMaintenancePart.getPartId();
-    if (relatedPartId) {
-      const machineToValidate = await this.getMachinePartById(relatedPartId);
+    this.validateChangeMaintenancePartData(targetMaintenancePart);
 
-      await this.validateMaintenanceLog(
-        newMaintenancePart.getMaintenanceId(),
-        machineToValidate.getMachineId(),
-        maintainerId,
+    const maintenanceLogToValidate = await this.maintenanceLogRepository
+      .readByMaintenanceId(targetMaintenancePart.getMaintenanceId());
+
+    this.validateChangeMaintenanceLogData(maintenanceLogToValidate, maintainerId);
+
+    if (newPartId) {
+      const machinePartToValidate = await this.machinePartRepository.readByPartId(newPartId);
+      this.validateMachinePartRelation(
+        machinePartToValidate.getMachineId(),
+        maintenanceLogToValidate,
       );
     }
 
-    const relatedOrderId = newMaintenancePart.getOrderId();
-    if (relatedOrderId) {
-      await this.validateOrder(relatedOrderId);
+    if (newOrderId) {
+      const orderToValidate = await this.orderRepository.readByOrderId(newOrderId);
+      this.validateOrderRelation(orderToValidate);
+
+      const maintenancePart = await this.maintenancePartRepository
+        .readByOrderId(orderToValidate.getOrderId());
+
+      this.validateMaintenancePartRelation(maintenancePart);
     }
 
-    const expectedMaintenancePartToEdit = new MaintenancePart().setPrimaryKey(primaryKey);
+    const expectedMaintenancePartToEdit = new MaintenancePart()
+      .setPrimaryKey([maintenanceIdToSet, partIdToSet]);
+
+    const affectedRowsAmount = await this.maintenancePartRepository
+      .update(newMaintenancePart, expectedMaintenancePartToEdit);
+
+    return affectedRowsAmount === 1 ? newMaintenancePart.setPrimaryKey(primaryKey) : null;
+  }
+
+  public async updateMaintenancePartStatus(
+    primaryKey: [number, number],
+    newStatus: string,
+    maintainerIdToValidate: number,
+  ): Promise<MaintenancePart> {
+    const maintenanceIdToSet = primaryKey[0];
+    const partIdToSet = primaryKey[1];
+    this.validatePositiveInteger(maintenanceIdToSet, 'maintenanceIdToSet', true);
+    this.validatePositiveInteger(partIdToSet, 'partIdToSet', true);
+    this.validateNonEmptyString(newStatus, 'newStatus', true);
+    this.validatePositiveInteger(maintainerIdToValidate, 'maintainerId', true);
+
+    const maintenancePartToValidate = await this.maintenancePartRepository
+      .readByPrimaryKey(maintenanceIdToSet, partIdToSet);
+
+    this.validateChangeMaintenancePartStatus(maintenancePartToValidate.getStatus(), newStatus);
+
+    const orderRelatedToMaintenancePart = await this.orderRepository
+      .readByOrderId(maintenancePartToValidate.getOrderId());
+
+    this.validateOrderProgress(orderRelatedToMaintenancePart);
+
+    const expectedMaintenancePartToEdit = new MaintenancePart()
+      .setPrimaryKey([maintenanceIdToSet, partIdToSet]);
+
+    const newMaintenancePart = new MaintenancePart().setStatus(newStatus);
 
     const affectedRowsAmount = await this.maintenancePartRepository
       .update(newMaintenancePart, expectedMaintenancePartToEdit);
@@ -113,51 +203,80 @@ export class MaintenancePartService {
   }
 
   public async deleteMaintenancePart(primaryKey: [number, number]): Promise<MaintenancePart> {
-    const expectedMaintenancePart = new MaintenancePart().setPrimaryKey(primaryKey);
-    const targetMaintenancePart = await this.getMaintenancePartByPrimaryKey(primaryKey);
+    const maintenanceIdToDelete = primaryKey[0];
+    const partIdToDelete = primaryKey[1];
+
+    this.validatePositiveInteger(maintenanceIdToDelete, 'maintenanceIdToDelete', true);
+    this.validatePositiveInteger(partIdToDelete, 'partIdToDelete', true);
+
+    const targetMaintenancePart = await this.maintenancePartRepository
+      .readByPrimaryKey(maintenanceIdToDelete, partIdToDelete);
 
     if (!targetMaintenancePart) {
       throw new InvalidRequestException('MaintenanceId or partId to delete not found');
     }
+
+    this.validateChangeMaintenancePartData(targetMaintenancePart);
+
+    const maintenanceLogToValidate = await this.maintenanceLogRepository
+      .readByMaintenanceId(targetMaintenancePart.getMaintenanceId());
+
+    this.validateChangeMaintenanceLogData(
+      maintenanceLogToValidate,
+      maintenanceLogToValidate.getMaintainerId(),
+    );
+
+    const expectedMaintenancePart = new MaintenancePart()
+      .setPrimaryKey([maintenanceIdToDelete, partIdToDelete]);
 
     const affectedRowsAmount = await this.maintenancePartRepository.delete(expectedMaintenancePart);
 
     return affectedRowsAmount === 1 ? targetMaintenancePart : null;
   }
 
-  private async validateOrder(relatedOrderId: number): Promise<void> {
-    const expectedOrderToValidate = new Order().setOrderId(relatedOrderId);
+  private validatePositiveInteger(
+    numberToValidate: number,
+    name: string,
+    isRequired: boolean,
+  ): void {
+    const parseNumberToValidate = Number(numberToValidate);
+    if (isRequired && !NumberUtils.isPositiveInteger(parseNumberToValidate)) {
+      throw new InvalidRequestException(`${name} must be a positive integer and cannot be null`);
+    } else if (parseNumberToValidate && !NumberUtils.isPositiveInteger(parseNumberToValidate)) {
+      throw new InvalidRequestException(`${name} must be a positive integer`);
+    }
+  }
 
-    const [orderToValidate] = await this.orderRepository.read(expectedOrderToValidate);
+  private validateNonEmptyString(
+    stringToValidate: string,
+    name: string,
+    isRequired: boolean,
+  ): void {
+    if (isRequired && stringToValidate === '') {
+      throw new InvalidRequestException(`${name} must be a non empty string and cannot be null`);
+    } else if (stringToValidate && stringToValidate === '') {
+      throw new InvalidRequestException(`${name} must be a non empty string`);
+    }
+  }
 
+  private validateOrderRelation(orderToValidate: Order): void {
     if (!orderToValidate) {
       throw new InvalidRequestException('Order related to maintenance part does not existed');
     }
+  }
 
-    const expectedMaintenancePartRelatedToOrder = new MaintenancePart()
-      .setOrderId(orderToValidate.getOrderId());
-
-    const maintenancePartRelatedToOrder = await this.maintenancePartRepository
-      .read(expectedMaintenancePartRelatedToOrder);
-
-    if (maintenancePartRelatedToOrder) {
+  private validateMaintenancePartRelation(maintenancePart: MaintenancePart): void {
+    if (maintenancePart) {
       throw new InvalidRequestException('Order related to maintenance part has other maintenance part to bind');
     }
   }
 
-  private async validateMaintenanceLog(
-    maintenanceId: number,
-    machineId: number,
+  private validateChangeMaintenanceLogData(
+    maintenanceLogToValidate: MaintenanceLog,
     maintainerId: number,
-  ): Promise<void> {
-    const maintenanceLogToValidate = await this.getMaintenanceLogById(maintenanceId);
-
+  ): void {
     if (!maintenanceLogToValidate) {
       throw new InvalidRequestException('Maintenance log not found');
-    }
-
-    if (maintenanceLogToValidate.getMachineId() !== machineId) {
-      throw new InvalidRequestException('Machine part to maintain is not related to maintenance log');
     }
 
     if (maintenanceLogToValidate.getMaintainerId() !== maintainerId) {
@@ -176,27 +295,45 @@ export class MaintenancePartService {
     }
   }
 
-  private async getMachinePartById(machinePartId: number): Promise<MachinePart> {
-    const expectedMachinePart = new MachinePart().setMachineId(machinePartId);
-    const [machinePart] = await this.machinePartRepository.read(expectedMachinePart);
-
-    return machinePart;
+  private validateMachinePartRelation(machineId: number, maintenanceLog: MaintenanceLog): void {
+    if (maintenanceLog.getMachineId() !== machineId) {
+      throw new InvalidRequestException('Machine part to maintain is not belong in machine');
+    }
   }
 
-  private async getMaintenanceLogById(maintenanceId: number): Promise<MaintenanceLog> {
-    const expectedMaintenanceLog = new MaintenanceLog().setMaintenanceId(maintenanceId);
-    const [maintenanceLog] = await this.maintenanceLogRepository.read(expectedMaintenanceLog);
-
-    return maintenanceLog;
+  private validateChangeMaintenancePartData(maintenancePart: MaintenancePart): void {
+    if (
+      maintenancePart.getStatus() === MaintenancePartStatus.SUCCESS
+      || maintenancePart.getStatus() === MaintenancePartStatus.FAILED
+    ) {
+      throw new InvalidRequestException('Cannot edit/add maintenance part to finished maintenance log');
+    }
   }
 
-  private async getMaintenancePartByPrimaryKey(
-    primaryKey: [number, number],
-  ): Promise<MaintenancePart> {
-    const expectedMaintenancePart = new MaintenancePart().setPrimaryKey(primaryKey);
-    const [maintenancePart] = await this.maintenancePartRepository.read(expectedMaintenancePart);
+  private validateChangeMaintenancePartStatus(fromStatus: string, toStatus: string): void {
+    if (fromStatus === toStatus) {
+      throw new InvalidRequestException('Cannot change maintenance part status to the same status');
+    }
 
-    return maintenancePart;
+    if (
+      fromStatus === MaintenancePartStatus.ORDERING
+      && toStatus !== MaintenancePartStatus.MAINTAINING
+    ) {
+      throw new InvalidRequestException('Cannot change maintenance part status from ordering to other status');
+    }
+
+    if (
+      fromStatus === MaintenancePartStatus.SUCCESS
+      || fromStatus === MaintenancePartStatus.FAILED
+    ) {
+      throw new InvalidRequestException('Cannot change maintenance part status from finished status');
+    }
+  }
+
+  private validateOrderProgress(orderRelatedToMaintenancePart: Order): void {
+    if (orderRelatedToMaintenancePart.getStatus() === OrderStatus.SHIPPING) {
+      throw new InvalidRequestException('order is shipping so it cannot change');
+    }
   }
 
 }

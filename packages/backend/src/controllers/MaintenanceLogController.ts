@@ -3,11 +3,8 @@ import { ControllerMapping } from '@/decorators/ControllerDecorator';
 import { RequestBody } from '@/decorators/RequestDecorator';
 import { RouteMapping } from '@/decorators/RouteDecorator';
 import { MaintenanceLog } from '@/entities/MaintenanceLog';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { ReadOptions } from '@/repositories/ReadOptions';
-import { MaintainerAction, MaintenanceLogService, MaintenanceLogStatus } from '@/services/MaintenanceLogService';
-import { EnumUtils } from '@/utils/EnumUtils';
-import { NumberUtils } from '@/utils/NumberUtils';
+import { MaintenanceLogService } from '@/services/MaintenanceLogService';
 import { Request, Response } from 'express';
 import { Controller } from '@/controllers/Controller';
 import { Methods } from '@/controllers/Route';
@@ -26,18 +23,14 @@ export class MaintenanceLogController extends Controller {
   @RouteMapping('/', Methods.GET)
   private async getMaintenanceLogsByQuery(req: Request, res: Response): Promise<void> {
     const { machineId } = req.query;
-
-    const parseMachineId = NumberUtils.parsePositiveInteger(machineId);
-    if (!parseMachineId) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
-    }
+    const { zoneId } = req.session;
 
     const readOptions: ReadOptions = {
       limit: Number(req.query.limit),
       offset: Number(req.query.offset),
     };
     const maintenanceLogs = await this.maintenanceLogService
-      .getMaintenanceLogsByMachineId(parseMachineId, readOptions);
+      .getMaintenanceLogsByMachineId(Number(machineId), zoneId, readOptions);
 
     res.status(200).json({ data: maintenanceLogs });
   }
@@ -49,17 +42,10 @@ export class MaintenanceLogController extends Controller {
     const { machineId, reason } = req.body;
     const { staffId: reporterId, zoneId: reporterZoneId } = req.session;
 
-    const parseMachineId = NumberUtils.parsePositiveInteger(machineId);
-    if (!parseMachineId) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
-    }
-
     const newMaintenanceLog = new MaintenanceLog()
-      .setMachineId(parseMachineId)
+      .setMachineId(machineId)
       .setReporterId(reporterId)
-      .setReason(reason)
-      .setStatus(MaintenanceLogStatus.OPENED)
-      .setReportDate(new Date());
+      .setReason(reason);
     const createdField = await this.maintenanceLogService
       .addMaintenanceLog(newMaintenanceLog, reporterZoneId);
 
@@ -74,15 +60,43 @@ export class MaintenanceLogController extends Controller {
     const { maintenanceId } = req.params;
     const { reason } = req.body;
 
-    const parseMaintenanceId = NumberUtils.parsePositiveInteger(maintenanceId);
-    if (!parseMaintenanceId) {
-      throw new InvalidRequestException('MaintenanceId must be a positive integer');
-    }
-
-    const newMaintenanceLog = new MaintenanceLog().setReason(reason);
+    const newMaintenanceLog = new MaintenanceLog()
+      .setReason(reason);
     const updatedField = await this.maintenanceLogService
-      .editMaintenanceLog(parseMaintenanceId, newMaintenanceLog, reporterId);
+      .editMaintenanceLog(Number(maintenanceId), newMaintenanceLog, reporterId);
 
+    res.status(200).json({ data: { updatedField } });
+  }
+
+  @Authentication(Role.TECHNICIAN)
+  @RouteMapping('/:maintenanceId/status', Methods.PUT)
+  @RequestBody('status')
+  private async updateMaintenanceLogStatus(req: Request, res: Response): Promise<void> {
+    const { staffId: reporterId } = req.session;
+    const { maintenanceId } = req.params;
+    const { status } = req.body;
+    const updatedField = await this.maintenanceLogService
+      .updateMaintenanceLogStatus(Number(maintenanceId), status, reporterId);
+    res.status(200).json({ data: { updatedField } });
+  }
+
+  @Authentication(Role.TECHNICIAN)
+  @RouteMapping('/:maintenanceId/claim', Methods.GET)
+  private async claimMaintenance(req: Request, res: Response): Promise<void> {
+    const { staffId: reporterId, role } = req.session;
+    const { maintenanceId } = req.params;
+    const updatedField = await this.maintenanceLogService
+      .claimMaintenanceLog(Number(maintenanceId), reporterId, role);
+    res.status(200).json({ data: { updatedField } });
+  }
+
+  @Authentication(Role.TECHNICIAN)
+  @RouteMapping('/:maintenanceId/unclaim', Methods.GET)
+  private async unclaimMaintenance(req: Request, res: Response): Promise<void> {
+    const { staffId: reporterId } = req.session;
+    const { maintenanceId } = req.params;
+    const updatedField = await this.maintenanceLogService
+      .unclaimMaintenanceLog(Number(maintenanceId), reporterId);
     res.status(200).json({ data: { updatedField } });
   }
 
@@ -90,37 +104,10 @@ export class MaintenanceLogController extends Controller {
   @RouteMapping('/:maintenanceId', Methods.DELETE)
   private async deleteMaintenance(req: Request, res: Response): Promise<void> {
     const { maintenanceId } = req.params;
-    const { staffId } = req.session;
-
-    const parseMaintenanceId = NumberUtils.parsePositiveInteger(maintenanceId);
-    if (!parseMaintenanceId) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
-    }
-
+    const { staffId, role } = req.session;
     const deletedField = await this.maintenanceLogService
-      .deleteMaintenanceLog(parseMaintenanceId, staffId);
-
+      .deleteMaintenanceLog(Number(maintenanceId), staffId, role);
     res.status(200).json({ data: { deletedField } });
-  }
-
-  @RouteMapping('/action', Methods.POST)
-  @Authentication(Role.TECHNICIAN)
-  @RequestBody('maintenanceId', 'action')
-  private async actionMaintenance(req: Request, res: Response): Promise<void> {
-    const { maintenanceId, action } = req.body;
-
-    const parseMaintenanceId = NumberUtils.parsePositiveInteger(maintenanceId);
-    if (!parseMaintenanceId) {
-      throw new InvalidRequestException('MaintenanceId must be a positive integer');
-    }
-
-    const isValidAction = EnumUtils.isIncludesInEnum(action, MaintainerAction);
-    if (!isValidAction) {
-      throw new InvalidRequestException('Action type is not valid');
-    }
-
-    res.status(200).json({ data: { maintenanceId, action } });
-
   }
 
 }
