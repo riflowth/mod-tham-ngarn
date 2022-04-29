@@ -49,6 +49,7 @@ import { BillService } from '@/services/BillService';
 import { BillController } from '@/controllers/BillController';
 import { MachinePartService } from '@/services/MachinePartService';
 import { MachinePartController } from '@/controllers/MachinePartController';
+import { IndexController } from '@/controllers/IndexController';
 
 export class Server {
 
@@ -197,6 +198,7 @@ export class Server {
     );
 
     this.controllerRegistry.loadControllers([
+      new IndexController(),
       new AddressController(this.addressService),
       new AuthController(this.cookieProvider, this.authService),
       new BillController(this.billService),

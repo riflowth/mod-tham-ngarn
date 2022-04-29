@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { Controller } from '@/controllers/Controller';
 import { Methods } from '@/controllers/Route';
-import { NotFoundException } from '@/exceptions/NotFoundException';
 import { RouteMapping } from '@/decorators/RouteDecorator';
 import { ControllerMapping } from '@/decorators/ControllerDecorator';
 
@@ -11,18 +10,10 @@ export class IndexController extends Controller {
   @RouteMapping('/', Methods.GET)
   private async index(req: Request, res: Response): Promise<void> {
     res.status(200).json({
-      message: 'hello',
+      name: 'Mod Tham Ngarn API',
+      version: '1.0.0',
+      repository: 'https://github.com/CPE34-KMUTT/mod-tham-ngarn/',
     });
-  }
-
-  @RouteMapping('/404', Methods.GET)
-  private async notFound(req: Request, res: Response): Promise<void> {
-    throw new NotFoundException('test');
-  }
-
-  @RouteMapping('/500', Methods.GET)
-  private async throwError(req: Request, res: Response): Promise<void> {
-    throw new Error('test');
   }
 
 }
