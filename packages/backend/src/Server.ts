@@ -182,6 +182,7 @@ export class Server {
       this.machineRepository,
       this.machinePartRepository,
       this.orderRepository,
+      this.maintenancePartRepository,
     );
   }
 
