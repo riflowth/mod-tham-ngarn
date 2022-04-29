@@ -142,11 +142,7 @@ export class MachinePartService {
       return machinePart.getStatus() === 'Disable';
     });
 
-    if (resultsStatus[0]) {
-      return 'Disable';
-    }
-
-    return 'Active';
+    return resultsStatus[0] ? 'Disable' : 'Active';
   }
 
   public async getMachineMaintenanceCost(machineId: number): Promise<number> {
