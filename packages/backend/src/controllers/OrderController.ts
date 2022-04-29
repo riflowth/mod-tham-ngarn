@@ -55,21 +55,15 @@ export class OrderController extends Controller {
 
   @Authentication(Role.PURCHASING)
   @RouteMapping('/:billId/order/:orderId', Methods.PUT)
-  @RequestBody('?machineId', '?partId', '?price', '?status')
+  @RequestBody('?machineId', '?partId', '?price')
   private async editOrder(req: Request, res: Response): Promise<void> {
     const { staffId: ordererId } = req.session;
-    const { billId, orderId } = req.params;
-    const {
-      machineId,
-      partId,
-      price,
-      status,
-    } = req.body;
+    const { orderId, billId } = req.params;
+    const { machineId, partId, price } = req.body;
 
     const newOrder = new Order()
       .setMachineId(machineId)
       .setPartId(partId)
-      .setStatus(status)
       .setPrice(price);
 
     const updatedField = await this.orderService
@@ -79,11 +73,25 @@ export class OrderController extends Controller {
   }
 
   @Authentication(Role.PURCHASING)
+  @RouteMapping('/:billId/order/:orderId/status', Methods.PUT)
+  @RequestBody('status')
+  private async updateOrderStatus(req: Request, res: Response): Promise<void> {
+    const { staffId: ordererId } = req.session;
+    const { orderId, billId } = req.params;
+    const { status } = req.body;
+
+    const updatedField = await this.orderService
+      .updateOrderStatus(Number(orderId), status, Number(billId), ordererId);
+
+    res.status(200).json({ updatedField });
+  }
+
+  @Authentication(Role.PURCHASING)
   @RouteMapping('/:billId/order/:orderId', Methods.DELETE)
   @RequestBody('orderId')
   private async deleteOrder(req: Request, res: Response): Promise<void> {
     const { staffId: ordererId } = req.session;
-    const { billId, orderId } = req.params;
+    const { orderId, billId } = req.params;
 
     const deletedField = await this.orderService
       .deleteOrder(Number(orderId), Number(billId), ordererId);

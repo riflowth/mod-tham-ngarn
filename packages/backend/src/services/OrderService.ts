@@ -41,137 +41,132 @@ export class OrderService {
   }
 
   public async getOrdersByBillId(billId: number, readOptions?: ReadOptions): Promise<Order[]> {
-    if (!NumberUtils.isPositiveInteger(billId)) {
-      throw new InvalidRequestException('BillId must be a positive integer');
-    }
+    this.validatePositiveInteger(billId, 'BillId', true);
 
     const expectedOrders = new Order().setBillId(billId);
     return this.orderRepository.read(expectedOrders, readOptions);
   }
 
-  public async addOrder(newOrder: Order, ordererId: number, ordererZoneId: number): Promise<Order> {
-    const machineId = newOrder.getMachineId();
-    const partId = newOrder.getPartId();
-    const billId = newOrder.getBillId();
-    const price = newOrder.getPrice();
+  public async addOrder(
+    newOrder: Order,
+    ordererIdToValidate: number,
+    ordererZoneIdToValidate: number,
+  ): Promise<Order> {
+    const newMachineId = newOrder.getMachineId();
+    const newPartId = newOrder.getPartId();
+    const newBillId = newOrder.getBillId();
+    const newPrice = newOrder.getPrice();
+    const newOrderId = newOrder.getOrderId();
+    const newArrivalDate = newOrder.getArrivalDate();
+    const newStatus = newOrder.getStatus();
 
-    const orderId = newOrder.getOrderId();
-    const arrivalDate = newOrder.getArrivalDate();
-    const status = newOrder.getStatus();
+    this.validatePositiveInteger(ordererIdToValidate, 'OrdererId', true);
+    this.validatePositiveInteger(newMachineId, 'MachineId', false);
+    this.validatePositiveInteger(newPartId, 'PartId', false);
+    this.validatePositiveInteger(newBillId, 'BillId', false);
+    this.validatePositiveInteger(newPrice, 'Price', false);
 
-    if (orderId || arrivalDate || status) {
+    if (newOrderId || newArrivalDate || newStatus) {
       throw new InvalidRequestException('OrderId, ArrivalDate and Status must not be set');
     }
 
-    if (!NumberUtils.isPositiveInteger(ordererId)) {
-      throw new InvalidRequestException('OrdererId must be a non-negative number');
-    }
-
-    if (machineId && !NumberUtils.isPositiveInteger(machineId)) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
-    }
-
-    if (partId && !NumberUtils.isPositiveInteger(partId)) {
-      throw new InvalidRequestException('PartId must be a positive integer');
-    }
-
-    if (billId && !NumberUtils.isPositiveInteger(billId)) {
-      throw new InvalidRequestException('BillId must be a positive integer');
-    }
-
-    if (price && !NumberUtils.isPositiveInteger(price)) {
-      throw new InvalidRequestException('Price must be a non-negative number');
-    }
-
-    if (machineId && partId) {
+    if (newMachineId && newPartId) {
       throw new InvalidRequestException('You can only order a machine or a machinePart, not both');
     }
 
-    if (!machineId && !partId) {
+    if (!newMachineId && !newPartId) {
       throw new InvalidRequestException('You must order at least machine or a machinePart');
     }
 
-    if (billId) {
-      const billToValidate = await this.billRepository.readByBillId(billId);
-      this.validateBillRelation(billToValidate, ordererId);
+    if (newBillId) {
+      const billToValidate = await this.billRepository.readByBillId(newBillId);
+      this.validateBillRelation(billToValidate, ordererIdToValidate);
     }
 
-    if (machineId) {
-      const machineToValidate = await this.machineRepository.readByMachineId(machineId);
-      this.validateMachineRelation(machineToValidate, ordererZoneId);
+    if (newMachineId) {
+      const machineToValidate = await this.machineRepository.readByMachineId(newMachineId);
+      this.validateMachineRelation(machineToValidate, ordererZoneIdToValidate);
     }
 
-    if (partId) {
-      const partToValidate = await this.machinePartRepository.readByPartId(partId);
+    if (newPartId) {
+      const partToValidate = await this.machinePartRepository.readByPartId(newPartId);
       this.validateMachinePartRelation(partToValidate);
 
       const machineByPartToValidate = await this.machineRepository
         .readByMachineId(partToValidate.getMachineId());
 
-      this.validateMachineRelation(machineByPartToValidate, ordererZoneId);
+      this.validateMachineRelation(machineByPartToValidate, ordererZoneIdToValidate);
     }
 
     return this.orderRepository.create(newOrder.setStatus(OrderStatus.SHIPPING));
   }
 
   public async editOrder(
-    orderId: number,
+    orderIdToEdit: number,
     newOrder: Order,
-    billId: number,
-    ordererId: number,
+    billIdToValidate: number,
+    ordererIdToValidate: number,
   ): Promise<Order> {
     const newStatus = newOrder.getStatus();
     const newMachineId = newOrder.getMachineId();
     const newPartId = newOrder.getPartId();
     const newPrice = newOrder.getPrice();
-
     const newOrderId = newOrder.getOrderId();
     const newBIllId = newOrder.getBillId();
     const newArrivalDate = newOrder.getArrivalDate();
 
-    if (newOrderId || newBIllId || newArrivalDate) {
+    this.validatePositiveInteger(orderIdToEdit, 'OrderId', true);
+    this.validatePositiveInteger(ordererIdToValidate, 'OrdererId', true);
+    this.validatePositiveInteger(newMachineId, 'MachineId', false);
+    this.validatePositiveInteger(newPartId, 'PartId', false);
+    this.validatePositiveInteger(newPrice, 'Price', false);
+
+    if (newOrderId || newBIllId || newArrivalDate || newStatus) {
       throw new InvalidRequestException('You cannot edit orderId, billId or arrivalDate');
     }
 
-    if (!NumberUtils.parsePositiveInteger(orderId)) {
-      throw new InvalidRequestException('OrderId must be a positive integer');
-    }
+    const orderToValidate = await this.orderRepository.readByOrderId(orderIdToEdit);
+    this.validateOrderRelation(orderToValidate);
+    this.validateChangeOrderData(orderToValidate);
 
-    if (!NumberUtils.parsePositiveInteger(billId)) {
-      throw new InvalidRequestException('BillId must be a positive integer');
+    if (billIdToValidate !== orderToValidate.getBillId()) {
+      throw new InvalidRequestException('Bill not relate to order');
     }
-
-    if (!NumberUtils.parsePositiveInteger(ordererId)) {
-      throw new InvalidRequestException('OrdererId must be a positive integer');
-    }
-
-    if (newStatus && (newMachineId || newPartId || newPrice)) {
-      throw new InvalidRequestException('You can only update status or machineId, partId or price, not all');
-    }
-
-    if (newMachineId && !NumberUtils.isPositiveInteger(newMachineId)) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
-    }
-
-    if (newPartId && !NumberUtils.isPositiveInteger(newPartId)) {
-      throw new InvalidRequestException('PartId must be a positive integer');
-    }
-
-    if (newPrice && !NumberUtils.isPositiveInteger(newPrice)) {
-      throw new InvalidRequestException('Price must be a non-negative number');
-    }
-
-    if (!EnumUtils.isIncludesInEnum(newStatus, OrderStatus)) {
-      throw new InvalidRequestException('Status to updated must be a SHIPPING, DELIVERED or CANCELLED');
-    }
-
-    const orderToValidate = await this.orderRepository.readByOrderId(orderId);
-    this.validateOrderRelation(orderToValidate, ordererId);
 
     const billToValidate = await this.billRepository.readByBillId(orderToValidate.getBillId());
-    this.validateBillRelation(billToValidate, ordererId);
+    this.validateBillRelation(billToValidate, ordererIdToValidate);
 
-    switch (newStatus) {
+    const expectedOrderToEdit = new Order().setOrderId(orderIdToEdit);
+
+    const affectedRowsAmount = await this.orderRepository.update(newOrder, expectedOrderToEdit);
+
+    return affectedRowsAmount === 1 ? newOrder.setPrimaryKey(orderIdToEdit) : null;
+  }
+
+  public async updateOrderStatus(
+    orderIdToEdit: number,
+    statusToUpdate: string,
+    billIdToValidate: number,
+    ordererIdToValidate: number,
+  ): Promise<Order> {
+    this.validatePositiveInteger(orderIdToEdit, 'OrderId', true);
+    this.validatePositiveInteger(ordererIdToValidate, 'OrdererId', true);
+
+    if (!EnumUtils.isIncludesInEnum(statusToUpdate, OrderStatus)) {
+      throw new InvalidRequestException('Status must be one of the following: SHIPPING, DELIVERED, CANCELED');
+    }
+
+    const orderToValidate = await this.orderRepository.readByOrderId(orderIdToEdit);
+    this.validateOrderRelation(orderToValidate);
+
+    if (billIdToValidate !== orderToValidate.getBillId()) {
+      throw new InvalidRequestException('Bill not relate to order');
+    }
+
+    const billToValidate = await this.billRepository.readByBillId(orderToValidate.getBillId());
+    this.validateBillRelation(billToValidate, ordererIdToValidate);
+
+    switch (statusToUpdate) {
       case OrderStatus.SHIPPING:
         this.validateChangeOrderStatusToShipping(orderToValidate);
         break;
@@ -182,41 +177,40 @@ export class OrderService {
         this.validateChangeOrderStatusToCanceled(orderToValidate);
         break;
       default:
-        this.validateChangeOrderData(orderToValidate);
+        throw new InvalidRequestException('Status to updated must be a SHIPPING, DELIVERED or CANCELLED');
     }
 
-    const expectedOrderToEdit = new Order().setOrderId(orderId);
+    const expectedOrderToEdit = new Order().setOrderId(orderIdToEdit);
+    const newOrder = new Order().setStatus(statusToUpdate);
 
     const affectedRowsAmount = await this.orderRepository.update(newOrder, expectedOrderToEdit);
 
-    return affectedRowsAmount === 1 ? newOrder.setPrimaryKey(orderId) : null;
+    return affectedRowsAmount === 1 ? newOrder.setPrimaryKey(orderIdToEdit) : null;
   }
 
-  public async deleteOrder(orderId: number, billId: number, ordererId: number): Promise<Order> {
-    if (!NumberUtils.isPositiveInteger(orderId)) {
-      throw new InvalidRequestException('OrderId must be a positive integer');
-    }
+  public async deleteOrder(
+    orderIdToDelete: number,
+    billIdToValidate: number,
+    ordererIdToValidate: number,
+  ): Promise<Order> {
+    this.validatePositiveInteger(orderIdToDelete, 'OrderId', true);
+    this.validatePositiveInteger(ordererIdToValidate, 'OrdererId', true);
 
-    if (!NumberUtils.isPositiveInteger(billId)) {
-      throw new InvalidRequestException('OrderId must be a positive integer');
-    }
-
-    if (!NumberUtils.isPositiveInteger(ordererId)) {
-      throw new InvalidRequestException('OrderId must be a positive integer');
-    }
-
-    const orderToValidate = await this.orderRepository.readByOrderId(orderId);
-    this.validateOrderRelation(orderToValidate, ordererId);
-
-    const billToValidate = await this.billRepository.readByBillId(orderToValidate.getBillId());
-    this.validateBillRelation(billToValidate, ordererId);
-
+    const orderToValidate = await this.orderRepository.readByOrderId(orderIdToDelete);
+    this.validateOrderRelation(orderToValidate);
     this.validateChangeOrderData(orderToValidate);
 
-    const expectedOrderToDelete = new Order().setOrderId(orderId);
+    if (billIdToValidate !== orderToValidate.getBillId()) {
+      throw new InvalidRequestException('Bill not relate to order');
+    }
+
+    const billToValidate = await this.billRepository.readByBillId(orderToValidate.getBillId());
+    this.validateBillRelation(billToValidate, ordererIdToValidate);
+
+    const expectedOrderToDelete = new Order().setOrderId(orderIdToDelete);
 
     const relatedMaintenancePart = await this.maintenancePartRepository
-      .readByOrderId(orderId);
+      .readByOrderId(orderIdToDelete);
 
     if (relatedMaintenancePart) {
       throw new InvalidRequestException('Order has related maintenance part');
@@ -224,7 +218,20 @@ export class OrderService {
 
     const affectedRowsAmount = await this.orderRepository.delete(expectedOrderToDelete);
 
-    return affectedRowsAmount === 1 ? new Order().setPrimaryKey(orderId) : null;
+    return affectedRowsAmount === 1 ? new Order().setPrimaryKey(orderIdToDelete) : null;
+  }
+
+  private validatePositiveInteger(
+    numberToValidate: number,
+    name: string,
+    isRequired: boolean,
+  ): void {
+    const parseNumberToValidate = Number(numberToValidate);
+    if (isRequired && !NumberUtils.isPositiveInteger(parseNumberToValidate)) {
+      throw new InvalidRequestException(`${name} must be a positive integer and cannot be null`);
+    } else if (parseNumberToValidate && !NumberUtils.isPositiveInteger(parseNumberToValidate)) {
+      throw new InvalidRequestException(`${name} must be a positive integer`);
+    }
   }
 
   private validateMachineRelation(
@@ -248,7 +255,7 @@ export class OrderService {
     }
   }
 
-  private validateOrderRelation(orderToValidate: Order, ordererId: number): void {
+  private validateOrderRelation(orderToValidate: Order): void {
     if (!orderToValidate) {
       throw new InvalidRequestException('Order does not exist');
     }
