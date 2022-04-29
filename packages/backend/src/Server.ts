@@ -47,6 +47,8 @@ import { OrderService } from '@/services/OrderService';
 import { OrderController } from '@/controllers/OrderController';
 import { BillService } from '@/services/BillService';
 import { BillController } from '@/controllers/BillController';
+import { MachinePartService } from '@/services/MachinePartService';
+import { MachinePartController } from '@/controllers/MachinePartController';
 
 export class Server {
 
@@ -73,6 +75,7 @@ export class Server {
   private addressService: AddressService;
   private billService: BillService;
   private branchService: BranchService;
+  private machinePartService: MachinePartService;
   private maintenanceLogService: MaintenanceLogService;
   private maintenancePartService: MaintenancePartService;
   private zoneService: ZoneService;
@@ -175,6 +178,11 @@ export class Server {
       this.staffRepository,
       this.orderRepository,
     );
+    this.machinePartService = new MachinePartService(
+      this.machineRepository,
+      this.machinePartRepository,
+      this.orderRepository,
+    );
   }
 
   private async loadControllers(): Promise<void> {
@@ -194,6 +202,7 @@ export class Server {
       new BranchController(this.branchService),
       new MaintenanceLogController(this.maintenanceLogService),
       new MaintenancePartController(this.maintenancePartService),
+      new MachinePartController(this.machinePartService),
       new OrderController(this.orderService),
       new StaffController(this.staffService),
       new ZoneController(this.zoneService),
