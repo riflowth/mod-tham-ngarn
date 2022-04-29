@@ -29,7 +29,6 @@ export class MaintenanceLogController extends Controller {
       limit: Number(req.query.limit),
       offset: Number(req.query.offset),
     };
-
     const maintenanceLogs = await this.maintenanceLogService
       .getMaintenanceLogsByMachineId(Number(machineId), zoneId, readOptions);
 
@@ -47,7 +46,6 @@ export class MaintenanceLogController extends Controller {
       .setMachineId(machineId)
       .setReporterId(reporterId)
       .setReason(reason);
-
     const createdField = await this.maintenanceLogService
       .addMaintenanceLog(newMaintenanceLog, reporterZoneId);
 
@@ -64,7 +62,6 @@ export class MaintenanceLogController extends Controller {
 
     const newMaintenanceLog = new MaintenanceLog()
       .setReason(reason);
-
     const updatedField = await this.maintenanceLogService
       .editMaintenanceLog(Number(maintenanceId), newMaintenanceLog, reporterId);
 
@@ -78,10 +75,8 @@ export class MaintenanceLogController extends Controller {
     const { staffId: reporterId } = req.session;
     const { maintenanceId } = req.params;
     const { status } = req.body;
-
     const updatedField = await this.maintenanceLogService
       .updateMaintenanceLogStatus(Number(maintenanceId), status, reporterId);
-
     res.status(200).json({ data: { updatedField } });
   }
 
@@ -90,10 +85,8 @@ export class MaintenanceLogController extends Controller {
   private async claimMaintenance(req: Request, res: Response): Promise<void> {
     const { staffId: reporterId, role } = req.session;
     const { maintenanceId } = req.params;
-
     const updatedField = await this.maintenanceLogService
       .claimMaintenanceLog(Number(maintenanceId), reporterId, role);
-
     res.status(200).json({ data: { updatedField } });
   }
 
@@ -102,10 +95,8 @@ export class MaintenanceLogController extends Controller {
   private async unclaimMaintenance(req: Request, res: Response): Promise<void> {
     const { staffId: reporterId } = req.session;
     const { maintenanceId } = req.params;
-
     const updatedField = await this.maintenanceLogService
       .unclaimMaintenanceLog(Number(maintenanceId), reporterId);
-
     res.status(200).json({ data: { updatedField } });
   }
 
@@ -114,10 +105,8 @@ export class MaintenanceLogController extends Controller {
   private async deleteMaintenance(req: Request, res: Response): Promise<void> {
     const { maintenanceId } = req.params;
     const { staffId, role } = req.session;
-
     const deletedField = await this.maintenanceLogService
       .deleteMaintenanceLog(Number(maintenanceId), staffId, role);
-
     res.status(200).json({ data: { deletedField } });
   }
 

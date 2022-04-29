@@ -27,9 +27,7 @@ export class ZoneController extends Controller {
       limit: Number(req.query.limit),
       offset: Number(req.query.offset),
     };
-
     const zones = await this.zoneService.getAllZones(readOptions);
-
     res.status(200).json({ data: zones });
   }
 
@@ -44,9 +42,7 @@ export class ZoneController extends Controller {
   @RouteMapping('/:zoneId', Methods.GET)
   private async getZoneByZoneId(req: Request, res: Response): Promise<void> {
     const parseZoneId = NumberUtils.parsePositiveInteger(req.params.zoneId);
-
     const zone = await this.zoneService.getZoneByZoneId(parseZoneId);
-
     res.status(200).json({ data: zone });
   }
 
@@ -62,7 +58,6 @@ export class ZoneController extends Controller {
       .setBranchId(parseBranchId)
       .setTimeToStart(timeToStart)
       .setTimeToEnd(timeToEnd);
-
     const createdField = await this.zoneService.addZone(newZone);
 
     res.status(200).json({ data: { createdField } });
@@ -82,7 +77,6 @@ export class ZoneController extends Controller {
       .setBranchId(parseBranchId)
       .setTimeToStart(timeToStart)
       .setTimeToEnd(timeToEnd);
-
     const updatedField = await this.zoneService.editZone(parseZoneId, newZone);
 
     res.status(200).json({ data: { updatedField } });
@@ -92,9 +86,7 @@ export class ZoneController extends Controller {
   @RouteMapping('/:zoneId', Methods.DELETE)
   public async deleteZoneByZoneId(req: Request, res: Response): Promise<void> {
     const parseZoneId = NumberUtils.parsePositiveInteger(req.params.zoneId);
-
     const deletedField = await this.zoneService.deleteZone(parseZoneId);
-
     res.status(200).json({ data: { deletedField } });
   }
 

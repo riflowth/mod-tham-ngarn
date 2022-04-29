@@ -28,7 +28,6 @@ export class MachinePartController extends Controller {
       limit: Number(req.query.limit),
       offset: Number(req.query.offset),
     };
-
     const machineParts = await this.machinePartService.getAllMachineParts(readOptions);
     res.status(200).json({ data: machineParts });
   }
@@ -37,11 +36,9 @@ export class MachinePartController extends Controller {
   @RouteMapping('/:partId', Methods.GET)
   private async getMachinePartByPartId(req: Request, res: Response): Promise<void> {
     const parsePartId = NumberUtils.parsePositiveInteger(req.params.partId);
-
     if (!parsePartId) {
       throw new InvalidRequestException('PartId must be a positive integer');
     }
-
     const machinePart = await this.machinePartService.getMachinePartByPartId(parsePartId);
     res.status(200).json({ data: machinePart });
   }
@@ -51,7 +48,6 @@ export class MachinePartController extends Controller {
   @RequestBody('machineId', 'partName', 'status')
   private async addMachinePart(req: Request, res: Response): Promise<void> {
     const { machineId, partName, status } = req.body;
-
     const parseMachinePart = NumberUtils.parsePositiveInteger(machineId);
 
     if (!parseMachinePart) {
@@ -62,7 +58,6 @@ export class MachinePartController extends Controller {
       .setMachineId(machineId)
       .setPartName(partName)
       .setStatus(status);
-
     const createdField = await this.machinePartService.addMachinePart(newMachinePart);
 
     res.status(200).json({ data: { createdField } });
@@ -79,7 +74,6 @@ export class MachinePartController extends Controller {
     }
 
     const { machineId, partName, status } = req.body;
-
     if (machineId === undefined && partName === undefined && status === undefined) {
       throw new InvalidRequestException('No provided data to update');
     }
@@ -88,7 +82,6 @@ export class MachinePartController extends Controller {
       .setMachineId(machineId)
       .setPartName(partName)
       .setStatus(status);
-
     const updatedField = await this.machinePartService.editMachinePart(parsePartId, newMachinePart);
 
     res.status(200).json({ data: { updatedField } });
@@ -98,11 +91,9 @@ export class MachinePartController extends Controller {
   @RouteMapping('/status/:machineId', Methods.GET)
   public async getStatusMachineByMachineId(req: Request, res: Response): Promise<void> {
     const parseMachineId = NumberUtils.parsePositiveInteger(req.params.machineId);
-
     if (!parseMachineId) {
       throw new InvalidRequestException('MachineId must be a positive integer');
     }
-
     const status = await this.machinePartService.getMachineStatus(parseMachineId);
     res.status(200).json({ data: status });
   }
@@ -111,11 +102,9 @@ export class MachinePartController extends Controller {
   @RouteMapping('/costs/:machineId', Methods.GET)
   public async getCostMachineMaintenanceByMachineId(req: Request, res: Response): Promise<void> {
     const parseMachineId = NumberUtils.parsePositiveInteger(req.params.machineId);
-
     if (!parseMachineId) {
       throw new InvalidRequestException('MachineId must be a positive integer');
     }
-
     const totalCost = await this.machinePartService.getMachineMaintenanceCost(parseMachineId);
     res.status(200).json({ data: totalCost });
   }

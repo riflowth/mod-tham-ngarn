@@ -28,7 +28,6 @@ export class OrderController extends Controller {
       limit: Number(req.query.limit),
       offset: Number(req.query.offset),
     };
-
     const orders = await this.orderService.getOrdersByBillId(Number(billId), readOptions);
 
     res.status(200).json({ data: orders });
@@ -47,7 +46,6 @@ export class OrderController extends Controller {
       .setMachineId(machineId)
       .setPartId(partId)
       .setPrice(price);
-
     const createdFields = await this.orderService.addOrder(newOrder, ordererId, ordererZoneId);
 
     res.status(200).json({ createdFields });
@@ -65,7 +63,6 @@ export class OrderController extends Controller {
       .setMachineId(machineId)
       .setPartId(partId)
       .setPrice(price);
-
     const updatedField = await this.orderService
       .editOrder(Number(orderId), newOrder, Number(billId), ordererId);
 
