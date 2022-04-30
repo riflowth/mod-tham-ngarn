@@ -1,15 +1,11 @@
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable no-await-in-loop */
 import { Bill } from '@/entities/Bill';
 import { Order } from '@/entities/Order';
 import { Staff } from '@/entities/Staff';
-import { ForbiddenException } from '@/exceptions/ForbiddenException';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
-import { NotFoundException } from '@/exceptions/NotFoundException';
 import { BillRepository } from '@/repositories/bill/BillRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { StaffRepository } from '@/repositories/staff/StaffRepository';
+import { BadRequestException, NotFoundException, ForbiddenException } from 'springpress';
 
 export class BillService {
 
@@ -69,7 +65,7 @@ export class BillService {
     const relatedOrders = await this.orderRepository.read(expectedRelatedOrders);
 
     if (relatedOrders.length !== 0) {
-      throw new InvalidRequestException('There are orders still related to this bill');
+      throw new BadRequestException('There are orders still related to this bill');
     }
 
     const affectedRowsAmount = await this.billRepository.delete(targetBill);
@@ -79,7 +75,7 @@ export class BillService {
 
   private async validateNumber(numberToValidate: number, name: string): Promise<void> {
     if (numberToValidate === null) {
-      throw new InvalidRequestException(`${name} must be a positive integer`);
+      throw new BadRequestException(`${name} must be a positive integer`);
     }
   }
 

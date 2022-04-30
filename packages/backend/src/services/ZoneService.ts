@@ -2,14 +2,13 @@ import { Branch } from '@/entities/Branch';
 import { Machine } from '@/entities/Machine';
 import { Staff } from '@/entities/Staff';
 import { Zone } from '@/entities/Zone';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
-import { NotFoundException } from '@/exceptions/NotFoundException';
 import { BranchRepository } from '@/repositories/branch/BranchRepository';
 import { MachineRepository } from '@/repositories/machine/MachineRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { StaffRepository } from '@/repositories/staff/StaffRepository';
 import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
 import { NumberUtils } from '@/utils/NumberUtils';
+import { BadRequestException, NotFoundException } from 'springpress';
 
 export class ZoneService {
 
@@ -37,7 +36,7 @@ export class ZoneService {
 
   public async getZoneByZoneId(zoneId: number): Promise<Zone[]> {
     if (!zoneId) {
-      throw new InvalidRequestException('ZoneId must be a positive integer');
+      throw new BadRequestException('ZoneId must be a positive integer');
     }
 
     const zoneToRead = new Zone().setZoneId(zoneId);
@@ -54,14 +53,14 @@ export class ZoneService {
   public async addZone(newZone: Zone): Promise<Zone> {
     const branchId = newZone.getBranchId();
     if (!branchId) {
-      throw new InvalidRequestException('BranchId must be a positive integer');
+      throw new BadRequestException('BranchId must be a positive integer');
     }
 
     const relatedBranchToRead = new Branch().setBranchId(newZone.getBranchId());
     const [relatedBranch] = await this.branchRepository.read(relatedBranchToRead);
 
     if (!relatedBranch) {
-      throw new InvalidRequestException('BranchId related to zone does not existed');
+      throw new BadRequestException('BranchId related to zone does not existed');
     }
 
     return this.zoneRepository.create(newZone);
@@ -73,11 +72,11 @@ export class ZoneService {
     const branchId = newZone.getBranchId();
 
     if (timeToStart === undefined && timeToEnd === undefined && branchId === undefined) {
-      throw new InvalidRequestException('No provided data to update');
+      throw new BadRequestException('No provided data to update');
     }
 
     if (zoneId === null || (zoneId && !NumberUtils.parsePositiveInteger(zoneId))) {
-      throw new InvalidRequestException('ZoneId must be a positive integer');
+      throw new BadRequestException('ZoneId must be a positive integer');
     }
 
     const zoneToEdit = new Zone().setZoneId(zoneId);
@@ -94,7 +93,7 @@ export class ZoneService {
       const [relatedBranch] = await this.branchRepository.read(relatedBranchToEdit);
 
       if (!relatedBranch) {
-        throw new InvalidRequestException('BranchId related to zone does not existed');
+        throw new BadRequestException('BranchId related to zone does not existed');
       }
     }
 
@@ -105,28 +104,28 @@ export class ZoneService {
 
   public async deleteZone(zoneId: number): Promise<Zone> {
     if (!zoneId) {
-      throw new InvalidRequestException('ZoneId must be a positive integer');
+      throw new BadRequestException('ZoneId must be a positive integer');
     }
 
     const zoneToDelete = new Zone().setZoneId(zoneId);
     const [targetZone] = await this.zoneRepository.read(zoneToDelete);
 
     if (!targetZone) {
-      throw new InvalidRequestException('Target zone to delete does not exist');
+      throw new BadRequestException('Target zone to delete does not exist');
     }
 
     const relatedMachineToRead = new Machine().setZoneId(zoneId);
     const relatedMachine = await this.machineRepository.read(relatedMachineToRead);
 
     if (relatedMachine.length > 0) {
-      throw new InvalidRequestException('Target zone to delete has related machine.');
+      throw new BadRequestException('Target zone to delete has related machine.');
     }
 
     const relatedStaffToRead = new Staff().setZoneId(zoneId);
     const relatedStaff = await this.staffRepository.read(relatedStaffToRead);
 
     if (relatedStaff.length > 0) {
-      throw new InvalidRequestException('Target zone to delete has related staff.');
+      throw new BadRequestException('Target zone to delete has related staff.');
     }
 
     const affectedRowsAmount = await this.zoneRepository.delete(zoneToDelete);

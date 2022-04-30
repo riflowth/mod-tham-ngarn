@@ -1,11 +1,13 @@
-import { Controller } from '@/controllers/Controller';
-import { Methods } from '@/controllers/Route';
-import { ControllerMapping } from '@/decorators/ControllerDecorator';
-import { RouteMapping } from '@/decorators/RouteDecorator';
+import { AuthService } from '@/services/AuthService';
 import { CookieProvider } from '@/utils/cookie/CookieProvider';
 import { Request, Response } from 'express';
-import { RequestBody } from '@/decorators/RequestDecorator';
-import { AuthService } from '@/services/AuthService';
+import {
+  Controller,
+  ControllerMapping,
+  Methods,
+  RequestBody,
+  RouteMapping,
+} from 'springpress';
 
 @ControllerMapping('/auth')
 export class AuthController extends Controller {

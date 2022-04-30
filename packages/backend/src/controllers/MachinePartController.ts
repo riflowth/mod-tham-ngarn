@@ -1,15 +1,17 @@
-import { Controller } from '@/controllers/Controller';
 import { Authentication, Role } from '@/decorators/AuthenticationDecorator';
-import { ControllerMapping } from '@/decorators/ControllerDecorator';
-import { RequestBody } from '@/decorators/RequestDecorator';
-import { RouteMapping } from '@/decorators/RouteDecorator';
 import { MachinePart } from '@/entities/MachinePart';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { MachinePartService } from '@/services/MachinePartService';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { Request, Response } from 'express';
-import { Methods } from '@/controllers/Route';
+import {
+  BadRequestException,
+  Controller,
+  ControllerMapping,
+  Methods,
+  RequestBody,
+  RouteMapping,
+} from 'springpress';
 
 @ControllerMapping('/part')
 export class MachinePartController extends Controller {
@@ -37,7 +39,7 @@ export class MachinePartController extends Controller {
   private async getMachinePartByPartId(req: Request, res: Response): Promise<void> {
     const parsePartId = NumberUtils.parsePositiveInteger(req.params.partId);
     if (!parsePartId) {
-      throw new InvalidRequestException('PartId must be a positive integer');
+      throw new BadRequestException('PartId must be a positive integer');
     }
     const machinePart = await this.machinePartService.getMachinePartByPartId(parsePartId);
     res.status(200).json({ data: machinePart });
@@ -51,7 +53,7 @@ export class MachinePartController extends Controller {
     const parseMachinePart = NumberUtils.parsePositiveInteger(machineId);
 
     if (!parseMachinePart) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
+      throw new BadRequestException('MachineId must be a positive integer');
     }
 
     const newMachinePart = new MachinePart()
@@ -70,12 +72,12 @@ export class MachinePartController extends Controller {
     const parsePartId = NumberUtils.parsePositiveInteger(req.params.partId);
 
     if (!parsePartId) {
-      throw new InvalidRequestException('PartId must be a positive integer');
+      throw new BadRequestException('PartId must be a positive integer');
     }
 
     const { machineId, partName, status } = req.body;
     if (machineId === undefined && partName === undefined && status === undefined) {
-      throw new InvalidRequestException('No provided data to update');
+      throw new BadRequestException('No provided data to update');
     }
 
     const newMachinePart = new MachinePart()
@@ -92,7 +94,7 @@ export class MachinePartController extends Controller {
   public async getStatusMachineByMachineId(req: Request, res: Response): Promise<void> {
     const parseMachineId = NumberUtils.parsePositiveInteger(req.params.machineId);
     if (!parseMachineId) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
+      throw new BadRequestException('MachineId must be a positive integer');
     }
     const status = await this.machinePartService.getMachineStatus(parseMachineId);
     res.status(200).json({ data: status });
@@ -103,7 +105,7 @@ export class MachinePartController extends Controller {
   public async getCostMachineMaintenanceByMachineId(req: Request, res: Response): Promise<void> {
     const parseMachineId = NumberUtils.parsePositiveInteger(req.params.machineId);
     if (!parseMachineId) {
-      throw new InvalidRequestException('MachineId must be a positive integer');
+      throw new BadRequestException('MachineId must be a positive integer');
     }
     const totalCost = await this.machinePartService.getMachineMaintenanceCost(parseMachineId);
     res.status(200).json({ data: totalCost });

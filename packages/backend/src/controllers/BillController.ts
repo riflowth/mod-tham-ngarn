@@ -1,16 +1,18 @@
-import { Controller } from '@/controllers/Controller';
-import { Methods } from '@/controllers/Route';
 import { Authentication, Role } from '@/decorators/AuthenticationDecorator';
-import { ControllerMapping } from '@/decorators/ControllerDecorator';
-import { RequestBody } from '@/decorators/RequestDecorator';
-import { RouteMapping } from '@/decorators/RouteDecorator';
 import { Bill } from '@/entities/Bill';
-import { ForbiddenException } from '@/exceptions/ForbiddenException';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { BillService } from '@/services/BillService';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { Request, Response } from 'express';
+import {
+  BadRequestException,
+  Controller,
+  ControllerMapping,
+  ForbiddenException,
+  Methods,
+  RequestBody,
+  RouteMapping,
+} from 'springpress';
 
 @ControllerMapping('/bill')
 export class BillController extends Controller {
@@ -58,7 +60,7 @@ export class BillController extends Controller {
 
     const parseOrderBy = NumberUtils.parsePositiveInteger(orderBy);
     if (parseOrderBy !== req.session.staffId) {
-      throw new InvalidRequestException('You are not who you say you are');
+      throw new BadRequestException('You are not who you say you are');
     }
 
     const newBill = new Bill()
@@ -77,7 +79,7 @@ export class BillController extends Controller {
     const parseBillId = NumberUtils.parsePositiveInteger(req.params.billId);
 
     if (Object.keys(req.body).length === 0) {
-      throw new InvalidRequestException('No provided data to update');
+      throw new BadRequestException('No provided data to update');
     }
 
     const { storeName, orderDate, orderBy } = req.body;

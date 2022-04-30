@@ -1,16 +1,18 @@
-import { Controller } from '@/controllers/Controller';
-import { Methods } from '@/controllers/Route';
 import { Authentication, Role } from '@/decorators/AuthenticationDecorator';
-import { ControllerMapping } from '@/decorators/ControllerDecorator';
-import { RequestBody } from '@/decorators/RequestDecorator';
-import { RouteMapping } from '@/decorators/RouteDecorator';
 import { Machine } from '@/entities/Machine';
-import { ForbiddenException } from '@/exceptions/ForbiddenException';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { MachineService } from '@/services/MachineService';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { Request, Response } from 'express';
+import {
+  BadRequestException,
+  Controller,
+  ControllerMapping,
+  ForbiddenException,
+  Methods,
+  RequestBody,
+  RouteMapping,
+} from 'springpress';
 
 @ControllerMapping('/machine')
 export class MachineController extends Controller {
@@ -106,7 +108,7 @@ export class MachineController extends Controller {
     const parseMachineId = NumberUtils.parsePositiveInteger(req.params.machineId);
 
     if (Object.keys(req.body).length === 0) {
-      throw new InvalidRequestException('No provided data to update');
+      throw new BadRequestException('No provided data to update');
     }
 
     const {

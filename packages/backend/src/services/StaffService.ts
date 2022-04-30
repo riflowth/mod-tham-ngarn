@@ -3,8 +3,6 @@ import { Branch } from '@/entities/Branch';
 import { MaintenanceLog } from '@/entities/MaintenanceLog';
 import { Staff } from '@/entities/Staff';
 import { Zone } from '@/entities/Zone';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
-import { NotFoundException } from '@/exceptions/NotFoundException';
 import { BillRepository } from '@/repositories/bill/BillRepository';
 import { BranchRepository } from '@/repositories/branch/BranchRepository';
 import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
@@ -12,6 +10,7 @@ import { ReadOptions } from '@/repositories/ReadOptions';
 import { StaffRepository } from '@/repositories/staff/StaffRepository';
 import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
 import { NumberUtils } from '@/utils/NumberUtils';
+import { BadRequestException, NotFoundException } from 'springpress';
 
 export class StaffService {
 
@@ -45,7 +44,7 @@ export class StaffService {
     const [relatedBranch] = await this.branchRepository.read(branchToRead);
 
     if (!relatedBranch) {
-      throw new InvalidRequestException('BranchId related to staff does not existed');
+      throw new BadRequestException('BranchId related to staff does not existed');
     }
 
     const staffToRead = new Staff().setBranchId(branchId);
@@ -59,7 +58,7 @@ export class StaffService {
     const [relatedZone] = await this.zoneRepository.read(zoneToRead);
 
     if (!relatedZone) {
-      throw new InvalidRequestException('ZoneId related to staff does not existed');
+      throw new BadRequestException('ZoneId related to staff does not existed');
     }
 
     const staffToRead = new Staff().setZoneId(zoneId);
@@ -73,7 +72,7 @@ export class StaffService {
     const [targetStaff] = await this.staffRepository.read(staffToRead, readOptions);
 
     if (!targetStaff) {
-      throw new InvalidRequestException('StaffId does not existed');
+      throw new BadRequestException('StaffId does not existed');
     }
 
     return [targetStaff];
@@ -84,14 +83,14 @@ export class StaffService {
     const [relatedBranch] = await this.branchRepository.read(relatedBranchToRead);
 
     if (!relatedBranch) {
-      throw new InvalidRequestException('BranchId related to staff does not existed');
+      throw new BadRequestException('BranchId related to staff does not existed');
     }
 
     const relatedZoneToRead = new Zone().setZoneId(newStaff.getZoneId());
     const [relatedZone] = await this.zoneRepository.read(relatedZoneToRead);
 
     if (!relatedZone) {
-      throw new InvalidRequestException('ZoneId related to staff does not existed');
+      throw new BadRequestException('ZoneId related to staff does not existed');
     }
 
     return this.staffRepository.create(newStaff);
@@ -108,7 +107,7 @@ export class StaffService {
     const newBranchId = newStaff.getBranchId();
 
     if (newBranchId === null && (newBranchId && !NumberUtils.isPositiveInteger(newBranchId))) {
-      throw new InvalidRequestException('newBranch must be positive integer');
+      throw new BadRequestException('newBranch must be positive integer');
     }
 
     if (newBranchId) {
@@ -116,14 +115,14 @@ export class StaffService {
       const [relatedBranch] = await this.branchRepository.read(relatedBranchToEdit);
 
       if (!relatedBranch) {
-        throw new InvalidRequestException('BranchId related to staff does not existed');
+        throw new BadRequestException('BranchId related to staff does not existed');
       }
     }
 
     const newZoneId = newStaff.getZoneId();
 
     if (newZoneId === null && (newZoneId && !NumberUtils.isPositiveInteger(newZoneId))) {
-      throw new InvalidRequestException('newZoneId must be positive integer');
+      throw new BadRequestException('newZoneId must be positive integer');
     }
 
     if (newZoneId) {
@@ -131,7 +130,7 @@ export class StaffService {
       const [relatedZone] = await this.zoneRepository.read(relatedZoneToEdit);
 
       if (!relatedZone) {
-        throw new InvalidRequestException('ZoneId related to staff does not existed');
+        throw new BadRequestException('ZoneId related to staff does not existed');
       }
     }
 
@@ -145,7 +144,7 @@ export class StaffService {
     const [targetStaff] = await this.staffRepository.read(staffToDelete);
 
     if (!targetStaff) {
-      throw new InvalidRequestException('Target staff to delete does not exist');
+      throw new BadRequestException('Target staff to delete does not exist');
     }
 
     const relatedReporterMaintenanceLog = new MaintenanceLog().setReporterId(staffId);
@@ -156,18 +155,18 @@ export class StaffService {
       .read(relatedMaintainerMaintenanceLog);
 
     if (relatedReporter.length > 0) {
-      throw new InvalidRequestException('Target staff to delete has related reporter.');
+      throw new BadRequestException('Target staff to delete has related reporter.');
     }
 
     if (relatedMaintainer.length > 0) {
-      throw new InvalidRequestException('Target staff to delete has related maintainer.');
+      throw new BadRequestException('Target staff to delete has related maintainer.');
     }
 
     const relatedOrderByBill = new Bill().setOrderBy(staffId);
     const relatedOrderBy = await this.billRepository.read(relatedOrderByBill);
 
     if (relatedOrderBy.length > 0) {
-      throw new InvalidRequestException('Target staff to delete has related order_by.');
+      throw new BadRequestException('Target staff to delete has related order_by.');
     }
 
     const affectedRowsAmount = await this.staffRepository.delete(targetStaff);

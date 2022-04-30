@@ -1,63 +1,58 @@
 import 'reflect-metadata';
-import http from 'http';
-import express, { Application } from 'express';
-import { ControllerRegistry } from '@/controllers/ControllerRegistry';
-import { DatabaseConnector } from '@/utils/database/DatabaseConnector';
-import { DatabaseException } from '@/exceptions/DatabaseException';
-import { CookieProvider } from '@/utils/cookie/CookieProvider';
+import { AddressController } from '@/controllers/AddressController';
 import { AuthController } from '@/controllers/AuthController';
-import { AuthService } from '@/services/AuthService';
+import { BillController } from '@/controllers/BillController';
+import { BranchController } from '@/controllers/BranchController';
+import { IndexController } from '@/controllers/IndexController';
+import { MachineController } from '@/controllers/MachineController';
+import { MachinePartController } from '@/controllers/MachinePartController';
+import { MaintenanceLogController } from '@/controllers/MaintenanceLogController';
+import { MaintenancePartController } from '@/controllers/MaintenancePartController';
+import { OrderController } from '@/controllers/OrderController';
+import { StaffController } from '@/controllers/StaffController';
+import { ZoneController } from '@/controllers/ZoneController';
+import { DatabaseException } from '@/exceptions/DatabaseException';
 import { AddressRepository } from '@/repositories/address/AddressRepository';
-import { BillRepository } from '@/repositories/bill/BillRepository';
-import { BranchRepository } from '@/repositories/branch/BranchRepository';
-import { MachineRepository } from '@/repositories/machine/MachineRepository';
-import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
-import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
-import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
-import { OrderRepository } from '@/repositories/order/OrderRepository';
-import { StaffRepository } from '@/repositories/staff/StaffRepository';
-import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
 import { DefaultAddressRepository } from '@/repositories/address/DefaultAddressRepository';
+import { BillRepository } from '@/repositories/bill/BillRepository';
 import { DefaultBillRepository } from '@/repositories/bill/DefaultBillRepository';
+import { BranchRepository } from '@/repositories/branch/BranchRepository';
 import { DefaultBranchRepository } from '@/repositories/branch/DefaultBranchRepository';
 import { DefaultMachineRepository } from '@/repositories/machine/DefaultMachineRepository';
+import { MachineRepository } from '@/repositories/machine/MachineRepository';
 import { DefaultMachinePartRepository } from '@/repositories/machinepart/DefaultMachinePartRepository';
+import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
 import { DefaultMaintenanceLogRepository } from '@/repositories/maintenancelog/DefaultMaintenanceLogRepository';
+import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
 import { DefaultMaintenancePartRepository } from '@/repositories/maintenancepart/DefaultMaintenancePartRepository';
+import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { DefaultOrderRepository } from '@/repositories/order/DefaultOrderRepository';
-import { DefaultStaffRepository } from '@/repositories/staff/DefaultStaffRepository';
-import { DefaultZoneRepository } from '@/repositories/zone/DefaultZoneRepository';
-import { SessionRepository } from '@/repositories/session/SessionRepository';
+import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { DefaultSessionRepository } from '@/repositories/session/DefaultSessionRepository';
-import { StaffController } from '@/controllers/StaffController';
-import { ZoneService } from '@/services/ZoneService';
-import { ZoneController } from '@/controllers/ZoneController';
-import { BranchService } from '@/services/BranchService';
-import { BranchController } from '@/controllers/BranchController';
-import { MachineService } from '@/services/MachineService';
-import { MachineController } from '@/controllers/MachineController';
-import { StaffService } from '@/services/StaffService';
+import { SessionRepository } from '@/repositories/session/SessionRepository';
+import { DefaultStaffRepository } from '@/repositories/staff/DefaultStaffRepository';
+import { StaffRepository } from '@/repositories/staff/StaffRepository';
+import { DefaultZoneRepository } from '@/repositories/zone/DefaultZoneRepository';
+import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
 import { AddressService } from '@/services/AddressService';
-import { AddressController } from '@/controllers/AddressController';
-import { MaintenanceLogService } from '@/services/MaintenanceLogService';
-import { MaintenanceLogController } from '@/controllers/MaintenanceLogController';
-import { MaintenancePartService } from '@/services/MaintenancePartService';
-import { MaintenancePartController } from '@/controllers/MaintenancePartController';
-import { OrderService } from '@/services/OrderService';
-import { OrderController } from '@/controllers/OrderController';
+import { AuthService } from '@/services/AuthService';
 import { BillService } from '@/services/BillService';
-import { BillController } from '@/controllers/BillController';
+import { BranchService } from '@/services/BranchService';
 import { MachinePartService } from '@/services/MachinePartService';
-import { MachinePartController } from '@/controllers/MachinePartController';
-import { IndexController } from '@/controllers/IndexController';
+import { MachineService } from '@/services/MachineService';
+import { MaintenanceLogService } from '@/services/MaintenanceLogService';
+import { MaintenancePartService } from '@/services/MaintenancePartService';
+import { OrderService } from '@/services/OrderService';
+import { StaffService } from '@/services/StaffService';
+import { ZoneService } from '@/services/ZoneService';
+import { CookieProvider } from '@/utils/cookie/CookieProvider';
+import { DatabaseConnector } from '@/utils/database/DatabaseConnector';
+import { Springpress } from 'springpress';
+import { AuthMiddleware } from '@/middlewares/AuthMiddleware';
 
-export class Server {
-
-  private readonly app: Application;
-  private readonly port: number;
+export class Server extends Springpress {
 
   private databaseConnector: DatabaseConnector;
-  private controllerRegistry: ControllerRegistry;
   private cookieProvider: CookieProvider;
 
   private addressRepository: AddressRepository;
@@ -84,27 +79,14 @@ export class Server {
   private orderService: OrderService;
   private staffService: StaffService;
 
-  public constructor(port: number) {
-    this.app = express();
-    this.port = port;
+  public async onStartup(): Promise<void> {
     this.databaseConnector = new DatabaseConnector();
-  }
-
-  public async run(): Promise<http.Server> {
-    this.app.use(express.urlencoded({ extended: true }));
-    this.app.use(express.json());
-    this.app.disable('x-powered-by');
-
     await this.connectDatabase();
     await this.registerRepository();
     await this.registerServices();
     await this.loadControllers();
 
-    return this.app.listen(this.port, this.onStartup.bind(this));
-  }
-
-  private onStartup(): void {
-    console.log(`Listening on http://localhost:${this.port}/`);
+    console.log('Starting up ... done!');
   }
 
   private async registerRepository(): Promise<void> {
@@ -190,30 +172,25 @@ export class Server {
   private async loadControllers(): Promise<void> {
     this.cookieProvider = new CookieProvider('this-is-the-secret-just-keep-it');
 
-    this.controllerRegistry = new ControllerRegistry(
-      this.app,
+    const authMiddleware = new AuthMiddleware(
       this.cookieProvider,
       this.sessionRepository,
       this.staffRepository,
     );
 
-    this.controllerRegistry.loadControllers([
-      new IndexController(),
-      new AddressController(this.addressService),
-      new AuthController(this.cookieProvider, this.authService),
-      new BillController(this.billService),
-      new BranchController(this.branchService),
-      new MaintenanceLogController(this.maintenanceLogService),
-      new MaintenancePartController(this.maintenancePartService),
-      new MachinePartController(this.machinePartService),
-      new OrderController(this.orderService),
-      new StaffController(this.staffService),
-      new ZoneController(this.zoneService),
-      new MachineController(this.machineService),
-    ]);
-
-    const controllerCount = this.controllerRegistry.size();
-    console.log(`Registered ${controllerCount} controller${controllerCount > 1 ? 's' : ''}`);
+    const registry = this.getControllerRegistry();
+    registry.register(new IndexController());
+    registry.register(new AddressController(this.addressService), authMiddleware);
+    registry.register(new AuthController(this.cookieProvider, this.authService), authMiddleware);
+    registry.register(new BillController(this.billService), authMiddleware);
+    registry.register(new BranchController(this.branchService), authMiddleware);
+    registry.register(new MaintenanceLogController(this.maintenanceLogService), authMiddleware);
+    registry.register(new MaintenancePartController(this.maintenancePartService), authMiddleware);
+    registry.register(new MachinePartController(this.machinePartService), authMiddleware);
+    registry.register(new OrderController(this.orderService), authMiddleware);
+    registry.register(new StaffController(this.staffService), authMiddleware);
+    registry.register(new ZoneController(this.zoneService), authMiddleware);
+    registry.register(new MachineController(this.machineService), authMiddleware);
   }
 
   private async connectDatabase(): Promise<void> {

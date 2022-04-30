@@ -1,14 +1,16 @@
 import { Authentication, Role } from '@/decorators/AuthenticationDecorator';
-import { ControllerMapping } from '@/decorators/ControllerDecorator';
-import { RequestBody } from '@/decorators/RequestDecorator';
-import { RouteMapping } from '@/decorators/RouteDecorator';
 import { Address } from '@/entities/Address';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { AddressService } from '@/services/AddressService';
 import { Request, Response } from 'express';
-import { Controller } from '@/controllers/Controller';
-import { Methods } from '@/controllers/Route';
+import {
+  BadRequestException,
+  Controller,
+  ControllerMapping,
+  Methods,
+  RequestBody,
+  RouteMapping,
+} from 'springpress';
 
 @ControllerMapping('/address')
 export class AddressController extends Controller {
@@ -67,7 +69,7 @@ export class AddressController extends Controller {
     const { region, country } = req.body;
 
     if (region === undefined && country === undefined) {
-      throw new InvalidRequestException('No provided data to update');
+      throw new BadRequestException('No provided data to update');
     }
 
     const newAddress = new Address()

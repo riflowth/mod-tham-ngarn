@@ -1,13 +1,15 @@
-import { Controller } from '@/controllers/Controller';
-import { Methods } from '@/controllers/Route';
 import { Authentication, Role } from '@/decorators/AuthenticationDecorator';
-import { ControllerMapping } from '@/decorators/ControllerDecorator';
-import { RequestBody } from '@/decorators/RequestDecorator';
-import { RouteMapping } from '@/decorators/RouteDecorator';
 import { Order } from '@/entities/Order';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { OrderService } from '@/services/OrderService';
 import { Request, Response } from 'express';
+import {
+  Controller,
+  ControllerMapping,
+  Methods,
+  RequestBody,
+  RouteMapping,
+} from 'springpress';
 
 @ControllerMapping('/bill')
 export class OrderController extends Controller {

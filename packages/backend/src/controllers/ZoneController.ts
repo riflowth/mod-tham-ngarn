@@ -1,14 +1,16 @@
-import { Controller } from '@/controllers/Controller';
 import { Authentication, Role } from '@/decorators/AuthenticationDecorator';
-import { ControllerMapping } from '@/decorators/ControllerDecorator';
-import { RequestBody } from '@/decorators/RequestDecorator';
-import { RouteMapping } from '@/decorators/RouteDecorator';
 import { Zone } from '@/entities/Zone';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { ZoneService } from '@/services/ZoneService';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { Request, Response } from 'express';
-import { Methods } from '@/controllers/Route';
+import {
+  Controller,
+  ControllerMapping,
+  Methods,
+  RequestBody,
+  RouteMapping,
+} from 'springpress';
 
 @ControllerMapping('/zone')
 export class ZoneController extends Controller {

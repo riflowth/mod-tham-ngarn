@@ -3,7 +3,7 @@ import { Server } from '@/Server';
 try {
   console.log('Starting up the application...');
   const server = new Server(4000);
-  server.run();
+  server.listen();
 } catch (error: unknown) {
   if (error instanceof Error) {
     console.log(`${error.name}: ${error.message}`);

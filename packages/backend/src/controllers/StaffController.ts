@@ -1,15 +1,17 @@
-import { Controller } from '@/controllers/Controller';
-import { Methods } from '@/controllers/Route';
 import { Authentication, Role } from '@/decorators/AuthenticationDecorator';
-import { ControllerMapping } from '@/decorators/ControllerDecorator';
-import { RequestBody } from '@/decorators/RequestDecorator';
-import { RouteMapping } from '@/decorators/RouteDecorator';
 import { Staff } from '@/entities/Staff';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { StaffService } from '@/services/StaffService';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { Request, Response } from 'express';
+import {
+  BadRequestException,
+  Controller,
+  ControllerMapping,
+  Methods,
+  RequestBody,
+  RouteMapping,
+} from 'springpress';
 
 @ControllerMapping('/staff')
 export class StaffController extends Controller {
@@ -37,7 +39,7 @@ export class StaffController extends Controller {
   private async getStaffByStaffId(req: Request, res: Response): Promise<void> {
     const parseStaffId = NumberUtils.parsePositiveInteger(req.params.staffId);
     if (!parseStaffId) {
-      throw new InvalidRequestException('StaffId must be a positive integer');
+      throw new BadRequestException('StaffId must be a positive integer');
     }
     const staff = await this.staffService.getStaffByStaffId(parseStaffId);
     res.status(200).json({ data: staff });
@@ -48,7 +50,7 @@ export class StaffController extends Controller {
   private async getStaffByZoneId(req: Request, res: Response): Promise<void> {
     const parseZoneId = NumberUtils.parsePositiveInteger(req.params.zoneId);
     if (!parseZoneId) {
-      throw new InvalidRequestException('zoneId must be a positive integer');
+      throw new BadRequestException('zoneId must be a positive integer');
     }
     const staff = await this.staffService.getStaffByZoneId(parseZoneId);
     res.status(200).json({ data: staff });
@@ -59,7 +61,7 @@ export class StaffController extends Controller {
   private async getStaffByBranchId(req: Request, res: Response): Promise<void> {
     const parseBranchId = NumberUtils.parsePositiveInteger(req.params.branchId);
     if (!parseBranchId) {
-      throw new InvalidRequestException('branchId must be a positive integer');
+      throw new BadRequestException('branchId must be a positive integer');
     }
     const staff = await this.staffService.getStaffByBranchId(parseBranchId);
     res.status(200).json({ data: staff });
@@ -82,12 +84,12 @@ export class StaffController extends Controller {
 
     const parseBranchId = NumberUtils.parsePositiveInteger(branchId);
     if (!parseBranchId) {
-      throw new InvalidRequestException('BranchId must be a positive integer');
+      throw new BadRequestException('BranchId must be a positive integer');
     }
 
     const parseZoneId = NumberUtils.parsePositiveInteger(zoneId);
     if (!parseZoneId) {
-      throw new InvalidRequestException('ZoneId must be a positive integer');
+      throw new BadRequestException('ZoneId must be a positive integer');
     }
 
     const newStaff = new Staff()
@@ -111,11 +113,11 @@ export class StaffController extends Controller {
     const parseStaffId = NumberUtils.parsePositiveInteger(req.params.staffId);
 
     if (!parseStaffId) {
-      throw new InvalidRequestException('StaffId must be a positive integer');
+      throw new BadRequestException('StaffId must be a positive integer');
     }
 
     if (Object.keys(req.body).length === 0) {
-      throw new InvalidRequestException('No provided data to update');
+      throw new BadRequestException('No provided data to update');
     }
 
     const {
@@ -148,7 +150,7 @@ export class StaffController extends Controller {
   public async deleteStaffByStaffId(req: Request, res: Response): Promise<void> {
     const parseStaffId = NumberUtils.parsePositiveInteger(req.params.staffId);
     if (!parseStaffId) {
-      throw new InvalidRequestException('StaffId must be a positive integer');
+      throw new BadRequestException('StaffId must be a positive integer');
     }
     const deletedField = await this.staffService.deleteStaff(parseStaffId);
     res.status(200).json({ data: { deletedField } });

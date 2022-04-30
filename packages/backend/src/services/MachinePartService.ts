@@ -2,14 +2,13 @@ import { Machine } from '@/entities/Machine';
 import { MachinePart } from '@/entities/MachinePart';
 import { MaintenancePart } from '@/entities/MaintenancePart';
 import { Order } from '@/entities/Order';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
-import { NotFoundException } from '@/exceptions/NotFoundException';
 import { MachineRepository } from '@/repositories/machine/MachineRepository';
 import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { NumberUtils } from '@/utils/NumberUtils';
+import { BadRequestException, NotFoundException } from 'springpress';
 
 export enum MachinePartStatus {
   AVAILABLE = 'AVAILABLE',
@@ -68,7 +67,7 @@ export class MachinePartService {
     const [relatedMachine] = await this.machineRepository.read(relatedMachineToRead);
 
     if (!relatedMachine) {
-      throw new InvalidRequestException('MachineId related to zone does nor existed');
+      throw new BadRequestException('MachineId related to zone does nor existed');
     }
 
     return this.machinePartRepository.create(newMachinePart);
@@ -84,7 +83,7 @@ export class MachinePartService {
     const newMachineId = newMachinePart.getMachineId();
 
     if (newMachineId === null || (newMachineId && !NumberUtils.isPositiveInteger(newMachineId))) {
-      throw new InvalidRequestException('newMachine must be positive integer');
+      throw new BadRequestException('newMachine must be positive integer');
     }
 
     if (newMachinePart.getPartName() === null) {
@@ -100,7 +99,7 @@ export class MachinePartService {
       const [relatedMachine] = await this.machineRepository.read(relatedMachineToEdit);
 
       if (!relatedMachine) {
-        throw new InvalidRequestException('machineId related to machinePart does not exist.');
+        throw new BadRequestException('machineId related to machinePart does not exist.');
       }
     }
     this.validatedStatus(partId, targetMachinePart.getStatus());
@@ -120,7 +119,7 @@ export class MachinePartService {
     allMaintenancePartRelated.forEach((maintenancePart) => {
       if (status === 'DISABLE') {
         if (maintenancePart.getStatus() !== 'SUCCESS') {
-          throw new InvalidRequestException('Can not change status because MaintenancePart is not SUCCESS');
+          throw new BadRequestException('Can not change status because MaintenancePart is not SUCCESS');
         }
       }
     });
@@ -129,7 +128,7 @@ export class MachinePartService {
     allOrder.forEach((order) => {
       if (status === 'DISABLE') {
         if (order.getStatus() !== 'DELIVERED') {
-          throw new InvalidRequestException('Can not change status because Order is not DELIVERED');
+          throw new BadRequestException('Can not change status because Order is not DELIVERED');
         }
       }
     });
@@ -140,7 +139,7 @@ export class MachinePartService {
     const [targetMachine] = await this.machineRepository.read(machineToRead);
 
     if (!targetMachine) {
-      throw new InvalidRequestException('Target machine does not exist');
+      throw new BadRequestException('Target machine does not exist');
     }
     const machinePartToRead = await this.getAllMachinePartByMachineId(machineId);
     const resultsStatus = machinePartToRead.filter((machinePart) => {
@@ -155,7 +154,7 @@ export class MachinePartService {
     const [targetMachine] = await this.machineRepository.read(machineToRead);
 
     if (!targetMachine) {
-      throw new InvalidRequestException('Target machine does not exist');
+      throw new BadRequestException('Target machine does not exist');
     }
 
     const machinePartToRead = await this.getAllMachinePartByMachineId(machineId);
