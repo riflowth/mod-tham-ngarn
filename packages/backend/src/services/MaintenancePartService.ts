@@ -1,7 +1,6 @@
 import { MaintenanceLog } from '@/entities/MaintenanceLog';
 import { MaintenancePart } from '@/entities/MaintenancePart';
 import { Order } from '@/entities/Order';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
 import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
@@ -10,6 +9,7 @@ import { ReadOptions } from '@/repositories/ReadOptions';
 import { MaintenanceLogStatus, MaintenancePartStatus } from '@/services/MaintenanceLogService';
 import { OrderStatus } from '@/services/OrderService';
 import { NumberUtils } from '@/utils/NumberUtils';
+import { BadRequestException } from 'springpress';
 
 export class MaintenancePartService {
 
@@ -56,13 +56,13 @@ export class MaintenancePartService {
     if (newType) this.validateNonEmptyString(newType, 'newType');
 
     if (newStatus) {
-      throw new InvalidRequestException('newStatus must be null');
+      throw new BadRequestException('newStatus must be null');
     }
 
     const machinePartToMaintain = await this.machinePartRepository.readByPartId(newPartId);
 
     if (!machinePartToMaintain) {
-      throw new InvalidRequestException('Machine part to maintain not found');
+      throw new BadRequestException('Machine part to maintain not found');
     }
 
     const maintenanceLogToValidate = await this.maintenanceLogRepository
@@ -92,7 +92,7 @@ export class MaintenancePartService {
       .readByPrimaryKey(newMaintenanceId, newPartId);
 
     if (existedMaintenancePart) {
-      throw new InvalidRequestException('Maintenance part already exists');
+      throw new BadRequestException('Maintenance part already exists');
     }
 
     return this.maintenancePartRepository.create(
@@ -121,18 +121,18 @@ export class MaintenancePartService {
     if (newPartId) this.validatePositiveInteger(newPartId, 'newPartId');
 
     if (newMaintenanceId || newPartId || newStatus) {
-      throw new InvalidRequestException('newMaintenanceId and newPartId must be null');
+      throw new BadRequestException('newMaintenanceId and newPartId must be null');
     }
 
     if (!newOrderId && !newType) {
-      throw new InvalidRequestException('No provide data');
+      throw new BadRequestException('No provide data');
     }
 
     const targetMaintenancePart = await this.maintenancePartRepository
       .readByPrimaryKey(maintenanceIdToSet, partIdToSet);
 
     if (!targetMaintenancePart) {
-      throw new InvalidRequestException('Maintenance part to edit not found');
+      throw new BadRequestException('Maintenance part to edit not found');
     }
 
     this.validateChangeMaintenancePartData(targetMaintenancePart);
@@ -213,7 +213,7 @@ export class MaintenancePartService {
       .readByPrimaryKey(maintenanceIdToDelete, partIdToDelete);
 
     if (!targetMaintenancePart) {
-      throw new InvalidRequestException('MaintenanceId or partId to delete not found');
+      throw new BadRequestException('MaintenanceId or partId to delete not found');
     }
 
     this.validateChangeMaintenancePartData(targetMaintenancePart);
@@ -239,7 +239,7 @@ export class MaintenancePartService {
     name: string,
   ): void {
     if (!NumberUtils.isPositiveInteger(Number(numberToValidate))) {
-      throw new InvalidRequestException(`${name} must be a positive integer and cannot be null`);
+      throw new BadRequestException(`${name} must be a positive integer and cannot be null`);
     }
   }
 
@@ -248,19 +248,19 @@ export class MaintenancePartService {
     name: string,
   ): void {
     if (stringToValidate === '') {
-      throw new InvalidRequestException(`${name} must be a non empty string and cannot be null`);
+      throw new BadRequestException(`${name} must be a non empty string and cannot be null`);
     }
   }
 
   private validateOrderRelation(orderToValidate: Order): void {
     if (!orderToValidate) {
-      throw new InvalidRequestException('Order related to maintenance part does not existed');
+      throw new BadRequestException('Order related to maintenance part does not existed');
     }
   }
 
   private validateMaintenancePartRelation(maintenancePart: MaintenancePart): void {
     if (maintenancePart) {
-      throw new InvalidRequestException('Order related to maintenance part has other maintenance part to bind');
+      throw new BadRequestException('Order related to maintenance part has other maintenance part to bind');
     }
   }
 
@@ -269,28 +269,28 @@ export class MaintenancePartService {
     maintainerId: number,
   ): void {
     if (!maintenanceLogToValidate) {
-      throw new InvalidRequestException('Maintenance log not found');
+      throw new BadRequestException('Maintenance log not found');
     }
 
     if (maintenanceLogToValidate.getMaintainerId() !== maintainerId) {
-      throw new InvalidRequestException('You cannot edit/add the maintenance that not belong to you');
+      throw new BadRequestException('You cannot edit/add the maintenance that not belong to you');
     }
 
     if (
       maintenanceLogToValidate.getStatus() === MaintenanceLogStatus.SUCCESS
       || maintenanceLogToValidate.getStatus() === MaintenanceLogStatus.FAILED
     ) {
-      throw new InvalidRequestException('Cannot edit/add maintenance part to finished maintenance log');
+      throw new BadRequestException('Cannot edit/add maintenance part to finished maintenance log');
     }
 
     if (maintenanceLogToValidate.getStatus() === MaintenanceLogStatus.OPENED) {
-      throw new InvalidRequestException('Cannot edit/add maintenance part to maintenance log that don\t have maintainer');
+      throw new BadRequestException('Cannot edit/add maintenance part to maintenance log that don\t have maintainer');
     }
   }
 
   private validateMachinePartRelation(machineId: number, maintenanceLog: MaintenanceLog): void {
     if (maintenanceLog.getMachineId() !== machineId) {
-      throw new InvalidRequestException('Machine part to maintain is not belong in machine');
+      throw new BadRequestException('Machine part to maintain is not belong in machine');
     }
   }
 
@@ -299,33 +299,33 @@ export class MaintenancePartService {
       maintenancePart.getStatus() === MaintenancePartStatus.SUCCESS
       || maintenancePart.getStatus() === MaintenancePartStatus.FAILED
     ) {
-      throw new InvalidRequestException('Cannot edit/add maintenance part to finished maintenance log');
+      throw new BadRequestException('Cannot edit/add maintenance part to finished maintenance log');
     }
   }
 
   private validateChangeMaintenancePartStatus(fromStatus: string, toStatus: string): void {
     if (fromStatus === toStatus) {
-      throw new InvalidRequestException('Cannot change maintenance part status to the same status');
+      throw new BadRequestException('Cannot change maintenance part status to the same status');
     }
 
     if (
       fromStatus === MaintenancePartStatus.ORDERING
       && toStatus !== MaintenancePartStatus.MAINTAINING
     ) {
-      throw new InvalidRequestException('Cannot change maintenance part status from ordering to other status');
+      throw new BadRequestException('Cannot change maintenance part status from ordering to other status');
     }
 
     if (
       fromStatus === MaintenancePartStatus.SUCCESS
       || fromStatus === MaintenancePartStatus.FAILED
     ) {
-      throw new InvalidRequestException('Cannot change maintenance part status from finished status');
+      throw new BadRequestException('Cannot change maintenance part status from finished status');
     }
   }
 
   private validateOrderProgress(orderRelatedToMaintenancePart: Order): void {
     if (orderRelatedToMaintenancePart.getStatus() === OrderStatus.SHIPPING) {
-      throw new InvalidRequestException('Order is shipping so it cannot change');
+      throw new BadRequestException('Order is shipping so it cannot change');
     }
   }
 

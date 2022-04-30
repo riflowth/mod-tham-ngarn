@@ -1,13 +1,15 @@
 import { Authentication, Role } from '@/decorators/AuthenticationDecorator';
-import { ControllerMapping } from '@/decorators/ControllerDecorator';
-import { RequestBody } from '@/decorators/RequestDecorator';
-import { RouteMapping } from '@/decorators/RouteDecorator';
 import { MaintenanceLog } from '@/entities/MaintenanceLog';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { MaintenanceLogService } from '@/services/MaintenanceLogService';
 import { Request, Response } from 'express';
-import { Controller } from '@/controllers/Controller';
-import { Methods } from '@/controllers/Route';
+import {
+  Controller,
+  ControllerMapping,
+  Methods,
+  RequestBody,
+  RouteMapping,
+} from 'springpress';
 
 @ControllerMapping('/maintenance')
 export class MaintenanceLogController extends Controller {

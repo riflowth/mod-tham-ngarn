@@ -8,7 +8,7 @@ describe('Test the AuthController response', () => {
 
   beforeAll(async () => {
     appServer = new Server(4000);
-    httpServer = await appServer.run();
+    httpServer = await appServer.listen();
   });
 
   afterAll(() => {

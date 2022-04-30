@@ -1,10 +1,9 @@
 import { Address } from '@/entities/Address';
 import { Branch } from '@/entities/Branch';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
-import { NotFoundException } from '@/exceptions/NotFoundException';
 import { AddressRepository } from '@/repositories/address/AddressRepository';
 import { BranchRepository } from '@/repositories/branch/BranchRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
+import { BadRequestException, NotFoundException } from 'springpress';
 
 export class AddressService {
 
@@ -46,7 +45,7 @@ export class AddressService {
     const existedAddress = await this.addressRepository.read(addressToAdd);
 
     if (existedAddress.length > 0) {
-      throw new InvalidRequestException('Postal code already existed');
+      throw new BadRequestException('Postal code already existed');
     }
 
     return this.addressRepository.create(newAddress);
@@ -67,7 +66,7 @@ export class AddressService {
       const existedAddress = await this.addressRepository.read(addressToCreate);
 
       if (existedAddress.length > 0) {
-        throw new InvalidRequestException('New Postal code already existed');
+        throw new BadRequestException('New Postal code already existed');
       }
 
       const relatedBranchesToEdit = new Branch().setPostalCode(postalCode);
@@ -85,14 +84,14 @@ export class AddressService {
     const [targetAddress] = await this.addressRepository.read(addressToDelete);
 
     if (!targetAddress) {
-      throw new InvalidRequestException('Target address to delete does not exist');
+      throw new BadRequestException('Target address to delete does not exist');
     }
 
     const relatedBranchToRead = new Branch().setPostalCode(postalCode);
     const relatedBranch = await this.branchRepository.read(relatedBranchToRead);
 
     if (relatedBranch.length > 0) {
-      throw new InvalidRequestException('Target address to delete has related branch.');
+      throw new BadRequestException('Target address to delete has related branch.');
     }
 
     const affectedRowsAmount = await this.addressRepository.delete(addressToDelete);

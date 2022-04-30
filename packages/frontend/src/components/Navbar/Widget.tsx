@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import { BellIcon, PencilAltIcon, SearchIcon } from "@heroicons/react/solid";
 import React from "react";
 

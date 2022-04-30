@@ -2,13 +2,13 @@ import { Role } from '@/decorators/AuthenticationDecorator';
 import { Machine } from '@/entities/Machine';
 import { MaintenanceLog } from '@/entities/MaintenanceLog';
 import { MaintenancePart } from '@/entities/MaintenancePart';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { MachineRepository } from '@/repositories/machine/MachineRepository';
 import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { EnumUtils } from '@/utils/EnumUtils';
 import { NumberUtils } from '@/utils/NumberUtils';
+import { BadRequestException } from 'springpress';
 
 export enum MaintainerAction {
   ACCEPT,
@@ -92,18 +92,18 @@ export class MaintenanceLogService {
     if (newReason) this.validateNonEmptyString(newReason, 'reason');
 
     if (newMaintenanceId || newMaintainerId || newReportDate || newMaintenanceDate || newStatus) {
-      throw new InvalidRequestException('You cannot add maintenance log with this data');
+      throw new BadRequestException('You cannot add maintenance log with this data');
     }
 
     if (newMachineId) {
       const machineToValidate = await this.machineRepository.readByMachineId(newMachineId);
 
       if (!machineToValidate) {
-        throw new InvalidRequestException('Machine not found');
+        throw new BadRequestException('Machine not found');
       }
 
       if (machineToValidate.getZoneId() !== reporterZoneIdToValidate) {
-        throw new InvalidRequestException('Machine is not in your zone.');
+        throw new BadRequestException('Machine is not in your zone.');
       }
 
       const inprogressMaintenanceLog = await this.maintenanceLogRepository
@@ -112,7 +112,7 @@ export class MaintenanceLogService {
       this.validateInprogressMaintenanceLog(inprogressMaintenanceLog);
 
       if (inprogressMaintenanceLog) {
-        throw new InvalidRequestException('Machine has an inprogress maintenance.');
+        throw new BadRequestException('Machine has an inprogress maintenance.');
       }
     }
 
@@ -148,7 +148,7 @@ export class MaintenanceLogService {
       || newMaintenanceDate
       || newStatus
     ) {
-      throw new InvalidRequestException('You cannot edit maintenance log with this data');
+      throw new BadRequestException('You cannot edit maintenance log with this data');
     }
 
     const maintenanceLogToValidate = await this.maintenanceLogRepository
@@ -178,7 +178,7 @@ export class MaintenanceLogService {
     this.validatePositiveInteger(maintainerIdToValidate, 'Reporter id');
 
     if (!EnumUtils.isIncludesInEnum(statusToUpdate, MaintenanceLogStatus)) {
-      throw new InvalidRequestException('Invalid status');
+      throw new BadRequestException('Invalid status');
     }
 
     const maintenanceLogToValidate = await this.maintenanceLogRepository
@@ -193,23 +193,23 @@ export class MaintenanceLogService {
     const toStatus = statusToUpdate;
 
     if (fromStatus === MaintenanceLogStatus.SUCCESS || fromStatus === MaintenanceLogStatus.FAILED) {
-      throw new InvalidRequestException('You cannot change status from success or failed');
+      throw new BadRequestException('You cannot change status from success or failed');
     }
 
     if (fromStatus === MaintenanceLogStatus.OPENED) {
       if (toStatus !== MaintenanceLogStatus.PENDING) {
-        throw new InvalidRequestException('You cannot change status from opened to other than pending');
+        throw new BadRequestException('You cannot change status from opened to other than pending');
       }
     }
 
     if (fromStatus === MaintenanceLogStatus.PENDING) {
       if (toStatus !== MaintenanceLogStatus.SUCCESS && toStatus !== MaintenanceLogStatus.FAILED) {
-        throw new InvalidRequestException('You cannot change status from pending to other than success or failed');
+        throw new BadRequestException('You cannot change status from pending to other than success or failed');
       }
     }
 
     if (toStatus === MaintenanceLogStatus.OPENED) {
-      throw new InvalidRequestException('You cannot change other status to opened');
+      throw new BadRequestException('You cannot change other status to opened');
     }
 
     const relatedMaintenanceParts = await this.maintenancePartRepository
@@ -236,18 +236,18 @@ export class MaintenanceLogService {
     this.validatePositiveInteger(claimerMaintainerId, 'Maintainer id');
 
     if (claimerMaintainerRoleToValidate !== Role.TECHNICIAN) {
-      throw new InvalidRequestException('You cannot claim maintenance log with this data');
+      throw new BadRequestException('You cannot claim maintenance log with this data');
     }
 
     const maintenanceLogToClaim = await this.maintenanceLogRepository
       .readByMaintenanceId(maintenanceLogIdToClaim);
 
     if (!maintenanceLogToClaim) {
-      throw new InvalidRequestException('Maintenance log not found');
+      throw new BadRequestException('Maintenance log not found');
     }
 
     if (maintenanceLogToClaim.getStatus() !== MaintenanceLogStatus.OPENED) {
-      throw new InvalidRequestException('This maintenance is already claimed');
+      throw new BadRequestException('This maintenance is already claimed');
     }
 
     const expectedMaintenanceToEdit = new MaintenanceLog()
@@ -283,7 +283,7 @@ export class MaintenanceLogService {
       .readByMaintenanceId(maintenanceLogIdToUnclaim);
 
     if (relatedMaintenanceParts.length > 0) {
-      throw new InvalidRequestException('You cannot unclaim maintenance log with related maintenance parts');
+      throw new BadRequestException('You cannot unclaim maintenance log with related maintenance parts');
     }
 
     const newMaintenanceLog = new MaintenanceLog()
@@ -309,11 +309,11 @@ export class MaintenanceLogService {
       .readByMaintenanceId(maintenanceLogIdToDelete);
 
     if (!maintenanceLogToValidate) {
-      throw new InvalidRequestException('Maintenance log not found');
+      throw new BadRequestException('Maintenance log not found');
     }
 
     if (maintenanceLogToValidate.getStatus() !== MaintenanceLogStatus.OPENED) {
-      throw new InvalidRequestException('Cannot delete claimed or finished maintenance');
+      throw new BadRequestException('Cannot delete claimed or finished maintenance');
     }
 
     if (maintainerRoleToValidate !== Role.TECHNICIAN) {
@@ -324,7 +324,7 @@ export class MaintenanceLogService {
       .readByMaintenanceId(maintenanceLogIdToDelete);
 
     if (relatedMaintenanceParts.length > 0) {
-      throw new InvalidRequestException('You cannot delete maintenance log with related maintenance parts');
+      throw new BadRequestException('You cannot delete maintenance log with related maintenance parts');
     }
 
     const expectedMaintenanceLog = new MaintenanceLog().setMaintenanceId(maintenanceLogIdToDelete);
@@ -340,7 +340,7 @@ export class MaintenanceLogService {
     name: string,
   ): void {
     if (!NumberUtils.isPositiveInteger(Number(numberToValidate))) {
-      throw new InvalidRequestException(`${name} must be a positive integer and cannot be null`);
+      throw new BadRequestException(`${name} must be a positive integer and cannot be null`);
     }
   }
 
@@ -349,23 +349,23 @@ export class MaintenanceLogService {
     name: string,
   ): void {
     if (stringToValidate === '') {
-      throw new InvalidRequestException(`${name} must be a non empty string and cannot be null`);
+      throw new BadRequestException(`${name} must be a non empty string and cannot be null`);
     }
   }
 
   private validateMachineRelation(machineToValidate: Machine, reporterZoneId: number): void {
     if (!machineToValidate) {
-      throw new InvalidRequestException('Machine not found');
+      throw new BadRequestException('Machine not found');
     }
 
     if (machineToValidate.getZoneId() !== reporterZoneId) {
-      throw new InvalidRequestException('Machine is not in your zone.');
+      throw new BadRequestException('Machine is not in your zone.');
     }
   }
 
   private validateInprogressMaintenanceLog(maintenanceLogToValidate: MaintenanceLog): void {
     if (maintenanceLogToValidate) {
-      throw new InvalidRequestException('Machine has an inprogress maintenance.');
+      throw new BadRequestException('Machine has an inprogress maintenance.');
     }
   }
 
@@ -374,27 +374,27 @@ export class MaintenanceLogService {
     staffId: number,
   ): void {
     if (!maintenanceLogToValidate) {
-      throw new InvalidRequestException('Maintenance log not found');
+      throw new BadRequestException('Maintenance log not found');
     }
 
     if (
       maintenanceLogToValidate.getReporterId() !== staffId
       && maintenanceLogToValidate.getMaintainerId() !== staffId
     ) {
-      throw new InvalidRequestException('This maintenance Log is not yours');
+      throw new BadRequestException('This maintenance Log is not yours');
     }
   }
 
   private validateChangeMaintenanceData(maintenanceLogToValidate: MaintenanceLog): void {
     if (!maintenanceLogToValidate) {
-      throw new InvalidRequestException('Maintenance log not found');
+      throw new BadRequestException('Maintenance log not found');
     }
 
     if (
       maintenanceLogToValidate.getStatus() !== MaintenanceLogStatus.OPENED
       && maintenanceLogToValidate.getStatus() !== MaintenanceLogStatus.PENDING
     ) {
-      throw new InvalidRequestException('You cannot delete/edit maintenance that finished');
+      throw new BadRequestException('You cannot delete/edit maintenance that finished');
     }
   }
 
@@ -404,11 +404,11 @@ export class MaintenanceLogService {
   ): void {
     if (newStatus === MaintenanceLogStatus.SUCCESS) {
       if (!this.isAllMaintenancePartSuccess(maintenanceParts)) {
-        throw new InvalidRequestException('All maintenance parts must be success');
+        throw new BadRequestException('All maintenance parts must be success');
       }
     } else if (newStatus === MaintenanceLogStatus.FAILED) {
       if (!this.isAllMaintenancePartFinished(maintenanceParts)) {
-        throw new InvalidRequestException('All maintenance parts must be failed');
+        throw new BadRequestException('All maintenance parts must be failed');
       }
     }
   }

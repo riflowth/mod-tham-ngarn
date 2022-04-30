@@ -2,7 +2,6 @@ import { Bill } from '@/entities/Bill';
 import { Machine } from '@/entities/Machine';
 import { MachinePart } from '@/entities/MachinePart';
 import { Order } from '@/entities/Order';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { BillRepository } from '@/repositories/bill/BillRepository';
 import { MachineRepository } from '@/repositories/machine/MachineRepository';
 import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
@@ -11,6 +10,7 @@ import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { EnumUtils } from '@/utils/EnumUtils';
 import { NumberUtils } from '@/utils/NumberUtils';
+import { BadRequestException } from 'springpress';
 
 export enum OrderStatus {
   SHIPPING = 'SHIPPING',
@@ -67,15 +67,15 @@ export class OrderService {
     if (newPrice) this.validatePositiveInteger(newPrice, 'Price');
 
     if (newOrderId || newArrivalDate || newStatus) {
-      throw new InvalidRequestException('OrderId, ArrivalDate and Status must not be set');
+      throw new BadRequestException('OrderId, ArrivalDate and Status must not be set');
     }
 
     if (newMachineId && newPartId) {
-      throw new InvalidRequestException('You can only order a machine or a machinePart, not both');
+      throw new BadRequestException('You can only order a machine or a machinePart, not both');
     }
 
     if (!newMachineId && !newPartId) {
-      throw new InvalidRequestException('You must order at least machine or a machinePart');
+      throw new BadRequestException('You must order at least machine or a machinePart');
     }
 
     if (newBillId) {
@@ -122,7 +122,7 @@ export class OrderService {
     if (newPrice) this.validatePositiveInteger(newPrice, 'Price');
 
     if (newOrderId || newBillId || newArrivalDate || newStatus) {
-      throw new InvalidRequestException('You cannot edit orderId, billId or arrivalDate');
+      throw new BadRequestException('You cannot edit orderId, billId or arrivalDate');
     }
 
     const orderToValidate = await this.orderRepository.readByOrderId(orderIdToEdit);
@@ -130,7 +130,7 @@ export class OrderService {
     this.validateChangeOrderData(orderToValidate);
 
     if (billIdToValidate !== orderToValidate.getBillId()) {
-      throw new InvalidRequestException('Bill not relate to order');
+      throw new BadRequestException('Bill not relate to order');
     }
 
     const billToValidate = await this.billRepository.readByBillId(orderToValidate.getBillId());
@@ -153,14 +153,14 @@ export class OrderService {
     this.validatePositiveInteger(ordererIdToValidate, 'OrdererId');
 
     if (!EnumUtils.isIncludesInEnum(statusToUpdate, OrderStatus)) {
-      throw new InvalidRequestException('Status must be one of the following: SHIPPING, DELIVERED, CANCELED');
+      throw new BadRequestException('Status must be one of the following: SHIPPING, DELIVERED, CANCELED');
     }
 
     const orderToValidate = await this.orderRepository.readByOrderId(orderIdToEdit);
     this.validateOrderRelation(orderToValidate);
 
     if (billIdToValidate !== orderToValidate.getBillId()) {
-      throw new InvalidRequestException('Bill not relate to order');
+      throw new BadRequestException('Bill not relate to order');
     }
 
     const billToValidate = await this.billRepository.readByBillId(orderToValidate.getBillId());
@@ -177,7 +177,7 @@ export class OrderService {
         this.validateChangeOrderStatusToCanceled(orderToValidate);
         break;
       default:
-        throw new InvalidRequestException('Status to updated must be a SHIPPING, DELIVERED or CANCELLED');
+        throw new BadRequestException('Status to updated must be a SHIPPING, DELIVERED or CANCELLED');
     }
 
     const expectedOrderToEdit = new Order().setOrderId(orderIdToEdit);
@@ -201,7 +201,7 @@ export class OrderService {
     this.validateChangeOrderData(orderToValidate);
 
     if (billIdToValidate !== orderToValidate.getBillId()) {
-      throw new InvalidRequestException('Bill not relate to order');
+      throw new BadRequestException('Bill not relate to order');
     }
 
     const billToValidate = await this.billRepository.readByBillId(orderToValidate.getBillId());
@@ -213,7 +213,7 @@ export class OrderService {
       .readByOrderId(orderIdToDelete);
 
     if (relatedMaintenancePart) {
-      throw new InvalidRequestException('Order has related maintenance part');
+      throw new BadRequestException('Order has related maintenance part');
     }
 
     const affectedRowsAmount = await this.orderRepository.delete(expectedOrderToDelete);
@@ -226,7 +226,7 @@ export class OrderService {
     name: string,
   ): void {
     if (!NumberUtils.isPositiveInteger(Number(numberToValidate))) {
-      throw new InvalidRequestException(`${name} must be a positive integer and cannot be null`);
+      throw new BadRequestException(`${name} must be a positive integer and cannot be null`);
     }
   }
 
@@ -235,11 +235,11 @@ export class OrderService {
     ordererZoneId: number,
   ): void {
     if (!machineToValidate) {
-      throw new InvalidRequestException('Machine does not exist');
+      throw new BadRequestException('Machine does not exist');
     }
 
     if (machineToValidate.getZoneId() !== ordererZoneId) {
-      throw new InvalidRequestException('Machine does not belong to your zone');
+      throw new BadRequestException('Machine does not belong to your zone');
     }
   }
 
@@ -247,23 +247,23 @@ export class OrderService {
     partToValidate: MachinePart,
   ): void {
     if (!partToValidate) {
-      throw new InvalidRequestException('Part does not exist');
+      throw new BadRequestException('Part does not exist');
     }
   }
 
   private validateOrderRelation(orderToValidate: Order): void {
     if (!orderToValidate) {
-      throw new InvalidRequestException('Order does not exist');
+      throw new BadRequestException('Order does not exist');
     }
   }
 
   private validateBillRelation(billToValidate: Bill, ordererId: number): void {
     if (!billToValidate) {
-      throw new InvalidRequestException('Bill does not exist');
+      throw new BadRequestException('Bill does not exist');
     }
 
     if (billToValidate.getOrderBy() !== ordererId) {
-      throw new InvalidRequestException('Bill does not belong to the current user');
+      throw new BadRequestException('Bill does not belong to the current user');
     }
   }
 
@@ -272,27 +272,27 @@ export class OrderService {
       orderToValidate.getStatus() === OrderStatus.DELIVERED
       || orderToValidate.getStatus() === OrderStatus.CANCELED
     ) {
-      throw new InvalidRequestException('You cannot delete/edit order that finished');
+      throw new BadRequestException('You cannot delete/edit order that finished');
     }
   }
 
   private validateChangeOrderStatusToShipping(orderToUpdate: Order): void {
     if (orderToUpdate.getStatus() === OrderStatus.SHIPPING) {
-      throw new InvalidRequestException('Order status is already shipping');
+      throw new BadRequestException('Order status is already shipping');
     } else {
-      throw new InvalidRequestException('Other status cannot be changed to shipping');
+      throw new BadRequestException('Other status cannot be changed to shipping');
     }
   }
 
   private validateChangeOrderStatusToDelivered(orderToUpdate: Order): void {
     if (orderToUpdate.getStatus() !== OrderStatus.SHIPPING) {
-      throw new InvalidRequestException('Order status must be shipping to be changed to delivered');
+      throw new BadRequestException('Order status must be shipping to be changed to delivered');
     }
   }
 
   private validateChangeOrderStatusToCanceled(orderToUpdate: Order): void {
     if (orderToUpdate.getStatus() !== OrderStatus.SHIPPING) {
-      throw new InvalidRequestException('Order status must be shipping to be changed to canceled');
+      throw new BadRequestException('Order status must be shipping to be changed to canceled');
     }
   }
 

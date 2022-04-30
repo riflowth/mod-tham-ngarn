@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
-import { Controller } from '@/controllers/Controller';
-import { Methods } from '@/controllers/Route';
-import { RouteMapping } from '@/decorators/RouteDecorator';
-import { ControllerMapping } from '@/decorators/ControllerDecorator';
+import {
+  Controller,
+  ControllerMapping,
+  Methods,
+  RouteMapping,
+} from 'springpress';
 
 @ControllerMapping('/')
 export class IndexController extends Controller {

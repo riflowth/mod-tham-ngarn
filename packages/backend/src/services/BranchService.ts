@@ -1,12 +1,11 @@
 import { Address } from '@/entities/Address';
 import { Branch } from '@/entities/Branch';
 import { Zone } from '@/entities/Zone';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
-import { NotFoundException } from '@/exceptions/NotFoundException';
 import { AddressRepository } from '@/repositories/address/AddressRepository';
 import { BranchRepository } from '@/repositories/branch/BranchRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
+import { BadRequestException, NotFoundException } from 'springpress';
 
 export class BranchService {
 
@@ -39,7 +38,7 @@ export class BranchService {
     const [relatedAddress] = await this.addressRepository.read(relatedAddressToRead);
 
     if (!relatedAddress) {
-      throw new InvalidRequestException('Postal code related to branch does not existed');
+      throw new BadRequestException('Postal code related to branch does not existed');
     }
 
     return this.branchRepository.create(newBranch);
@@ -75,14 +74,14 @@ export class BranchService {
     const [targetBranch] = await this.branchRepository.read(branchToDelete);
 
     if (!targetBranch) {
-      throw new InvalidRequestException('Target branch to delete does not exist');
+      throw new BadRequestException('Target branch to delete does not exist');
     }
 
     const relatedZoneToRead = new Zone().setBranchId(branchId);
     const relatedZone = await this.zoneRepository.read(relatedZoneToRead);
 
     if (relatedZone.length > 0) {
-      throw new InvalidRequestException('Target branch to delete has related zone.');
+      throw new BadRequestException('Target branch to delete has related zone.');
     }
 
     const affectedRowsAmount = await this.branchRepository.delete(branchToDelete);

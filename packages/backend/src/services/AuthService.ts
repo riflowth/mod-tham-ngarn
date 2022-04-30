@@ -6,7 +6,7 @@ import { StaffRepository } from '@/repositories/staff/StaffRepository';
 import { Staff } from '@/entities/Staff';
 import { SessionRepository } from '@/repositories/session/SessionRepository';
 import { Session } from '@/entities/Session';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
+import { BadRequestException } from 'springpress';
 
 export class AuthService {
 
@@ -20,23 +20,23 @@ export class AuthService {
 
   public async login(username: string, password: string): Promise<Cookie> {
     if (!RegexUtil.DIGIT_ONLY.test(username)) {
-      throw new InvalidRequestException('Username must be contain only numbers (staff id)');
+      throw new BadRequestException('Username must be contain only numbers (staff id)');
     }
 
     if (password.length < 8) {
-      throw new InvalidRequestException('Password must be at least 8 characters');
+      throw new BadRequestException('Password must be at least 8 characters');
     }
 
     const expectedStaff = new Staff().setStaffId(Number(username));
     const [staff] = await this.staffRepository.read(expectedStaff);
 
     if (!staff) {
-      throw new InvalidRequestException('Username or password is incorrect');
+      throw new BadRequestException('Username or password is incorrect');
     }
 
     const isCorrectPassword = await bcrypt.compare(password, staff.getPassword());
     if (!isCorrectPassword) {
-      throw new InvalidRequestException('Username or password is incorrect');
+      throw new BadRequestException('Username or password is incorrect');
     }
 
     const sessionId = crypto.randomUUID();

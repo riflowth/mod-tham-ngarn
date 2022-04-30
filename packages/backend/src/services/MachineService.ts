@@ -1,21 +1,17 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
 import { Machine } from '@/entities/Machine';
-import { MachineRepository } from '@/repositories/machine/MachineRepository';
-import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
-import { ReadOptions } from '@/repositories/ReadOptions';
-import { Zone } from '@/entities/Zone';
-import { NotFoundException } from '@/exceptions/NotFoundException';
-import { Staff } from '@/entities/Staff';
-import { StaffRepository } from '@/repositories/staff/StaffRepository';
-import { ForbiddenException } from '@/exceptions/ForbiddenException';
-import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
-import { OrderRepository } from '@/repositories/order/OrderRepository';
-import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
 import { MachinePart } from '@/entities/MachinePart';
-import { InvalidRequestException } from '@/exceptions/InvalidRequestException';
 import { MaintenanceLog } from '@/entities/MaintenanceLog';
 import { Order } from '@/entities/Order';
+import { Staff } from '@/entities/Staff';
+import { Zone } from '@/entities/Zone';
+import { MachineRepository } from '@/repositories/machine/MachineRepository';
+import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
+import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
+import { OrderRepository } from '@/repositories/order/OrderRepository';
+import { ReadOptions } from '@/repositories/ReadOptions';
+import { StaffRepository } from '@/repositories/staff/StaffRepository';
+import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
+import { BadRequestException, ForbiddenException, NotFoundException } from 'springpress';
 
 export class MachineService {
 
@@ -102,7 +98,7 @@ export class MachineService {
     const relatedMachineParts = await this.machinePartRepository.read(expectedRelatedMachineParts);
 
     if (relatedMachineParts.length !== 0) {
-      throw new InvalidRequestException('There are machine parts still related to this machine');
+      throw new BadRequestException('There are machine parts still related to this machine');
     }
 
     const expectedRelatedMaintenanceLogs = new MaintenanceLog().setMachineId(machineId);
@@ -111,14 +107,14 @@ export class MachineService {
     );
 
     if (relatedMaintenanceLogs.length !== 0) {
-      throw new InvalidRequestException('There are maintenance logs still related to this machine');
+      throw new BadRequestException('There are maintenance logs still related to this machine');
     }
 
     const expectedRelatedOrders = new Order().setMachineId(machineId);
     const relatedOrders = await this.orderRepository.read(expectedRelatedOrders);
 
     if (relatedOrders.length !== 0) {
-      throw new InvalidRequestException('There are orders still related to this machine');
+      throw new BadRequestException('There are orders still related to this machine');
     }
 
     const affectedRowsAmount = await this.machineRepository.delete(targetMachine);
@@ -128,7 +124,7 @@ export class MachineService {
 
   private async validateNumber(numberToValidate: number, name: string): Promise<void> {
     if (!numberToValidate) {
-      throw new InvalidRequestException(`${name} must be a positive integer`);
+      throw new BadRequestException(`${name} must be a positive integer`);
     }
   }
 
