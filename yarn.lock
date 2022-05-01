@@ -9345,9 +9345,10 @@ split@^1.0.0:
   dependencies:
     through "2"
 
-"springpress@https://github.com/riflowth/springpress":
-  version "1.0.0"
-  resolved "https://github.com/riflowth/springpress#2fe2abeab2e23ae721b7984f0ef1cd73d1935fc9"
+springpress@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/springpress/-/springpress-1.1.1.tgz#95e4b36aeb635af9d9f553d4350949855fd98d64"
+  integrity sha512-1K/fcbA/tN+xukfbfYOLiK/+7lCAqwF+p53bKmGl/rS12wARzwi9+LKritOtTMe0PbIOFDXR2ZCHA4nTNgivlg==
   dependencies:
     express "^4.17.3"
     reflect-metadata "^0.1.13"
