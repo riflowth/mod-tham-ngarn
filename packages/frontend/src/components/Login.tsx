@@ -1,9 +1,9 @@
 import Image from "next/image";
 import axios from "axios";
-import React, { useState } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
 
-const Login = () => {
+export const Login = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -116,5 +116,3 @@ const Login = () => {
     </div>
   );
 };
-
-export default Login;
