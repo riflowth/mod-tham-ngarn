@@ -21,78 +21,111 @@ export class MaintenanceLogController extends Controller {
     this.maintenanceLogService = maintenanceLogService;
   }
 
-  @Authentication(Role.TECHNICIAN, Role.OFFICER)
+  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/', Methods.GET)
   private async getMaintenanceLogsByQuery(req: Request, res: Response): Promise<void> {
     const { machineId } = req.query;
-    const { zoneId } = req.session;
+    const { zoneId: staffZoneIdToValidate, role: staffRoleToValidate } = req.session;
 
     const readOptions: ReadOptions = {
       limit: Number(req.query.limit),
       offset: Number(req.query.offset),
     };
-    const maintenanceLogs = await this.maintenanceLogService
-      .getMaintenanceLogsByMachineId(Number(machineId), zoneId, readOptions);
+
+    const maintenanceLogs = await this.maintenanceLogService.getMaintenanceLogsByMachineId(
+      Number(machineId),
+      staffZoneIdToValidate,
+      staffRoleToValidate,
+      readOptions,
+    );
 
     res.status(200).json({ data: maintenanceLogs });
   }
 
-  @Authentication(Role.TECHNICIAN, Role.OFFICER)
+  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/', Methods.POST)
   @RequestBody('machineId', '?reason')
   private async addMaintenanceLog(req: Request, res: Response): Promise<void> {
     const { machineId, reason } = req.body;
-    const { staffId: reporterId, zoneId: reporterZoneId } = req.session;
+    const {
+      staffId: reporterId,
+      role: reporterRoleToValidate,
+      zoneId: reporterZoneIdToValidate,
+    } = req.session;
 
     const newMaintenanceLog = new MaintenanceLog()
       .setMachineId(machineId)
       .setReporterId(reporterId)
       .setReason(reason);
     const createdField = await this.maintenanceLogService
-      .addMaintenanceLog(newMaintenanceLog, reporterZoneId);
+      .addMaintenanceLog(newMaintenanceLog, reporterZoneIdToValidate, reporterRoleToValidate);
 
     res.status(200).json({ data: { createdField } });
   }
 
-  @Authentication(Role.TECHNICIAN, Role.OFFICER)
+  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/:maintenanceId', Methods.PUT)
   @RequestBody('reason')
   private async editMaintenanceLog(req: Request, res: Response): Promise<void> {
-    const { staffId: reporterId } = req.session;
+    const {
+      staffId: reporterId,
+      role: reporterRoleToValidate,
+    } = req.session;
     const { maintenanceId } = req.params;
     const { reason } = req.body;
 
     const newMaintenanceLog = new MaintenanceLog()
       .setReason(reason);
-    const updatedField = await this.maintenanceLogService
-      .editMaintenanceLog(Number(maintenanceId), newMaintenanceLog, reporterId);
+    const updatedField = await this.maintenanceLogService.editMaintenanceLog(
+      Number(maintenanceId),
+      newMaintenanceLog,
+      reporterId,
+      reporterRoleToValidate,
+    );
 
     res.status(200).json({ data: { updatedField } });
   }
 
-  @Authentication(Role.TECHNICIAN)
+  @Authentication(Role.TECHNICIAN, Role.MANAGER, Role.CEO)
   @RouteMapping('/:maintenanceId/status', Methods.PUT)
   @RequestBody('status')
   private async updateMaintenanceLogStatus(req: Request, res: Response): Promise<void> {
-    const { staffId: reporterId } = req.session;
+    const {
+      staffId: maintainerIdToValidate,
+      role: maintainerRoleToValidate,
+    } = req.session;
     const { maintenanceId } = req.params;
     const { status } = req.body;
-    const updatedField = await this.maintenanceLogService
-      .updateMaintenanceLogStatus(Number(maintenanceId), status, reporterId);
+
+    const updatedField = await this.maintenanceLogService.updateMaintenanceLogStatus(
+      Number(maintenanceId),
+      status,
+      maintainerIdToValidate,
+      maintainerRoleToValidate,
+    );
+
     res.status(200).json({ data: { updatedField } });
   }
 
-  @Authentication(Role.TECHNICIAN)
+  @Authentication(Role.TECHNICIAN, Role.MANAGER, Role.CEO)
   @RouteMapping('/:maintenanceId/claim', Methods.GET)
   private async claimMaintenance(req: Request, res: Response): Promise<void> {
-    const { staffId: reporterId, role } = req.session;
+    const {
+      staffId: claimerIdToValidate,
+      role: claimerRoleToValidate,
+    } = req.session;
     const { maintenanceId } = req.params;
-    const updatedField = await this.maintenanceLogService
-      .claimMaintenanceLog(Number(maintenanceId), reporterId, role);
+
+    const updatedField = await this.maintenanceLogService.claimMaintenanceLog(
+      Number(maintenanceId),
+      claimerIdToValidate,
+      claimerRoleToValidate,
+    );
+
     res.status(200).json({ data: { updatedField } });
   }
 
-  @Authentication(Role.TECHNICIAN)
+  @Authentication(Role.TECHNICIAN, Role.MANAGER, Role.CEO)
   @RouteMapping('/:maintenanceId/unclaim', Methods.GET)
   private async unclaimMaintenance(req: Request, res: Response): Promise<void> {
     const { staffId: reporterId } = req.session;
@@ -102,7 +135,7 @@ export class MaintenanceLogController extends Controller {
     res.status(200).json({ data: { updatedField } });
   }
 
-  @Authentication(Role.TECHNICIAN, Role.OFFICER)
+  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/:maintenanceId', Methods.DELETE)
   private async deleteMaintenance(req: Request, res: Response): Promise<void> {
     const { maintenanceId } = req.params;

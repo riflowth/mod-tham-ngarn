@@ -30,7 +30,7 @@ export class BranchController extends Controller {
     res.status(200).json({ data: branch });
   }
 
-  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @Authentication(Role.CEO)
   @RouteMapping('/', Methods.GET)
   private async getALlBranches(req: Request, res: Response): Promise<void> {
     const readOptions: ReadOptions = {
@@ -49,6 +49,11 @@ export class BranchController extends Controller {
     if (!parseBranchId) {
       throw new BadRequestException('BranchId must be a positive integer');
     }
+
+    if (req.session.role !== Role.CEO && req.session.branchId !== parseBranchId) {
+      throw new BadRequestException('You are not allowed to access this branch');
+    }
+
     const branch = await this.branchService.getBranchByBranchId(parseBranchId);
     res.status(200).json({ data: branch });
   }
