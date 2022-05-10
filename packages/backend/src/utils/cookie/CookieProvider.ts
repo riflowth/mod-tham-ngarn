@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { Cookie } from '@/utils/cookie/Cookie';
-import { Request, Response } from 'express';
+import { Response, Request } from 'springpress';
 
 export class CookieProvider {
 

@@ -1,8 +1,9 @@
-import { Request, Response } from 'express';
 import {
   Controller,
   ControllerMapping,
   Methods,
+  Request,
+  Response,
   RouteMapping,
 } from 'springpress';
 

@@ -2,12 +2,13 @@ import { Authentication, Role } from '@/decorators/AuthenticationDecorator';
 import { MaintenancePart } from '@/entities/MaintenancePart';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { MaintenancePartService } from '@/services/MaintenancePartService';
-import { Request, Response } from 'express';
 import {
   Controller,
   ControllerMapping,
   Methods,
+  Request,
   RequestBody,
+  Response,
   RouteMapping,
 } from 'springpress';
 

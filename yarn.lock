@@ -4563,7 +4563,7 @@ expect@^27.5.1:
     jest-matcher-utils "^27.5.1"
     jest-message-util "^27.5.1"
 
-express@^4.17.3, express@^4.18.1:
+express@^4.18.1:
   version "4.18.1"
   resolved "https://registry.yarnpkg.com/express/-/express-4.18.1.tgz#7797de8b9c72c857b9cd0e14a5eea80666267caf"
   integrity sha512-zZBcOX9TfehHQhtupq57OF8lFZ3UZi08Y97dwFCkD8p9d/d2Y3M+ykKcwaMDEL+4qyUolgBDX6AblpR3fL212Q==
@@ -9345,12 +9345,13 @@ split@^1.0.0:
   dependencies:
     through "2"
 
-springpress@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/springpress/-/springpress-1.1.1.tgz#95e4b36aeb635af9d9f553d4350949855fd98d64"
-  integrity sha512-1K/fcbA/tN+xukfbfYOLiK/+7lCAqwF+p53bKmGl/rS12wARzwi9+LKritOtTMe0PbIOFDXR2ZCHA4nTNgivlg==
+springpress@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/springpress/-/springpress-1.2.1.tgz#f2108957088655f2e05c93766edf576a30d4eb2f"
+  integrity sha512-nXWzMI2krhGvjO+St47AjZKq5qlf8rql1uj1ve/D2ODldVo9CEr4ca60UxH5QrpBKvx1ONLUQVk3EbUp0k58Hw==
   dependencies:
-    express "^4.17.3"
+    "@types/express" "^4.17.13"
+    express "^4.18.1"
     reflect-metadata "^0.1.13"
 
 sprintf-js@~1.0.2:
