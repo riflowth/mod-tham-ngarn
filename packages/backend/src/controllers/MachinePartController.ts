@@ -3,13 +3,14 @@ import { MachinePart } from '@/entities/MachinePart';
 import { ReadOptions } from '@/repositories/ReadOptions';
 import { MachinePartService } from '@/services/MachinePartService';
 import { NumberUtils } from '@/utils/NumberUtils';
-import { Request, Response } from 'express';
 import {
   BadRequestException,
   Controller,
   ControllerMapping,
   Methods,
+  Request,
   RequestBody,
+  Response,
   RouteMapping,
 } from 'springpress';
 

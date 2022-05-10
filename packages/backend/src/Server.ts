@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { AddressController } from '@/controllers/AddressController';
 import { AuthController } from '@/controllers/AuthController';
 import { BillController } from '@/controllers/BillController';
