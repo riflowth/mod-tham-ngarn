@@ -1,3 +1,5 @@
+import { RouteUtil } from 'springpress';
+
 export enum Role {
   OFFICER = 'OFFICER',
   TECHNICIAN = 'TECHNICIAN',
@@ -12,9 +14,8 @@ export const Authentication = (...role: Role[]) => {
     propertyKey: string,
     descriptor: TypedPropertyDescriptor<any>,
   ): any => {
-    Reflect.defineMetadata(propertyKey, {
-      ...Reflect.getMetadata(propertyKey, target),
+    RouteUtil.addRouteMetadata({
       authentication: role,
-    }, target);
+    });
   };
 };

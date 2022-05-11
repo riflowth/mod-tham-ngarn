@@ -8,7 +8,10 @@ machine maintenance, error logging, and service operations in the small-medium f
 
 This is a part of **CPE231 Database System project** for learning/practicing about the database system, especially on RDMS.
 
-## Structural
+## Architecture
+
+<img src="https://i.imgur.com/ANFIRls.png" alt="mod tham ngarn system design" />
+
 We provide the frontend project and backend project in this single repository, called monorepo,
 using [Lerna](https://github.com/lerna/lerna) for managing stuffs. 
 
