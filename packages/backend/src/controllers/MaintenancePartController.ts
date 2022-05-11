@@ -42,14 +42,18 @@ export class MaintenancePartController extends Controller {
   private async addMaintenancePart(req: Request, res: Response): Promise<void> {
     const { maintenanceId } = req.params;
     const { partId, type, orderId } = req.body;
+    const { staffId: maintainerIdToValidate, role: maintainerRoleToValidate } = req.session;
 
     const newMaintenancePart = new MaintenancePart()
       .setMaintenanceId(Number(maintenanceId))
       .setPartId(partId)
       .setType(type)
       .setOrderId(orderId);
-    const maintenancePart = await this.maintenancePartService
-      .addMaintenancePart(newMaintenancePart, req.session.staffId);
+    const maintenancePart = await this.maintenancePartService.addMaintenancePart(
+      newMaintenancePart,
+      maintainerIdToValidate,
+      maintainerRoleToValidate,
+    );
 
     res.status(200).json({ data: maintenancePart });
   }
@@ -60,14 +64,18 @@ export class MaintenancePartController extends Controller {
   private async editMaintenancePart(req: Request, res: Response): Promise<void> {
     const { maintenanceId, partId } = req.params;
     const { type, orderId } = req.body;
-    const { staffId: maintainerId } = req.session;
+    const { staffId: maintainerIdToValidate, role: maintainerRoleToValidate } = req.session;
 
     const primaryKeyToUpdate: [number, number] = [Number(maintenanceId), Number(partId)];
     const newMaintenancePart = new MaintenancePart()
       .setType(type)
       .setOrderId(orderId);
-    const updatedField = await this.maintenancePartService
-      .editMaintenancePart(primaryKeyToUpdate, newMaintenancePart, maintainerId);
+    const updatedField = await this.maintenancePartService.editMaintenancePart(
+      primaryKeyToUpdate,
+      newMaintenancePart,
+      maintainerIdToValidate,
+      maintainerRoleToValidate,
+    );
 
     res.status(200).json({ data: updatedField });
   }
@@ -78,11 +86,15 @@ export class MaintenancePartController extends Controller {
   private async updateMaintenancePartStatus(req: Request, res: Response): Promise<void> {
     const { maintenanceId, partId } = req.params;
     const { status } = req.body;
-    const { staffId: maintainerId } = req.session;
+    const { staffId: maintainerIdToValidate, role: maintainerRoleToValidate } = req.session;
 
     const primaryKeyToUpdate: [number, number] = [Number(maintenanceId), Number(partId)];
-    const updatedField = await this.maintenancePartService
-      .updateMaintenancePartStatus(primaryKeyToUpdate, status, maintainerId);
+    const updatedField = await this.maintenancePartService.updateMaintenancePartStatus(
+      primaryKeyToUpdate,
+      status,
+      maintainerIdToValidate,
+      maintainerRoleToValidate,
+    );
 
     res.status(200).json({ data: updatedField });
   }
@@ -90,9 +102,14 @@ export class MaintenancePartController extends Controller {
   @Authentication(Role.TECHNICIAN, Role.MANAGER, Role.CEO)
   @RouteMapping('/:maintenanceId/part/:partId', Methods.DELETE)
   private async deleteMaintenancePart(req: Request, res: Response): Promise<void> {
+    const { staffId: maintainerIdToValidate, role: maintainerRoleToValidate } = req.session;
     const { maintenanceId, partId } = req.params;
-    const deletedField = await this.maintenancePartService
-      .deleteMaintenancePart([Number(maintenanceId), Number(partId)]);
+    const deletedField = await this.maintenancePartService.deleteMaintenancePart(
+      [Number(maintenanceId), Number(partId)],
+      maintainerIdToValidate,
+      maintainerRoleToValidate,
+    );
+
     res.status(200).json({ deletedField });
   }
 

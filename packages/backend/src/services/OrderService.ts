@@ -1,3 +1,4 @@
+import { Role } from '@/decorators/AuthenticationDecorator';
 import { Bill } from '@/entities/Bill';
 import { Machine } from '@/entities/Machine';
 import { MachinePart } from '@/entities/MachinePart';
@@ -40,9 +41,11 @@ export class OrderService {
     this.orderRepository = orderRepository;
   }
 
-  public async getOrdersByBillId(billId: number, readOptions?: ReadOptions): Promise<Order[]> {
+  public async getOrdersByBillId(
+    billId: number,
+    readOptions?: ReadOptions,
+  ): Promise<Order[]> {
     this.validatePositiveInteger(billId, 'BillId');
-
     const expectedOrders = new Order().setBillId(billId);
     return this.orderRepository.read(expectedOrders, readOptions);
   }
@@ -50,6 +53,7 @@ export class OrderService {
   public async addOrder(
     newOrder: Order,
     ordererIdToValidate: number,
+    ordererRoleToValidate: string,
     ordererZoneIdToValidate: number,
   ): Promise<Order> {
     const newMachineId = newOrder.getMachineId();
@@ -80,12 +84,16 @@ export class OrderService {
 
     if (newBillId) {
       const billToValidate = await this.billRepository.readByBillId(newBillId);
-      this.validateBillRelation(billToValidate, ordererIdToValidate);
+      this.validateBillRelation(billToValidate, ordererIdToValidate, ordererRoleToValidate);
     }
 
     if (newMachineId) {
       const machineToValidate = await this.machineRepository.readByMachineId(newMachineId);
-      this.validateMachineRelation(machineToValidate, ordererZoneIdToValidate);
+      this.validateMachineRelation(
+        machineToValidate,
+        ordererRoleToValidate,
+        ordererZoneIdToValidate,
+      );
     }
 
     if (newPartId) {
@@ -95,7 +103,11 @@ export class OrderService {
       const machineByPartToValidate = await this.machineRepository
         .readByMachineId(partToValidate.getMachineId());
 
-      this.validateMachineRelation(machineByPartToValidate, ordererZoneIdToValidate);
+      this.validateMachineRelation(
+        machineByPartToValidate,
+        ordererRoleToValidate,
+        ordererZoneIdToValidate,
+      );
     }
 
     return this.orderRepository.create(newOrder.setStatus(OrderStatus.SHIPPING));
@@ -106,6 +118,7 @@ export class OrderService {
     newOrder: Order,
     billIdToValidate: number,
     ordererIdToValidate: number,
+    ordererRoleToValidate: string,
   ): Promise<Order> {
     const newStatus = newOrder.getStatus();
     const newMachineId = newOrder.getMachineId();
@@ -134,7 +147,7 @@ export class OrderService {
     }
 
     const billToValidate = await this.billRepository.readByBillId(orderToValidate.getBillId());
-    this.validateBillRelation(billToValidate, ordererIdToValidate);
+    this.validateBillRelation(billToValidate, ordererIdToValidate, ordererRoleToValidate);
 
     const expectedOrderToEdit = new Order().setOrderId(orderIdToEdit);
 
@@ -148,6 +161,7 @@ export class OrderService {
     statusToUpdate: string,
     billIdToValidate: number,
     ordererIdToValidate: number,
+    ordererRoleToValidate: string,
   ): Promise<Order> {
     this.validatePositiveInteger(orderIdToEdit, 'OrderId');
     this.validatePositiveInteger(ordererIdToValidate, 'OrdererId');
@@ -164,7 +178,7 @@ export class OrderService {
     }
 
     const billToValidate = await this.billRepository.readByBillId(orderToValidate.getBillId());
-    this.validateBillRelation(billToValidate, ordererIdToValidate);
+    this.validateBillRelation(billToValidate, ordererIdToValidate, ordererRoleToValidate);
 
     switch (statusToUpdate) {
       case OrderStatus.SHIPPING:
@@ -192,6 +206,7 @@ export class OrderService {
     orderIdToDelete: number,
     billIdToValidate: number,
     ordererIdToValidate: number,
+    ordererRoleToValidate: string,
   ): Promise<Order> {
     this.validatePositiveInteger(orderIdToDelete, 'OrderId');
     this.validatePositiveInteger(ordererIdToValidate, 'OrdererId');
@@ -205,7 +220,7 @@ export class OrderService {
     }
 
     const billToValidate = await this.billRepository.readByBillId(orderToValidate.getBillId());
-    this.validateBillRelation(billToValidate, ordererIdToValidate);
+    this.validateBillRelation(billToValidate, ordererIdToValidate, ordererRoleToValidate);
 
     const expectedOrderToDelete = new Order().setOrderId(orderIdToDelete);
 
@@ -232,13 +247,18 @@ export class OrderService {
 
   private validateMachineRelation(
     machineToValidate: Machine,
+    ordererRole: string,
     ordererZoneId: number,
   ): void {
     if (!machineToValidate) {
       throw new BadRequestException('Machine does not exist');
     }
 
-    if (machineToValidate.getZoneId() !== ordererZoneId) {
+    if (
+      ordererRole !== Role.CEO
+      && ordererRole !== Role.MANAGER
+      && machineToValidate.getZoneId() !== ordererZoneId
+    ) {
       throw new BadRequestException('Machine does not belong to your zone');
     }
   }
@@ -257,12 +277,20 @@ export class OrderService {
     }
   }
 
-  private validateBillRelation(billToValidate: Bill, ordererId: number): void {
+  private validateBillRelation(
+    billToValidate: Bill,
+    ordererId: number,
+    ordererRole: string,
+  ): void {
     if (!billToValidate) {
       throw new BadRequestException('Bill does not exist');
     }
 
-    if (billToValidate.getOrderBy() !== ordererId) {
+    if (
+      ordererRole !== Role.CEO
+      && ordererRole !== Role.MANAGER
+      && billToValidate.getOrderBy() !== ordererId
+    ) {
       throw new BadRequestException('Bill does not belong to the current user');
     }
   }

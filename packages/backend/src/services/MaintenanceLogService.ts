@@ -54,12 +54,13 @@ export class MaintenanceLogService {
   public async getMaintenanceLogsByMachineId(
     machineId: number,
     staffZoneIdToValidate: number,
+    staffRoleToValidate: string,
     readOptions?: ReadOptions,
   ): Promise<MaintenanceLog[]> {
     this.validatePositiveInteger(machineId, 'Machine id');
 
     const machineToValidate = await this.machineRepository.readByMachineId(machineId);
-    this.validateMachineRelation(machineToValidate, staffZoneIdToValidate);
+    this.validateMachineRelation(machineToValidate, staffZoneIdToValidate, staffRoleToValidate);
 
     const expectedMaintenanceLog = new MaintenanceLog().setMachineId(machineId);
 
@@ -76,6 +77,7 @@ export class MaintenanceLogService {
   public async addMaintenanceLog(
     newMaintenanceLog: MaintenanceLog,
     reporterZoneIdToValidate: number,
+    reporterRoleToValidate: string,
   ): Promise<MaintenanceLog> {
     const newMachineId = newMaintenanceLog.getMachineId();
     const newReporterId = newMaintenanceLog.getReporterId();
@@ -102,7 +104,11 @@ export class MaintenanceLogService {
         throw new BadRequestException('Machine not found');
       }
 
-      if (machineToValidate.getZoneId() !== reporterZoneIdToValidate) {
+      if (
+        reporterRoleToValidate !== Role.CEO
+        && reporterRoleToValidate !== Role.MANAGER
+        && machineToValidate.getZoneId() !== reporterZoneIdToValidate
+      ) {
         throw new BadRequestException('Machine is not in your zone.');
       }
 
@@ -127,6 +133,7 @@ export class MaintenanceLogService {
     maintenanceLogIdToEdit: number,
     newMaintenanceLog: MaintenanceLog,
     reporterIdToValidate: number,
+    reporterRoleToValidate: string,
   ): Promise<MaintenanceLog> {
     const newReason = newMaintenanceLog.getReason();
     const newStatus = newMaintenanceLog.getStatus();
@@ -157,6 +164,7 @@ export class MaintenanceLogService {
     this.validateMaintenanceLogRelation(
       maintenanceLogToValidate,
       reporterIdToValidate,
+      reporterRoleToValidate,
     );
     this.validateChangeMaintenanceData(maintenanceLogToValidate);
 
@@ -173,6 +181,7 @@ export class MaintenanceLogService {
     maintenanceLogIdToEdit: number,
     statusToUpdate: string,
     maintainerIdToValidate: number,
+    maintainerRoleToValidate: string,
   ): Promise<MaintenanceLog> {
     this.validatePositiveInteger(maintenanceLogIdToEdit, 'Maintenance log id');
     this.validatePositiveInteger(maintainerIdToValidate, 'Reporter id');
@@ -187,6 +196,7 @@ export class MaintenanceLogService {
     this.validateMaintenanceLogRelation(
       maintenanceLogToValidate,
       maintainerIdToValidate,
+      maintainerRoleToValidate,
     );
 
     const fromStatus = maintenanceLogToValidate.getStatus();
@@ -316,9 +326,11 @@ export class MaintenanceLogService {
       throw new BadRequestException('Cannot delete claimed or finished maintenance');
     }
 
-    if (maintainerRoleToValidate !== Role.TECHNICIAN) {
-      this.validateMaintenanceLogRelation(maintenanceLogToValidate, staffIdToValidate);
-    }
+    this.validateMaintenanceLogRelation(
+      maintenanceLogToValidate,
+      staffIdToValidate,
+      maintainerRoleToValidate,
+    );
 
     const relatedMaintenanceParts = await this.maintenancePartRepository
       .readByMaintenanceId(maintenanceLogIdToDelete);
@@ -353,12 +365,20 @@ export class MaintenanceLogService {
     }
   }
 
-  private validateMachineRelation(machineToValidate: Machine, reporterZoneId: number): void {
+  private validateMachineRelation(
+    machineToValidate: Machine,
+    reporterZoneId: number,
+    reporterRole: string,
+  ): void {
     if (!machineToValidate) {
       throw new BadRequestException('Machine not found');
     }
 
-    if (machineToValidate.getZoneId() !== reporterZoneId) {
+    if (
+      reporterRole !== Role.CEO
+      && reporterRole !== Role.MANAGER
+      && machineToValidate.getZoneId() !== reporterZoneId
+    ) {
       throw new BadRequestException('Machine is not in your zone.');
     }
   }
@@ -372,13 +392,16 @@ export class MaintenanceLogService {
   private validateMaintenanceLogRelation(
     maintenanceLogToValidate: MaintenanceLog,
     staffId: number,
+    reporterRole: string,
   ): void {
     if (!maintenanceLogToValidate) {
       throw new BadRequestException('Maintenance log not found');
     }
 
     if (
-      maintenanceLogToValidate.getReporterId() !== staffId
+      reporterRole !== Role.CEO
+      && reporterRole !== Role.MANAGER
+      && maintenanceLogToValidate.getReporterId() !== staffId
       && maintenanceLogToValidate.getMaintainerId() !== staffId
     ) {
       throw new BadRequestException('This maintenance Log is not yours');

@@ -23,7 +23,7 @@ export class StaffController extends Controller {
     this.staffService = staffService;
   }
 
-  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @Authentication(Role.CEO)
   @RouteMapping('/', Methods.GET)
   private async getAllStaff(req: Request, res: Response): Promise<void> {
     const readOptions: ReadOptions = {
@@ -37,15 +37,22 @@ export class StaffController extends Controller {
   @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/:staffId', Methods.GET)
   private async getStaffByStaffId(req: Request, res: Response): Promise<void> {
+    const {
+      staffId: staffIdToValidate,
+      role: roleToValidate,
+      branchId: branchIdToValidate,
+    } = req.session;
+
     const parseStaffId = NumberUtils.parsePositiveInteger(req.params.staffId);
     if (!parseStaffId) {
       throw new BadRequestException('StaffId must be a positive integer');
     }
-    const staff = await this.staffService.getStaffByStaffId(parseStaffId);
+    const staff = await this.staffService
+      .getStaffByStaffId(parseStaffId, staffIdToValidate, roleToValidate, branchIdToValidate);
     res.status(200).json({ data: staff });
   }
 
-  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @Authentication(Role.MANAGER, Role.CEO)
   @RouteMapping('/zone/:zoneId', Methods.GET)
   private async getStaffByZoneId(req: Request, res: Response): Promise<void> {
     const parseZoneId = NumberUtils.parsePositiveInteger(req.params.zoneId);
@@ -56,14 +63,21 @@ export class StaffController extends Controller {
     res.status(200).json({ data: staff });
   }
 
-  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @Authentication(Role.MANAGER, Role.CEO)
   @RouteMapping('/branch/:branchId', Methods.GET)
   private async getStaffByBranchId(req: Request, res: Response): Promise<void> {
+    const {
+      role: roleToValidate,
+      branchId: branchIdToValidate,
+    } = req.session;
+
     const parseBranchId = NumberUtils.parsePositiveInteger(req.params.branchId);
     if (!parseBranchId) {
       throw new BadRequestException('branchId must be a positive integer');
     }
-    const staff = await this.staffService.getStaffByBranchId(parseBranchId);
+    const staff = await this.staffService
+      .getStaffByBranchId(parseBranchId, roleToValidate, branchIdToValidate);
+
     res.status(200).json({ data: staff });
   }
 
@@ -71,6 +85,11 @@ export class StaffController extends Controller {
   @RouteMapping('/', Methods.POST)
   @RequestBody('password', '?fullName', '?branchId', '?zoneId', '?telNo', '?salary', '?position', '?dob')
   private async addStaff(req: Request, res: Response): Promise<void> {
+    const {
+      role: roleToValidate,
+      branchId: branchIdToValidate,
+    } = req.session;
+
     const {
       password,
       fullName,
@@ -101,7 +120,8 @@ export class StaffController extends Controller {
       .setSalary(salary)
       .setPosition(position)
       .setDateOfBirth(new Date(dob));
-    const createdField = await this.staffService.addStaff(newStaff);
+    const createdField = await this.staffService
+      .addStaff(newStaff, roleToValidate, branchIdToValidate);
 
     res.status(200).json({ data: { createdField } });
   }
@@ -110,6 +130,10 @@ export class StaffController extends Controller {
   @RouteMapping('/:staffId', Methods.PUT)
   @RequestBody('?password', '?fullName', '?branchId', '?zoneId', '?telNo', '?salary', '?position', '?dob')
   private async editStaffByStaffId(req: Request, res: Response): Promise<void> {
+    const {
+      role: roleToValidate,
+      branchId: branchIdToValidate,
+    } = req.session;
     const parseStaffId = NumberUtils.parsePositiveInteger(req.params.staffId);
 
     if (!parseStaffId) {
@@ -140,7 +164,9 @@ export class StaffController extends Controller {
       .setSalary(salary)
       .setPosition(position)
       .setDateOfBirth(new Date(dob));
-    const updatedField = await this.staffService.editStaff(parseStaffId, newStaff);
+
+    const updatedField = await this.staffService
+      .editStaff(parseStaffId, newStaff, roleToValidate, branchIdToValidate);
 
     res.status(200).json({ data: { updatedField } });
   }
@@ -148,11 +174,19 @@ export class StaffController extends Controller {
   @Authentication(Role.MANAGER, Role.CEO)
   @RouteMapping('/:staffId', Methods.DELETE)
   public async deleteStaffByStaffId(req: Request, res: Response): Promise<void> {
+    const {
+      role: roleToValidate,
+      branchId: branchIdToValidate,
+    } = req.session;
     const parseStaffId = NumberUtils.parsePositiveInteger(req.params.staffId);
+
     if (!parseStaffId) {
       throw new BadRequestException('StaffId must be a positive integer');
     }
-    const deletedField = await this.staffService.deleteStaff(parseStaffId);
+
+    const deletedField = await this.staffService
+      .deleteStaff(parseStaffId, roleToValidate, branchIdToValidate);
+
     res.status(200).json({ data: { deletedField } });
   }
 
