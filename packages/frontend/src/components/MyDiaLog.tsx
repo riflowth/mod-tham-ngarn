@@ -1,7 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 
-export default function MyDialog() {
+export function MyDialog() {
   let [isOpen, setIsOpen] = useState(false);
 
   function closeModal() {

@@ -15,7 +15,7 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import { TableHead } from "@mui/material";
-import MyDialog from "@components/MyDiaLog";
+import { MyDialog } from "@components/MyDiaLog";
 import axios, { AxiosResponse } from "axios";
 
 interface TablePaginationActionsProps {
@@ -135,7 +135,7 @@ const rows = [
   createData(13, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
 ].sort((a, b) => (a.staffid < b.staffid ? -1 : 1));
 
-export default function TableTest() {
+export function TableTest() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
