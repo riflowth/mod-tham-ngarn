@@ -137,7 +137,7 @@ const rows = [
 
 export function TableTest() {
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -158,18 +158,33 @@ export function TableTest() {
   };
 
   return (
-    <div className="h-full">
-      <div>
-        <TableContainer component={Paper} className="mx-auto ">
-          <Table aria-label="custom pagination table">
+    <div className="w-4/5 h-full p-10 mx-auto ">
+      <div className="">
+        <TableContainer
+          component={Paper}
+          className="text-white rounded-t-md bg-zinc-900"
+        >
+          <Table aria-label="custom pagination table" className="">
             <TableHead>
               <TableRow>
-                <TableCell>StaffId</TableCell>
-                <TableCell>FirstName</TableCell>
-                <TableCell>LastName</TableCell>
-                <TableCell>ZoneId</TableCell>
-                <TableCell>BranchId</TableCell>
-                <TableCell>Tel-no</TableCell>
+                <TableCell align="center" className="text-white ">
+                  StaffId
+                </TableCell>
+                <TableCell align="center" className="text-white ">
+                  FirstName
+                </TableCell>
+                <TableCell align="center" className="text-white ">
+                  LastName
+                </TableCell>
+                <TableCell align="center" className="text-white ">
+                  ZoneId
+                </TableCell>
+                <TableCell align="center" className="text-white ">
+                  BranchId
+                </TableCell>
+                <TableCell align="center" className="text-white ">
+                  Tel-no
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -180,28 +195,43 @@ export function TableTest() {
                   )
                 : rows
               ).map((row) => (
-                <TableRow key={row.staffid}>
-                  <TableCell style={{ width: 160 }}>{row.staffid}</TableCell>
-                  <TableCell style={{ width: 160 }}>{row.firstname}</TableCell>
-                  <TableCell style={{ width: 160 }}>{row.lastname}</TableCell>
-                  <TableCell style={{ width: 160 }}>{row.zoneid}</TableCell>
-                  <TableCell style={{ width: 160 }}>{row.branchid}</TableCell>
-                  <TableCell style={{ width: 160 }}>{row.telno}</TableCell>
-                  <div className="space-x-3">
-                    <button className="p-2 font-semibold bg-green-400 rounded-md">
+                <TableRow key={row.staffid} className="hover:bg-zinc-800">
+                  <TableCell align="center" className="text-white">
+                    {row.staffid}
+                  </TableCell>
+                  <TableCell align="center" className="text-white">
+                    {row.firstname}
+                  </TableCell>
+                  <TableCell align="center" className="text-white">
+                    {row.lastname}
+                  </TableCell>
+                  <TableCell align="center" className="text-white">
+                    {row.zoneid}
+                  </TableCell>
+                  <TableCell align="center" className="text-white">
+                    {row.branchid}
+                  </TableCell>
+                  <TableCell align="center" className="text-white">
+                    {row.telno}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    className="flex justify-center space-x-4 text-white"
+                  >
+                    <button className="px-4 py-1 font-semibold bg-green-400 rounded-md bg-opacity-80 hover:bg-opacity-100">
                       Edit
                     </button>
-                    <button className="p-2 font-semibold bg-red-400 rounded-md">
+                    <button className="px-4 py-1 font-semibold bg-red-400 rounded-md bg-opacity-80 hover:bg-opacity-100">
                       Delete
                     </button>
                     <div>
                       <MyDialog />
                     </div>
-                  </div>
+                  </TableCell>
                 </TableRow>
               ))}{" "}
               {emptyRows > 0 && (
-                <TableRow style={{ height: 53 * emptyRows }}>
+                <TableRow style={{ height: 61 * emptyRows }}>
                   <TableCell colSpan={6} />
                 </TableRow>
               )}
@@ -209,9 +239,9 @@ export function TableTest() {
           </Table>
         </TableContainer>
       </div>
-      <div className="flex items-end justify-center w-full bg-white">
+      <div className="flex items-end justify-center text-white bg-white rounded-b-md">
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
+          rowsPerPageOptions={[3, 5, 10, { label: "All", value: -1 }]}
           colSpan={3}
           count={rows.length}
           rowsPerPage={rowsPerPage}

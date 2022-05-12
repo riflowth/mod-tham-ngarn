@@ -18,9 +18,9 @@ export function MyDialog() {
         <button
           type="button"
           onClick={openModal}
-          className="px-4 py-2 text-sm font-medium text-white bg-black rounded-md focus:outline-none bg-opacity-20 hover:bg-opacity-30 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+          className="px-4 py-1 text-sm font-medium text-white bg-opacity-50 rounded-md bg-violet-500 focus:outline-none hover:bg-opacity-80 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
         >
-          Open dialog
+          See More...
         </button>
       </div>
 
