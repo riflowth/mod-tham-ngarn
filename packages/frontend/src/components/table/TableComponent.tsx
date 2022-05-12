@@ -17,6 +17,8 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import { TableHead } from "@mui/material";
 import { MyDialog } from "@components/MyDiaLog";
 import axios, { AxiosResponse } from "axios";
+import { TableColumms } from "@components/table/TableColumns";
+import { TableItems } from "@components/table/TableItems";
 
 interface TablePaginationActionsProps {
   count: number;
@@ -108,34 +110,7 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
   );
 }
 
-function createData(
-  staffid: number,
-  firstname: string,
-  lastname: string,
-  zoneid: number,
-  branchid: number,
-  telno: string
-) {
-  return { staffid, firstname, lastname, zoneid, branchid, telno };
-}
-
-const rows = [
-  createData(1, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
-  createData(2, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
-  createData(3, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
-  createData(4, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
-  createData(5, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
-  createData(6, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
-  createData(7, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
-  createData(8, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
-  createData(9, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
-  createData(10, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
-  createData(11, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
-  createData(12, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
-  createData(13, "Eeieiza", "hahaluvluv", 2, 3, "xxxx-xxx-xxx"),
-].sort((a, b) => (a.staffid < b.staffid ? -1 : 1));
-
-export function TableTest() {
+export const TableComponent = ({ title, columns, rows, style }) => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -158,78 +133,23 @@ export function TableTest() {
   };
 
   return (
-    <div className="w-4/5 h-full p-10 mx-auto ">
-      <div className="">
-        <TableContainer
-          component={Paper}
-          className="text-white rounded-t-md bg-zinc-900"
-        >
-          <Table aria-label="custom pagination table" className="">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center" className="text-white ">
-                  StaffId
-                </TableCell>
-                <TableCell align="center" className="text-white ">
-                  FirstName
-                </TableCell>
-                <TableCell align="center" className="text-white ">
-                  LastName
-                </TableCell>
-                <TableCell align="center" className="text-white ">
-                  ZoneId
-                </TableCell>
-                <TableCell align="center" className="text-white ">
-                  BranchId
-                </TableCell>
-                <TableCell align="center" className="text-white ">
-                  Tel-no
-                </TableCell>
-              </TableRow>
-            </TableHead>
+    <div className="h-full">
+      <div>
+        <TableContainer component={Paper} className="mx-auto ">
+          {title}
+          <Table aria-label="custom pagination table">
+            <TableColumms names={columns} />
             <TableBody>
-              {(rowsPerPage > 0
-                ? rows.slice(
+              {rowsPerPage > 0 ? (
+                <TableItems
+                  rows={rows.slice(
                     page * rowsPerPage,
                     page * rowsPerPage + rowsPerPage
-                  )
-                : rows
-              ).map((row) => (
-                <TableRow key={row.staffid} className="hover:bg-zinc-800">
-                  <TableCell align="center" className="text-white">
-                    {row.staffid}
-                  </TableCell>
-                  <TableCell align="center" className="text-white">
-                    {row.firstname}
-                  </TableCell>
-                  <TableCell align="center" className="text-white">
-                    {row.lastname}
-                  </TableCell>
-                  <TableCell align="center" className="text-white">
-                    {row.zoneid}
-                  </TableCell>
-                  <TableCell align="center" className="text-white">
-                    {row.branchid}
-                  </TableCell>
-                  <TableCell align="center" className="text-white">
-                    {row.telno}
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    className="flex justify-center space-x-4 text-white"
-                  >
-                    <button className="px-4 py-1 font-semibold bg-green-400 rounded-md bg-opacity-80 hover:bg-opacity-100">
-                      Edit
-                    </button>
-                    <button className="px-4 py-1 font-semibold bg-red-400 rounded-md bg-opacity-80 hover:bg-opacity-100">
-                      Delete
-                    </button>
-                    <div>
-                      <MyDialog />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}{" "}
+                  )}
+                />
+              ) : (
+                <TableItems rows={rows} />
+              )}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 61 * emptyRows }}>
                   <TableCell colSpan={6} />
@@ -259,4 +179,4 @@ export function TableTest() {
       </div>
     </div>
   );
-}
+};
