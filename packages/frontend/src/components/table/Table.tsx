@@ -226,7 +226,6 @@ export function TableTest() {
           onRowsPerPageChange={handleChangeRowsPerPage}
           ActionsComponent={TablePaginationActions}
         />
-        ห
       </div>
     </div>
   );
