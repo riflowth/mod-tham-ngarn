@@ -1,4 +1,4 @@
-import { CheckCircleIcon } from '@heroicons/react/outline';
+import { ClockIcon } from '@heroicons/react/outline';
 import Image from 'next/image';
 
 type BranchItemProp = {
@@ -45,11 +45,10 @@ export const BranchItem = ({
 
       <div className="flex flex-row space-x-4">
         <div className="flex flex-rol items-center">
-          <div className="border border-violet-500 text-violet-400  rounded-md w-10 h-10 p-1.5 mr-3"><CheckCircleIcon /></div>
+          <div className="border border-violet-500 hover:bg-violet-500 text-violet-400 hover:text-white rounded-md w-10 h-10 p-1.5 mr-3 transition ease-in duration-100"><ClockIcon /></div>
           <div className="flex flex-col">
             <div className="text-white font-medium text-lg leading-tight">11</div>
             <div className="text-zinc-400 font-light text-xs leading-tight">Ticket Pending</div>
-            <div className=""></div>
           </div>
         </div>
       </div>
