@@ -18,7 +18,7 @@ import { TableHead } from "@mui/material";
 import { MyDialog } from "@components/MyDiaLog";
 import axios, { AxiosResponse } from "axios";
 import { TableColumms } from "@components/table/TableColumns";
-import { TableItems } from "@components/table/TableItems";
+import { Entity } from 'src/models/Entity';
 
 interface TablePaginationActionsProps {
   count: number;
@@ -33,16 +33,6 @@ interface TablePaginationActionsProps {
 function TablePaginationActions(props: TablePaginationActionsProps) {
   const theme = useTheme();
   const { count, page, rowsPerPage, onPageChange } = props;
-  const [data, setData] = React.useState<AxiosResponse | null | void>(null);
-  React.useEffect(() => {
-    axios
-      .get("https://localhost:4000/api/staff/")
-      .then((res) => {
-        setData(res);
-        console.log(data);
-      })
-      .catch((err) => console.log(err));
-  }, []);
 
   const handleFirstPageButtonClick = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -110,13 +100,37 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
   );
 }
 
-export const TableComponent = ({ title, columns, rows, style }) => {
+type TableComponentProp = {
+  path: string,
+  title: string,
+  columns: string[],
+  children: React.ReactElement
+};
+
+interface ApiResponse<T extends Entity> {
+  data: Array<T> 
+};
+
+export const TableComponent = <T, >({ path, title, columns, children }: TableComponentProp) => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [data, setData] = React.useState<T[]>([]);
+  React.useEffect(() => {
+      const loadData = async () => {
+        try {
+          const response = await axios.get<ApiResponse<T>>(`http://localhost:4000/${path}/`);
+          console.log(response)
+          setData(response.data.data);
+        } catch (e) {
+          console.log(e);
+        }
+      }
 
+      loadData();
+  }, []);
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -136,19 +150,22 @@ export const TableComponent = ({ title, columns, rows, style }) => {
     <div className="h-full">
       <div>
         <TableContainer component={Paper} className="mx-auto ">
-          {title}
+          <div className='flex flex-row justify-between p-4'>
+            <div className="">
+              {title}
+            </div>
+            <button className='bg-violet-600 text-white rounded-md'>{`Add ${title}`}</button>
+          </div>
           <Table aria-label="custom pagination table">
             <TableColumms names={columns} />
             <TableBody>
               {rowsPerPage > 0 ? (
-                <TableItems
-                  rows={rows.slice(
-                    page * rowsPerPage,
-                    page * rowsPerPage + rowsPerPage
-                  )}
-                />
+                React.cloneElement(children, { rows: data.slice(
+                  page * rowsPerPage,
+                  page * rowsPerPage + rowsPerPage
+                )})
               ) : (
-                <TableItems rows={rows} />
+                React.cloneElement(children, { rows: data })
               )}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 61 * emptyRows }}>
@@ -163,7 +180,7 @@ export const TableComponent = ({ title, columns, rows, style }) => {
         <TablePagination
           rowsPerPageOptions={[3, 5, 10, { label: "All", value: -1 }]}
           colSpan={3}
-          count={rows.length}
+          count={data.length}
           rowsPerPage={rowsPerPage}
           page={page}
           SelectProps={{
