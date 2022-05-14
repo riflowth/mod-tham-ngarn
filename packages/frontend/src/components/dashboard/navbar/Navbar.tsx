@@ -1,3 +1,4 @@
+import { ProfileMenu } from '@components/dashboard/navbar/ProfileMenu';
 import { BellIcon } from '@heroicons/react/outline';
 import moment from 'moment';
 
@@ -17,7 +18,9 @@ export const Navbar = () => {
           </div>
         </div>
 
-        <div className="w-9 h-9 rounded-md bg-white" />
+        <ProfileMenu
+          id="1"
+        />
       </div>
     </div>
   );

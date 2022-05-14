@@ -1,11 +1,12 @@
 import { SidebarButton } from '@components/dashboard/sidebar/SidebarButton';
-import { ChipIcon, ClipboardListIcon, HomeIcon, UserIcon } from '@heroicons/react/outline';
+import { ChipIcon, ClipboardListIcon, HomeIcon, UserIcon, ViewListIcon } from '@heroicons/react/outline';
 
 const sidebarMenus = [
   { icon: <HomeIcon />, text: 'Home', href: '/' },
-  { icon: <UserIcon />, text: 'Manage User', href: '/' },
-  { icon: <ChipIcon />, text: 'Manage Machine', href: '/' },
-  { icon: <ClipboardListIcon />, text: 'Tickets', href: '/' },
+  { icon: <UserIcon />, text: 'User', href: '/' },
+  { icon: <ChipIcon />, text: 'Machine', href: '/' },
+  { icon: <ViewListIcon />, text: 'Branch', href: '/branch' },
+  { icon: <ClipboardListIcon />, text: 'Ticket', href: '/' },
 ];
 
 export const Sidebar = () => {
@@ -25,6 +26,7 @@ export const Sidebar = () => {
             <SidebarButton
               icon={menu.icon}
               text={menu.text}
+              href={menu.href}
               active={index === 0}
             />
           </a>

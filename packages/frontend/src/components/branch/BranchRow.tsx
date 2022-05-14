@@ -17,7 +17,7 @@ export const BranchRow = ({
   last,
 }: BranchItemProp) => {
   return (
-    <tr className={`bg-zinc-700 hover:bg-zinc-600 ${!last ? 'border-b-2 border-zinc-600' : ''}`}>
+    <tr className={`bg-zinc-700 hover:bg-zinc-600 ${!last ? 'border-b-2 border-zinc-500' : ''}`}>
       <td className="px-6 py-5">
         <div className="flex flex-col">
           <span className="text-zinc-400">Branch ID</span>
