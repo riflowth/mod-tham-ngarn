@@ -10,7 +10,7 @@ export interface MaintenanceLogRepository extends Repository<MaintenanceLog> {
 
   readByStatusByBranchId(
     branchId: number,
-    status: string,
+    status: string[],
     readOptions?: ReadOptions
   ): Promise<MaintenanceLog[]>;
 

@@ -75,7 +75,7 @@ export class MaintenanceLogService {
     branchId: number,
     staffBranchIdToValidate: number,
     staffRoleToValidate: string,
-    status: string,
+    expectedStatus?: string[],
     readOptions?: ReadOptions,
   ): Promise<MaintenanceLog[]> {
     this.validatePositiveInteger(branchId, 'Branch Id');
@@ -86,7 +86,9 @@ export class MaintenanceLogService {
       throw new BadRequestException('Branch not found');
     }
 
-    if (!EnumUtils.isIncludesInEnum(status, MaintenanceLogStatus)) {
+    if (
+      expectedStatus.length !== 0
+      && expectedStatus.some((s) => !EnumUtils.isIncludesInEnum(s, MaintenanceLogStatus))) {
       throw new BadRequestException('accepted status only OPENED, PENDING, SUCCESS, FAILED');
     }
 
@@ -99,7 +101,7 @@ export class MaintenanceLogService {
     }
 
     const expectedMaintenanceLog = this.maintenanceLogRepository
-      .readByStatusByBranchId(branchId, status, readOptions);
+      .readByStatusByBranchId(branchId, expectedStatus, readOptions);
 
     return expectedMaintenanceLog;
   }

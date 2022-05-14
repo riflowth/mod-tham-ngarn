@@ -132,15 +132,16 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
 
   public async readByStatusByBranchId(
     branchId: number,
-    status: string,
+    expectedStatus: string[],
     readOptions?: ReadOptions,
   ): Promise<MaintenanceLog[]> {
-    const query = 'SELECT * FROM MaintenanceLog WHERE status = ? AND machine_id IN (SELECT machine_id FROM Machine WHERE zone_id IN (SELECT zone_id FROM Zone WHERE branch_id = ?))';
-    const values = [status, branchId];
+    const query = `SELECT * FROM MaintenanceLog WHERE status IN (${expectedStatus.map((e) => `'${e}'`).join(',')}) AND machine_id IN (SELECT machine_id FROM Machine WHERE zone_id IN (SELECT zone_id FROM Zone WHERE branch_id = ?))`;
+
+    const values = [branchId];
 
     const results: any = await this.execute(query, values);
 
-    const [maintenanceLogs] = results[0].map((result) => {
+    const maintenanceLogs = results[0].map((result) => {
       return new MaintenanceLog()
         .setMaintenanceId(result.maintenance_id)
         .setMachineId(result.machine_id)
