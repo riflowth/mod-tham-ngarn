@@ -27,6 +27,8 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
+import Image from "next/image";
+import { PencilAltIcon, PencilIcon, TrashIcon } from "@heroicons/react/outline";
 
 function Row(props: { row: Staff }) {
   const { row } = props;
@@ -34,16 +36,16 @@ function Row(props: { row: Staff }) {
 
   return (
     <React.Fragment>
-      <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
+      <TableRow style={{ width: "auto" }}>
         <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-            className="text-white bg-violet-700 hover:bg-violet-400"
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
+          <div className="relative w-10 h-10 overflow-hidden rounded-full bg-zinc-500">
+            <Image
+              src={`https://avatars.dicebear.com/api/micah/${row.staffId}.svg`}
+              alt=""
+              layout="fill"
+              objectFit="cover"
+            />
+          </div>
         </TableCell>
         <TableCell style={{ width: 160 }} className="text-white">
           {row.staffId}
@@ -65,18 +67,28 @@ function Row(props: { row: Staff }) {
         </TableCell>
 
         <TableCell>
-          <div className="space-x-3 ">
-            <button className="p-2 font-semibold bg-green-500 rounded-md hover:bg-green-400">
-              Edit
+          <div className="flex justify-around">
+            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
+              <PencilAltIcon />
             </button>
-            <button className="p-2 font-semibold bg-red-500 rounded-md hover:bg-red-400">
-              Delete
+            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
+              <TrashIcon />
             </button>
           </div>
         </TableCell>
+        <TableCell>
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpen(!open)}
+            className="text-white bg-violet-700 hover:bg-violet-400"
+          >
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
       </TableRow>
       <TableRow className="w-full bg-gray-800">
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography className="text-white" gutterBottom component="div">
