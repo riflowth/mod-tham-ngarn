@@ -29,11 +29,36 @@ import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import Image from "next/image";
 import { PencilAltIcon, PencilIcon, TrashIcon } from "@heroicons/react/outline";
+import Swal from "sweetalert2";
+import Router from "next/router";
+import fetch from "@utils/Fetch";
 
 function Row(props: { row: Machine }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
 
+  const deleteMachine = async (machineId: number) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await fetch
+          .delete(`/machine/${machineId}`)
+          .then(() => {
+            Swal.fire("Deleted!", "Your file has been deleted.", "success");
+            Router.reload();
+          })
+          .catch((error: any) => Swal.fire("Failed", error, "error"));
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire("Cancelled", "Your imaginary file is safe :)", "error");
+      }
+    });
+  };
   return (
     <React.Fragment>
       <TableRow style={{ width: "auto" }}>
@@ -58,7 +83,10 @@ function Row(props: { row: Machine }) {
             <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
               <PencilAltIcon />
             </button>
-            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
+            <button
+              className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white"
+              onClick={() => deleteMachine(row.machineId)}
+            >
               <TrashIcon />
             </button>
           </div>

@@ -29,10 +29,32 @@ import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import Image from "next/image";
 import { PencilAltIcon, PencilIcon, TrashIcon } from "@heroicons/react/outline";
+import Swal from "sweetalert2";
+import fetch from "@utils/Fetch";
+import Router from "next/router";
 
 function Row(props: { row: Staff }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
+
+  const deleteStaff = async (staffId: number) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await fetch.delete(`/staff/${staffId}`);
+        Swal.fire("Deleted!", "Your file has been deleted.", "success");
+        Router.reload();
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire("Cancelled", "Your imaginary file is safe :)", "error");
+      }
+    });
+  };
 
   return (
     <React.Fragment>
@@ -71,7 +93,10 @@ function Row(props: { row: Staff }) {
             <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
               <PencilAltIcon />
             </button>
-            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
+            <button
+              className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white"
+              onClick={() => deleteStaff(row.staffId)}
+            >
               <TrashIcon />
             </button>
           </div>
@@ -120,3 +145,6 @@ export const StaffItems = ({ rows }: { rows: Array<Staff> }) => {
   const rowElements = rows.map((row, i) => <Row key={i} row={row} />);
   return <>{rowElements}</>;
 };
+function redirects() {
+  throw new Error("Function not implemented.");
+}
