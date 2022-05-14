@@ -1,7 +1,7 @@
 import { BranchTable } from '@components/branch/BranchTable';
 import { Sorting, SortingButton } from '@components/SortingButton';
 import { PencilIcon } from '@heroicons/react/outline';
-import axios from 'axios';
+import fetch from '@utils/Fetch';
 import { useEffect, useState } from 'react';
 
 type BranchResponse = {
@@ -58,8 +58,8 @@ export const BranchBoard = () => {
 
   useEffect(() => {
     const loadBranchesData = async () => {
-      const branches = await axios.get<ApiResponse<BranchResponse[]>>('http://localhost:4000/branch');
-      const staffs = await axios.get<ApiResponse<StaffResponse[]>>('http://localhost:4000/staff');
+      const branches = await fetch.get<ApiResponse<BranchResponse[]>>('/branch');
+      const staffs = await fetch.get<ApiResponse<StaffResponse[]>>('/staff');
 
       const branchesData: Branch[] = branches.data.data.map((branch) => {
         const manager = staffs.data.data.find((staff) => {
@@ -93,14 +93,14 @@ export const BranchBoard = () => {
         </div>
       </div>
 
-      {branches.length === 0 && (
+      {branches.length === 0 ? (
         <div className="text-zinc-400">No Branch</div>
+      ) : (
+        <BranchTable
+          branches={branches}
+          sortBy={sortBy}
+        />
       )}
-
-      <BranchTable
-        branches={branches}
-        sortBy={sortBy}  
-      />
     </div>
   );
 };

@@ -14,7 +14,7 @@ export const BranchTable = ({
   return (
     <div className="overflow-x-auto rounded-md">
       <table className="w-full">
-        <tbody className="space-y-4 divide">
+        <tbody className="space-y-4">
           {branches.length !== 0 && branches.sort(sortBy.sort).map((branch, index) => (
             <BranchRow
               key={branch.branchId}

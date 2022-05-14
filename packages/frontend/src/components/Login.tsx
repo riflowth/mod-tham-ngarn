@@ -1,6 +1,7 @@
+import axios from 'axios';
 import Image from "next/image";
-import axios from "axios";
 import { useState } from "react";
+import fetch from '@utils/Fetch';
 import Swal from "sweetalert2";
 
 export const Login = () => {
@@ -31,7 +32,7 @@ export const Login = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:4000/auth/login', {
+      const response = await fetch.post('/auth/login', {
         username, password,
       });
 
