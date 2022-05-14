@@ -22,6 +22,20 @@ export class MaintenanceLogController extends Controller {
     this.maintenanceLogService = maintenanceLogService;
   }
 
+  @Authentication(Role.CEO)
+  @RouteMapping('/', Methods.GET)
+  public async getAllMaintenanceLogs(req: Request, res: Response): Promise<void> {
+    const { limit, offset } = req.query;
+
+    const readOptions: ReadOptions = {
+      limit: Number(limit),
+      offset: Number(offset),
+    };
+
+    const maintenanceLogs = await this.maintenanceLogService.getAllMaintenanceLogs(readOptions);
+    res.status(200).json({ data: maintenanceLogs });
+  }
+
   @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/machine/:machineId', Methods.GET)
   private async getMaintenanceByMachineId(req: Request, res: Response): Promise<void> {
