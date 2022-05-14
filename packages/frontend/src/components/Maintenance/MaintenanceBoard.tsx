@@ -67,7 +67,7 @@ export const MaintenanceBoard = ({
       }
     };
     fetchData();
-  }, []);
+  }, [maintenanceId]);
 
   const handleClaim = async () => {
     await swalWhenError(async () => {
