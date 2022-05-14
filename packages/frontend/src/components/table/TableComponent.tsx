@@ -109,11 +109,11 @@ interface ApiResponse<T extends Entity> {
   data: Array<T>;
 }
 
-export const TableComponent = <T, >({ 
+export const TableComponent = <T,>({
   path,
   title,
   columns,
-  children, 
+  children,
 }: TableComponentProp) => {
   const [isClick, setIsClick] = React.useState(false)
   const [page, setPage] = React.useState(0);
@@ -154,36 +154,46 @@ export const TableComponent = <T, >({
   };
 
   return (
-    <div>
-      <div>
-        <TableContainer component={Paper} className="mx-auto ">
-          <div className='flex flex-row justify-between p-4'>
-            <div className="">
-              {title}
-            </div>
-            <button onClick={openModal} className='bg-violet-600 text-white rounded-md'>{`Add ${title}`}</button>
+    <div className="w-full">
+      <TableContainer
+        component={Paper}
+        style={{
+          backgroundColor: 'rgb(63 63 70)',
+          borderTopLeftRadius: '0.375rem',
+          borderTopRightRadius: '0.375rem'
+        }}
+      >
+        <div className='flex flex-row justify-between bg-zinc-700 text-white rounded-md p-4'>
+          <div className="">
+            {title}
           </div>
-          <Table aria-label="custom pagination table">
-            <TableColumms names={columns} />
-            <TableBody>
-              {rowsPerPage > 0 ? (
-                React.cloneElement(children[0], { rows: data.slice(
+          <button onClick={openModal} className='bg-violet-600 hover:bg-violet-800 text-white rounded-md text-sm px-2 py-1'>{`Add ${title}`}</button>
+        </div>
+        <Table aria-label="custom pagination table">
+          <TableColumms names={columns} />
+          <TableBody className="bg-zinc-700 text-zinc-400">
+            {rowsPerPage > 0 ? (
+              React.cloneElement(children[0], {
+                rows: data.slice(
                   page * rowsPerPage,
                   page * rowsPerPage + rowsPerPage
-                )})
-              ) : (
-                React.cloneElement(children[0], { rows: data })
-              )}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 61 * emptyRows }}>
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
-      <div className="flex items-end justify-center bg-white rounded-b-md">
+                )
+              })
+            ) : (
+              React.cloneElement(children[0], { rows: data })
+            )}
+            {emptyRows > 0 && (
+              <TableRow
+                style={{ height: 61 * emptyRows }}
+                classes="text-white"
+              >
+                <TableCell colSpan={6} />
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <div className="flex items-end justify-center bg-zinc-700 rounded-b-md">
         <TablePagination
           rowsPerPageOptions={[3, 5, 8]}
           colSpan={3}
@@ -195,6 +205,10 @@ export const TableComponent = <T, >({
               "aria-label": "rows per page",
             },
             native: true,
+          }}
+          style={{
+            backgroundColor: 'rgb(63 63 70)',
+            borderBottom: 0,
           }}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}

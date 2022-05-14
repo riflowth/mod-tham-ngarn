@@ -8,11 +8,11 @@ import { withUser } from '@components/hoc/withUser';
 const MachinesPage: NextPage = () => {
   return (
     <Dashboard current="Machine">
-      <div className="p-8 overflow-y-auto">
+      <div className="p-8 overflow-y-auto w-full">
         <TableComponent<Machine>
           path={"machine"}
           title={"Machines"}
-          columns={["Id", "Name", "Zone", "Serial", "Manufacturer"]}
+          columns={["Id", "Name", "Zone", "Serial", "Manufacturer", "", ""]}
         >
           <MachineItems rows={[]} />
           <div>deleteme</div>
