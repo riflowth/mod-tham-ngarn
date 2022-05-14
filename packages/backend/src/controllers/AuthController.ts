@@ -1,5 +1,7 @@
+import { Authentication, Role } from '@/decorators/AuthenticationDecorator';
 import { AuthService } from '@/services/AuthService';
 import { CookieProvider } from '@/utils/cookie/CookieProvider';
+import { ObjectUtils } from '@/utils/ObjectUtils';
 import {
   Controller,
   ControllerMapping,
@@ -43,6 +45,16 @@ export class AuthController extends Controller {
     await this.authService.logout(sessionId);
     res.status(200).json({
       message: 'Logged out successfully',
+    });
+  }
+
+  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @RouteMapping('/me', Methods.GET)
+  private async meRoute(req: Request, res: Response): Promise<void> {
+    const { session: requesterData } = req;
+    const cleanedRequesterData = ObjectUtils.removeProperty(requesterData, 'sessionId');
+    res.status(200).json({
+      cleanedRequesterData,
     });
   }
 

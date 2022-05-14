@@ -51,6 +51,7 @@ export class AuthMiddleware implements Middleware {
           .setStaffId(cachedSession.staffId);
         staff = new Staff()
           .setStaffId(cachedSession.staffId)
+          .setFullName(cachedSession.name)
           .setPosition(cachedSession.role)
           .setZoneId(cachedSession.zoneId)
           .setBranchId(cachedSession.branchId);
@@ -75,6 +76,7 @@ export class AuthMiddleware implements Middleware {
         await this.sessionRepository.cacheSession(sessionId, {
           sessionId,
           staffId: staff.getStaffId(),
+          name: staff.getFullName(),
           role: staff.getPosition(),
           zoneId: staff.getZoneId(),
           branchId: staff.getBranchId(),
@@ -92,6 +94,7 @@ export class AuthMiddleware implements Middleware {
       req.session = {
         sessionId: session.getSessionId(),
         staffId: session.getStaffId(),
+        name: staff.getFullName(),
         zoneId: staff.getZoneId(),
         branchId: staff.getBranchId(),
         role: staff.getPosition(),
