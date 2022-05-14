@@ -5,7 +5,7 @@ import { NextPage } from 'next';
 
 const BranchPage: NextPage = () => {
   return (
-    <Dashboard>
+    <Dashboard current="Branch">
       <BranchBoard />
     </Dashboard>
   );

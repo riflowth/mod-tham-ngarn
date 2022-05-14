@@ -154,7 +154,7 @@ export const TableComponent = <T, >({
   };
 
   return (
-    <div className="w-4/5 m-auto mt-10 ">
+    <div>
       <div>
         <TableContainer component={Paper} className="mx-auto ">
           <div className='flex flex-row justify-between p-4'>

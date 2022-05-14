@@ -7,16 +7,18 @@ import { withUser } from '@components/hoc/withUser';
 
 const MaintenancesPage: NextPage = () => {
   return (
-      <Dashboard>
+    <Dashboard current="Ticket">
+      <div className="p-8 overflow-y-auto">
         <TableComponent<MaintenanceLog>
           path={'maintenance'}
-          title={'Maintenance Logs'} 
-          columns={['Id', 'Machine', 'Status', 'Reporter', 'Report Date', 'Maintenance Date']} 
+          title={'Maintenance Logs'}
+          columns={['Id', 'Machine', 'Status', 'Reporter', 'Report Date', 'Maintenance Date']}
         >
           <MaintenanceLogItems rows={[]} />
           <div>deleteme</div>
-        </TableComponent> 
-      </Dashboard>
+        </TableComponent>
+      </div>
+    </Dashboard>
   );
 }
 
