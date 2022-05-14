@@ -117,6 +117,7 @@ export class Server extends Springpress {
       this.zoneRepository,
     );
     this.maintenanceLogService = new MaintenanceLogService(
+      this.branchRepository,
       this.machineRepository,
       this.maintenanceLogRepository,
       this.maintenancePartRepository,
