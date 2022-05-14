@@ -54,7 +54,7 @@ export class AuthController extends Controller {
     const { session: requesterData } = req;
     const cleanedRequesterData = ObjectUtils.removeProperty(requesterData, 'sessionId');
     res.status(200).json({
-      cleanedRequesterData,
+      data: cleanedRequesterData,
     });
   }
 
