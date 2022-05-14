@@ -1,14 +1,15 @@
 import { SidebarButton } from '@components/dashboard/sidebar/SidebarButton';
-import { ChipIcon, ClipboardListIcon, HomeIcon, UserIcon, ViewListIcon } from '@heroicons/react/outline';
+import { CashIcon, ChipIcon, ClipboardListIcon, HomeIcon, UserIcon, ViewListIcon } from '@heroicons/react/outline';
 import ModThamNgarnLogo from '@publics/mtn-logo.svg';
 import Image from 'next/image';
 
 const sidebarMenus = [
   { icon: <HomeIcon />, text: 'Home', href: '/' },
-  { icon: <UserIcon />, text: 'User', href: '/' },
-  { icon: <ChipIcon />, text: 'Machine', href: '/' },
+  { icon: <UserIcon />, text: 'Staff', href: '/staffs' },
+  { icon: <ChipIcon />, text: 'Machine', href: '/machines' },
   { icon: <ViewListIcon />, text: 'Branch', href: '/branch' },
-  { icon: <ClipboardListIcon />, text: 'Ticket', href: '/' },
+  { icon: <ClipboardListIcon />, text: 'Ticket', href: '/maintenances' },
+  { icon: <CashIcon />, text: 'Bill', href: '/bills' },
 ];
 
 export const Sidebar = () => {
