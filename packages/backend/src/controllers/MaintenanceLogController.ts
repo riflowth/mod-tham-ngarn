@@ -68,6 +68,15 @@ export class MaintenanceLogController extends Controller {
   }
 
   @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @RouteMapping('/:id', Methods.GET)
+  private async getMaintenanceLogById(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
+    const maintenanceLog = await this.maintenanceLogService.getMaintenanceLogById(Number(id));
+
+    res.status(200).json({ data: maintenanceLog });
+  }
+
+  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/', Methods.POST)
   @RequestBody('machineId', '?reason')
   private async addMaintenanceLog(req: Request, res: Response): Promise<void> {

@@ -104,6 +104,21 @@ export class MaintenanceLogService {
     return expectedMaintenanceLog;
   }
 
+  public async getMaintenanceLogById(
+    maintenanceId: number,
+  ): Promise<MaintenanceLog> {
+    this.validatePositiveInteger(maintenanceId, 'Maintenance Id');
+
+    const maintenanceLogToValidate = await this.maintenanceLogRepository
+      .readByMaintenanceId(maintenanceId);
+
+    if (!maintenanceLogToValidate) {
+      throw new BadRequestException('Maintenance log not found');
+    }
+
+    return maintenanceLogToValidate;
+  }
+
   public async addMaintenanceLog(
     newMaintenanceLog: MaintenanceLog,
     reporterZoneIdToValidate: number,
@@ -275,10 +290,13 @@ export class MaintenanceLogService {
     this.validatePositiveInteger(maintenanceLogIdToClaim, 'Maintenance log id');
     this.validatePositiveInteger(claimerMaintainerId, 'Maintainer id');
 
-    if (claimerMaintainerRoleToValidate !== Role.TECHNICIAN) {
+    if (
+      claimerMaintainerRoleToValidate === Role.OFFICER
+      || claimerMaintainerRoleToValidate === Role.PURCHASING
+    ) {
       throw new BadRequestException('You cannot claim maintenance log with this data');
     }
-
+    console.log(maintenanceLogIdToClaim);
     const maintenanceLogToClaim = await this.maintenanceLogRepository
       .readByMaintenanceId(maintenanceLogIdToClaim);
 
