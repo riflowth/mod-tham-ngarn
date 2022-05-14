@@ -3,6 +3,7 @@ import { NextPage } from "next";
 import { TableComponent } from "@components/table/TableComponent";
 import { MachineItems } from "@components/machine/MachineItems";
 import { Machine } from "@models/Machine";
+import { withUser } from '@components/hoc/withUser';
 
 const MachinesPage: NextPage = () => {
   return (
@@ -20,4 +21,4 @@ const MachinesPage: NextPage = () => {
   );
 };
 
-export default MachinesPage;
+export default withUser(MachinesPage);

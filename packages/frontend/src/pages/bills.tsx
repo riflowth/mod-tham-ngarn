@@ -1,9 +1,9 @@
-import { Dashboard } from "@components/dashboard/Dashboard";
-import { NextPage } from "next";
-import { Disclosure } from "@headlessui/react";
-import { TableComponent } from "@components/table/TableComponent";
+import { Dashboard } from '@components/dashboard/Dashboard';
+import { NextPage } from 'next';
+import { TableComponent } from '@components/table/TableComponent';
 import { BillItems } from "@components/bill/BillItems";
 import { Bill } from "@models/Bill";
+import { withUser } from '@components/hoc/withUser';
 
 const BillsPage: NextPage = () => {
   return (
@@ -21,4 +21,4 @@ const BillsPage: NextPage = () => {
   );
 };
 
-export default BillsPage;
+export default withUser(BillsPage);

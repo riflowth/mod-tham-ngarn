@@ -1,5 +1,6 @@
 import { BranchBoard } from '@components/branch/BranchBoard';
 import { Dashboard } from '@components/dashboard/Dashboard';
+import { withUser } from '@components/hoc/withUser';
 import { NextPage } from 'next';
 
 const BranchPage: NextPage = () => {
@@ -10,4 +11,4 @@ const BranchPage: NextPage = () => {
   );
 };
 
-export default BranchPage;
+export default withUser(BranchPage);

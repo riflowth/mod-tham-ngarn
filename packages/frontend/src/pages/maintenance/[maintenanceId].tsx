@@ -1,7 +1,6 @@
 import { Dashboard } from '@components/dashboard/Dashboard';
-import { MaintenanceLogItems } from '@components/maintenanceLog/MaintenanceLogItems';
-import { MaintenanceBoard } from '@components/maintenanceLog/MaintenanceBoard';
-import { MaintenancePartItems } from '@components/maintenanceLog/MaintenancePartItems';
+import { MaintenanceBoard } from '@components/maintenancelog/MaintenanceBoard';
+import { MaintenancePartItems } from '@components/maintenancelog/MaintenancePartItems';
 import { TableComponent } from '@components/table/TableComponent';
 import { MaintenanceLog } from '@models/MaintenanceLog';
 import { MaintenancePart } from '@models/MaintenancePart';
