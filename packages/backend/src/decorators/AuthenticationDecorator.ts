@@ -9,13 +9,7 @@ export enum Role {
 }
 
 export const Authentication = (...role: Role[]) => {
-  return (
-    target: Object,
-    propertyKey: string,
-    descriptor: TypedPropertyDescriptor<any>,
-  ): any => {
-    RouteUtil.addRouteMetadata({
-      authentication: role,
-    });
-  };
+  return RouteUtil.addRouteMetadata({
+    authentication: role,
+  });
 };
