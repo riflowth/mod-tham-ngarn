@@ -28,12 +28,35 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
-import { MaintenancePart } from '@models/MaintenancePart';
+import { MaintenancePart } from "@models/MaintenancePart";
+import Swal from "sweetalert2";
+import fetch from "@utils/Fetch";
+import Router from "next/router";
 
 function Row(props: { row: MaintenancePart }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
 
+  const deleteMaintenance = async (maintenanceId: number) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await fetch
+          .delete(`/maintenance/${maintenanceId}/part`)
+          .then(() => {
+            Swal.fire("Deleted!", "Your file has been deleted.", "success");
+            Router.reload();
+          })
+          .catch((error: any) => Swal.fire("Failed", error, "error"));
+      }
+    });
+  };
   return (
     <React.Fragment>
       <TableRow style={{ width: "auto" }}>
@@ -58,7 +81,10 @@ function Row(props: { row: MaintenancePart }) {
             <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
               <PencilAltIcon />
             </button>
-            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
+            <button
+              className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white"
+              onClick={() => deleteMaintenance(row.maintenanceId)}
+            >
               <TrashIcon />
             </button>
           </div>
