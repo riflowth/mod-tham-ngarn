@@ -6,7 +6,7 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
-import { useTheme } from "@mui/material/styles";
+import { makeStyles, useTheme } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -115,8 +115,9 @@ export const TableComponent = <T,>({
   children,
 }: TableComponentProp) => {
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(8);
   const [data, setData] = React.useState<T[]>([]);
+
   React.useEffect(() => {
     const loadData = async () => {
       try {
@@ -149,13 +150,9 @@ export const TableComponent = <T,>({
   };
 
   return (
-    <div className="m-auto mt-10">
+    <div className="w-4/5 m-auto mt-10 ">
       <div>
-        <TableContainer component={Paper} className="mx-auto bg-zinc-900">
-          <div className="flex flex-row justify-between p-4 text-white">
-            <div className="">{title}</div>
-            <button className="p-2 text-white rounded-md bg-violet-600 hover:bg-violet-500">{`Add ${title}`}</button>
-          </div>
+        <TableContainer component={Paper} className="mx-auto bg-zinc-700">
           <Table aria-label="custom pagination table">
             <TableColumms names={columns} />
             <TableBody className="text-white">
@@ -176,9 +173,9 @@ export const TableComponent = <T,>({
           </Table>
         </TableContainer>
       </div>
-      <div className="flex items-end justify-center text-white bg-white rounded-b-md">
+      <div className="flex items-end justify-center bg-white rounded-b-md">
         <TablePagination
-          rowsPerPageOptions={[3, 5, { label: "All", value: -1 }]}
+          rowsPerPageOptions={[3, 5, 8]}
           colSpan={3}
           count={data.length}
           rowsPerPage={rowsPerPage}
