@@ -28,8 +28,9 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
+import { MaintenancePart } from '@models/MaintenancePart';
 
-function Row(props: { row: MaintenanceLog }) {
+function Row(props: { row: MaintenancePart }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -40,19 +41,16 @@ function Row(props: { row: MaintenanceLog }) {
           {row.maintenanceId}
         </TableCell>
         <TableCell style={{ width: 160 }} className="text-white">
-          {row.machineId}
+          {row.partId}
+        </TableCell>
+        <TableCell style={{ width: 160 }} className="text-white">
+          {row.type}
         </TableCell>
         <TableCell style={{ width: 160 }} className="text-white">
           {row.status}
         </TableCell>
         <TableCell style={{ width: 160 }} className="text-white">
-          {row.reporterId}
-        </TableCell>
-        <TableCell style={{ width: 160 }} className="text-white">
-          {row.reportDate.toString()}
-        </TableCell>
-        <TableCell style={{ width: 160 }} className="text-white">
-          {row.maintenanceDate?.toString()}
+          {row.orderId}
         </TableCell>
 
         <TableCell>
@@ -104,10 +102,10 @@ function Row(props: { row: MaintenanceLog }) {
   );
 }
 
-export const MaintenanceLogItems = ({
+export const MaintenancePartItems = ({
   rows,
 }: {
-  rows: Array<MaintenanceLog>;
+  rows: Array<MaintenancePart>;
 }) => {
   const rowElements = rows.map((row, i) => {
     return <Row key={i} row={row} />;
