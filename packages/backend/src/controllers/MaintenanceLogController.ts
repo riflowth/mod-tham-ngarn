@@ -23,20 +23,44 @@ export class MaintenanceLogController extends Controller {
   }
 
   @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
-  @RouteMapping('/', Methods.GET)
-  private async getMaintenanceLogsByQuery(req: Request, res: Response): Promise<void> {
-    const { machineId } = req.query;
+  @RouteMapping('/machine/:machineId', Methods.GET)
+  private async getMaintenanceByMachineId(req: Request, res: Response): Promise<void> {
+    const { limit, offset } = req.query;
+    const { machineId } = req.params;
     const { zoneId: staffZoneIdToValidate, role: staffRoleToValidate } = req.session;
 
     const readOptions: ReadOptions = {
-      limit: Number(req.query.limit),
-      offset: Number(req.query.offset),
+      limit: Number(limit),
+      offset: Number(offset),
     };
 
     const maintenanceLogs = await this.maintenanceLogService.getMaintenanceLogsByMachineId(
       Number(machineId),
       staffZoneIdToValidate,
       staffRoleToValidate,
+      readOptions,
+    );
+
+    res.status(200).json({ data: maintenanceLogs });
+  }
+
+  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @RouteMapping('/branch/:branchId', Methods.GET)
+  private async getMaintenanceByBranchId(req: Request, res: Response): Promise<void> {
+    const { status, limit, offset } = req.query;
+    const { branchId } = req.params;
+    const { branchId: staffBranchIdToValidate, role: staffRoleToValidate } = req.session;
+
+    const readOptions: ReadOptions = {
+      limit: Number(limit),
+      offset: Number(offset),
+    };
+
+    const maintenanceLogs = await this.maintenanceLogService.getMaintenanceLogByBranchId(
+      Number(branchId),
+      staffBranchIdToValidate,
+      staffRoleToValidate,
+      String(status),
       readOptions,
     );
 

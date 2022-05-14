@@ -2,6 +2,7 @@ import { Role } from '@/decorators/AuthenticationDecorator';
 import { Machine } from '@/entities/Machine';
 import { MaintenanceLog } from '@/entities/MaintenanceLog';
 import { MaintenancePart } from '@/entities/MaintenancePart';
+import { BranchRepository } from '@/repositories/branch/BranchRepository';
 import { MachineRepository } from '@/repositories/machine/MachineRepository';
 import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
@@ -32,15 +33,18 @@ export enum MaintenanceLogStatus {
 
 export class MaintenanceLogService {
 
+  private readonly branchRepository: BranchRepository;
   private readonly machineRepository: MachineRepository;
   private readonly maintenanceLogRepository: MaintenanceLogRepository;
   private readonly maintenancePartRepository: MaintenancePartRepository;
 
   public constructor(
+    branchRepository: BranchRepository,
     machineRepository: MachineRepository,
     maintenanceLogRepository: MaintenanceLogRepository,
     maintenancePartRepository: MaintenancePartRepository,
   ) {
+    this.branchRepository = branchRepository;
     this.machineRepository = machineRepository;
     this.maintenanceLogRepository = maintenanceLogRepository;
     this.maintenancePartRepository = maintenancePartRepository;
@@ -69,9 +73,35 @@ export class MaintenanceLogService {
 
   public async getMaintenanceLogByBranchId(
     branchId: number,
+    staffBranchIdToValidate: number,
+    staffRoleToValidate: string,
+    status: string,
     readOptions?: ReadOptions,
   ): Promise<MaintenanceLog[]> {
-    throw new Error('Method not implemented.');
+    this.validatePositiveInteger(branchId, 'Branch Id');
+
+    const branchToValidate = await this.branchRepository.readByBranchId(branchId);
+
+    if (!branchToValidate) {
+      throw new BadRequestException('Branch not found');
+    }
+
+    if (!EnumUtils.isIncludesInEnum(status, MaintenanceLogStatus)) {
+      throw new BadRequestException('accepted status only OPENED, PENDING, SUCCESS, FAILED');
+    }
+
+    if (
+      staffRoleToValidate !== Role.CEO
+      && staffRoleToValidate !== Role.MANAGER
+      && staffBranchIdToValidate !== branchId
+    ) {
+      throw new BadRequestException('You are not in your branch');
+    }
+
+    const expectedMaintenanceLog = this.maintenanceLogRepository
+      .readByStatusByBranchId(branchId, status, readOptions);
+
+    return expectedMaintenanceLog;
   }
 
   public async addMaintenanceLog(
