@@ -70,11 +70,13 @@ export class MaintenanceLogController extends Controller {
       offset: Number(offset),
     };
 
+    const expectedStatus = status ? String(status).split('&') : [];
+
     const maintenanceLogs = await this.maintenanceLogService.getMaintenanceLogByBranchId(
       Number(branchId),
       staffBranchIdToValidate,
       staffRoleToValidate,
-      String(status),
+      expectedStatus,
       readOptions,
     );
 
