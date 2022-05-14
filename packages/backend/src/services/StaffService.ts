@@ -9,6 +9,7 @@ import { ReadOptions } from '@/repositories/ReadOptions';
 import { StaffRepository } from '@/repositories/staff/StaffRepository';
 import { ZoneRepository } from '@/repositories/zone/ZoneRepository';
 import { NumberUtils } from '@/utils/NumberUtils';
+import { ObjectUtils } from '@/utils/ObjectUtils';
 import { BadRequestException, NotFoundException } from 'springpress';
 
 export class StaffService {
@@ -35,7 +36,8 @@ export class StaffService {
 
   public async getAllStaffs(readOptions: ReadOptions): Promise<Staff[]> {
     const staffToRead = new Staff();
-    return this.staffRepository.read(staffToRead, readOptions);
+    const staffs = await this.staffRepository.read(staffToRead, readOptions);
+    return staffs.map((staff) => this.removeStaffPassword(staff));
   }
 
   public async getStaffByBranchId(
@@ -60,7 +62,7 @@ export class StaffService {
     const staffToRead = new Staff().setBranchId(branchIdToGetStaff);
     const staffs = await this.staffRepository.read(staffToRead, readOptions);
 
-    return staffs;
+    return staffs.map((staff) => this.removeStaffPassword(staff));
   }
 
   public async getStaffByZoneId(
@@ -80,7 +82,7 @@ export class StaffService {
     const staffToRead = new Staff().setZoneId(zoneIdToGetStaff);
     const staffs = await this.staffRepository.read(staffToRead, readOptions);
 
-    return staffs;
+    return staffs.map((staff) => this.removeStaffPassword(staff));
   }
 
   public async getStaffByStaffId(
@@ -114,7 +116,7 @@ export class StaffService {
       throw new BadRequestException('You are not allowed to access this staff (staff not in your branch)');
     }
 
-    return [targetStaff];
+    return [this.removeStaffPassword(targetStaff)];
   }
 
   public async addStaff(
@@ -194,7 +196,8 @@ export class StaffService {
 
     const affectedRowsAmount = await this.staffRepository.update(newStaff, staffToEdit);
 
-    return affectedRowsAmount === 1 ? newStaff.setPrimaryKey(staffIdToEdit) : null;
+    return affectedRowsAmount === 1
+      ? this.removeStaffPassword(newStaff.setPrimaryKey(staffIdToEdit)) : null;
   }
 
   public async deleteStaff(
@@ -241,7 +244,11 @@ export class StaffService {
 
     const affectedRowsAmount = await this.staffRepository.delete(staffToDelete);
 
-    return affectedRowsAmount === 1 ? targetStaff : null;
+    return affectedRowsAmount === 1 ? this.removeStaffPassword(targetStaff) : null;
+  }
+
+  private removeStaffPassword(staff: Staff): Staff {
+    return ObjectUtils.removeProperty(staff, 'password');
   }
 
 }
