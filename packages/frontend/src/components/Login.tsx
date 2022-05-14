@@ -62,9 +62,9 @@ export const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center w-full h-screen bg-violet-700">
-      <div className="flex w-full max-w-7xl drop-shadow-2xl">
-        <div className="relative w-2/3">
+    <div className="flex items-center justify-center w-full h-screen bg-zinc-800">
+      <div className="flex justify-center w-full lg:max-w-7xl drop-shadow-2xl mx-12">
+        <div className="hidden lg:block relative w-2/3">
           <Image
             loader={image}
             src={image()}
@@ -75,7 +75,7 @@ export const Login = () => {
           />
         </div>
 
-        <div className="w-1/3 px-5 py-24 space-y-10 bg-white rounded-r-xl">
+        <div className="w-full lg:w-1/3 px-5 py-24 space-y-10 bg-white rounded-xl lg:rounded-r-xl">
           <div className="flex flex-col items-center w-full mx-auto space-y-5">
             <div className="mb-4 text-2xl font-bold">
               <span className="text-[#6043D0]">Login</span> your account
@@ -102,15 +102,16 @@ export const Login = () => {
                   onChange={handleInput}
                 />
               </div>
-              <div className=" text-xl font-extrabold bg-[#6043D0] w-[60%] flex items-center mx-auto text-white py-2 hover:bg-[#6043D0]/90">
-                <button className="items-center w-full" type="submit">
-                  Login
-                </button>
-              </div>
+              <button
+                className="flex justify-center w-2/3 mx-auto py-2 rounded-md text-xl bg-violet-700 text-white hover:bg-violet-700/90"
+                type="submit"
+              >
+                Login
+              </button>
             </form>
             <a
               href=""
-              className="text-[#6043D0] border-b border-[#6043D0] hover:font-medium hover:border-b-2"
+              className="text-violet-700 border-b border-violet-700 hover:font-medium hover:border-b-2"
             >
               Forget Password?
             </a>
