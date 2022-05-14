@@ -22,6 +22,7 @@ const StaffsPage: NextPage = () => {
         ]}
       >
         <StaffItems rows={[]} />
+        <div>deleteme</div>
       </TableComponent>
     </Dashboard>
   );

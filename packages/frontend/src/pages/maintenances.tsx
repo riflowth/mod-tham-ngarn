@@ -14,6 +14,7 @@ const MaintenancesPage: NextPage = () => {
           columns={['Id', 'Machine', 'Status', 'Reporter', 'Report Date', 'Maintenance Date']} 
         >
           <MaintenanceLogItems rows={[]} />
+          <div>deleteme</div>
         </TableComponent> 
       </Dashboard>
   );

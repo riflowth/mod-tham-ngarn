@@ -15,6 +15,7 @@ const MachinesPage: NextPage = () => {
           columns={["Id", "Name", "Zone", "Serial", "Manufacturer"]}
         >
           <MachineItems rows={[]} />
+          <div>deleteme</div>
         </TableComponent>
       </div>
     </Dashboard>

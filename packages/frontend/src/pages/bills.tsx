@@ -15,6 +15,7 @@ const BillsPage: NextPage = () => {
           columns={["", "Id", "Stroe", "Oredered by"]}
         >
           <BillItems rows={[]} />
+          <div>deleteme</div>
         </TableComponent>
       </div>
     </Dashboard>
