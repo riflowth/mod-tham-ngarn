@@ -1,9 +1,9 @@
 import { Dashboard } from "@components/dashboard/Dashboard";
 import { NextPage } from "next";
-import { Disclosure } from "@headlessui/react";
 import { TableComponent } from "@components/table/TableComponent";
 import { StaffItems } from "@components/staff/StaffItems";
 import { Staff } from "@models/Staff";
+import { withUser } from '@components/hoc/withUser';
 
 const StaffsPage: NextPage = () => {
   return (
@@ -27,4 +27,4 @@ const StaffsPage: NextPage = () => {
   );
 };
 
-export default StaffsPage;
+export default withUser(StaffsPage);

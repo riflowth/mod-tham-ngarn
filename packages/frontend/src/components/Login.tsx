@@ -1,10 +1,13 @@
-import axios from "axios";
+import { useAuth } from '@hooks/auth/AuthContext';
 import Image from "next/image";
+import { useRouter } from 'next/router';
 import { useState } from "react";
-import fetch from "@utils/Fetch";
 import Swal from "sweetalert2";
 
 export const Login = () => {
+  const { login, error } = useAuth();
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -33,27 +36,22 @@ export const Login = () => {
       return;
     }
 
-    try {
-      const response = await fetch.post("/auth/login", {
-        username,
-        password,
-      });
+    login(username, password);
 
+    if (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: error.response.data.message,
+      });
+    } else {
       Swal.fire({
         icon: "success",
         title: "Yeahh...",
-        text: response.data.message,
+        text: 'Login successfully!',
+      }).then(() => {
+        router.push('/');
       });
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 400) {
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: error.response.data.message,
-          });
-        }
-      }
     }
   };
 

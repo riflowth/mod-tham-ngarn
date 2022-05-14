@@ -1,9 +1,8 @@
 import { Menu, Transition } from '@headlessui/react';
 import { LogoutIcon } from '@heroicons/react/outline';
+import { useAuth } from '@hooks/auth/AuthContext';
 import { ClassUtils } from '@utils/CommonUtils';
-import fetch from '@utils/Fetch';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
 import { Fragment } from 'react';
 
 type ProfileMenuProp = {
@@ -13,14 +12,7 @@ type ProfileMenuProp = {
 export const ProfileMenu = ({
   id,
 }: ProfileMenuProp) => {
-  const router = useRouter();
-
-  const logout = async () => {
-    const response = await fetch.get('/auth/logout');
-    if (response.status === 200) {
-      router.push('/login');
-    }
-  };
+  const { logout } = useAuth();
 
   return (
     <Menu as="div" className="relative">

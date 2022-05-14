@@ -1,9 +1,9 @@
 import { Dashboard } from '@components/dashboard/Dashboard';
 import { NextPage } from 'next';
-import { Disclosure } from '@headlessui/react';
 import { TableComponent } from '@components/table/TableComponent';
 import { MaintenanceLogItems } from "@components/maintenancelog/MaintenanceLogItems";
 import { MaintenanceLog } from "@models/MaintenanceLog";
+import { withUser } from '@components/hoc/withUser';
 
 const MaintenancesPage: NextPage = () => {
   return (
@@ -19,4 +19,4 @@ const MaintenancesPage: NextPage = () => {
   );
 }
 
-export default MaintenancesPage;
+export default withUser(MaintenancesPage);
