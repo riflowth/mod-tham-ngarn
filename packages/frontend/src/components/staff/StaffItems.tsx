@@ -15,7 +15,7 @@ import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
-import { TableHead } from "@mui/material";
+import { Tab, TableHead } from "@mui/material";
 import { MyDialog } from "@components/MyDiaLog";
 import axios, { AxiosResponse } from "axios";
 import { TableColumms } from "@components/table/TableColumns";
@@ -40,44 +40,57 @@ function Row(props: { row: Staff }) {
             aria-label="expand row"
             size="small"
             onClick={() => setOpen(!open)}
+            className="text-white bg-violet-700 hover:bg-violet-400"
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell style={{ width: 160 }}>{row.staffId}</TableCell>
-        <TableCell style={{ width: 160 }}>
+        <TableCell style={{ width: 160 }} className="text-white">
+          {row.staffId}
+        </TableCell>
+        <TableCell style={{ width: 160 }} className="text-white">
           {row.fullName.split(" ")[0]}
         </TableCell>
-        <TableCell style={{ width: 160 }}>
+        <TableCell style={{ width: 160 }} className="text-white">
           {row.fullName.split(" ")[1]}
         </TableCell>
-        <TableCell style={{ width: 160 }}>{row.branchId}</TableCell>
-        <TableCell style={{ width: 160 }}>{row.zoneId}</TableCell>
-        <TableCell style={{ width: 160 }}>{row.position}</TableCell>
+        <TableCell style={{ width: 160 }} className="text-white">
+          {row.branchId}
+        </TableCell>
+        <TableCell style={{ width: 160 }} className="text-white">
+          {row.zoneId}
+        </TableCell>
+        <TableCell style={{ width: 160 }} className="text-white">
+          {row.position}
+        </TableCell>
 
-        <div className="space-x-3">
-          <button className="p-2 font-semibold bg-green-400 rounded-md">
-            Edit
-          </button>
-          <button className="p-2 font-semibold bg-red-400 rounded-md">
-            Delete
-          </button>
-        </div>
+        <TableCell>
+          <div className="space-x-3 ">
+            <button className="p-2 font-semibold bg-green-500 rounded-md hover:bg-green-400">
+              Edit
+            </button>
+            <button className="p-2 font-semibold bg-red-500 rounded-md hover:bg-red-400">
+              Delete
+            </button>
+          </div>
+        </TableCell>
       </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+      <TableRow className="w-full bg-gray-800">
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
+              <Typography className="text-white" gutterBottom component="div">
                 History
               </Typography>
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Total price ($)</TableCell>
+                    <TableCell className="text-white">Date</TableCell>
+                    <TableCell className="text-white">Customer</TableCell>
+                    <TableCell className="text-white">Amount</TableCell>
+                    <TableCell className="text-white">
+                      Total price ($)
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>{/* เนิ้อหา */}</TableBody>

@@ -13,9 +13,9 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import fetch from '@utils/Fetch';
+import fetch from "@utils/Fetch";
 import * as React from "react";
-import { Entity } from 'src/models/Entity';
+import { Entity } from "src/models/Entity";
 
 interface TablePaginationActionsProps {
   count: number;
@@ -98,32 +98,37 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 }
 
 type TableComponentProp = {
-  path: string,
-  title: string,
-  columns: string[],
-  children: React.ReactElement
+  path: string;
+  title: string;
+  columns: string[];
+  children: React.ReactElement;
 };
 
 interface ApiResponse<T extends Entity> {
-  data: Array<T> 
-};
+  data: Array<T>;
+}
 
-export const TableComponent = <T, >({ path, title, columns, children }: TableComponentProp) => {
+export const TableComponent = <T,>({
+  path,
+  title,
+  columns,
+  children,
+}: TableComponentProp) => {
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [data, setData] = React.useState<T[]>([]);
   React.useEffect(() => {
-      const loadData = async () => {
-        try {
-          const response = await fetch.get<ApiResponse<T>>(`/${path}`);
-          console.log(response)
-          setData(response.data.data);
-        } catch (e) {
-          console.log(e);
-        }
+    const loadData = async () => {
+      try {
+        const response = await fetch.get<ApiResponse<T>>(`/${path}`);
+        console.log(response);
+        setData(response.data.data);
+      } catch (e) {
+        console.log(e);
       }
+    };
 
-      loadData();
+    loadData();
   }, []);
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -144,26 +149,24 @@ export const TableComponent = <T, >({ path, title, columns, children }: TableCom
   };
 
   return (
-    <div className="h-full">
+    <div className="m-auto mt-10">
       <div>
-        <TableContainer component={Paper} className="mx-auto ">
-          <div className='flex flex-row justify-between p-4'>
-            <div className="">
-              {title}
-            </div>
-            <button className='bg-violet-600 text-white rounded-md'>{`Add ${title}`}</button>
+        <TableContainer component={Paper} className="mx-auto bg-zinc-900">
+          <div className="flex flex-row justify-between p-4 text-white">
+            <div className="">{title}</div>
+            <button className="p-2 text-white rounded-md bg-violet-600 hover:bg-violet-500">{`Add ${title}`}</button>
           </div>
           <Table aria-label="custom pagination table">
             <TableColumms names={columns} />
-            <TableBody>
-              {rowsPerPage > 0 ? (
-                React.cloneElement(children, { rows: data.slice(
-                  page * rowsPerPage,
-                  page * rowsPerPage + rowsPerPage
-                )})
-              ) : (
-                React.cloneElement(children, { rows: data })
-              )}
+            <TableBody className="text-white">
+              {rowsPerPage > 0
+                ? React.cloneElement(children, {
+                    rows: data.slice(
+                      page * rowsPerPage,
+                      page * rowsPerPage + rowsPerPage
+                    ),
+                  })
+                : React.cloneElement(children, { rows: data })}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 61 * emptyRows }}>
                   <TableCell colSpan={6} />
@@ -175,7 +178,7 @@ export const TableComponent = <T, >({ path, title, columns, children }: TableCom
       </div>
       <div className="flex items-end justify-center text-white bg-white rounded-b-md">
         <TablePagination
-          rowsPerPageOptions={[3, 5, 10, { label: "All", value: -1 }]}
+          rowsPerPageOptions={[3, 5, { label: "All", value: -1 }]}
           colSpan={3}
           count={data.length}
           rowsPerPage={rowsPerPage}

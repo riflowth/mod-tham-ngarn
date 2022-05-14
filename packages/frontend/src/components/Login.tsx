@@ -1,20 +1,22 @@
-import axios from 'axios';
+import axios from "axios";
 import Image from "next/image";
 import { useState } from "react";
-import fetch from '@utils/Fetch';
+import fetch from "@utils/Fetch";
 import Swal from "sweetalert2";
 
 export const Login = () => {
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
+    username: "",
+    password: "",
   });
-  
+
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const submitFrom = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const submitFrom = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
 
     const { username, password } = formData;
@@ -32,21 +34,22 @@ export const Login = () => {
     }
 
     try {
-      const response = await fetch.post('/auth/login', {
-        username, password,
+      const response = await fetch.post("/auth/login", {
+        username,
+        password,
       });
 
       Swal.fire({
-        icon: 'success',
-        title: 'Yeahh...',
+        icon: "success",
+        title: "Yeahh...",
         text: response.data.message,
       });
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 400) {
           Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
+            icon: "error",
+            title: "Oops...",
             text: error.response.data.message,
           });
         }
@@ -55,7 +58,7 @@ export const Login = () => {
   };
 
   const image = () => {
-    return 'https://images.unsplash.com/photo-1522543558187-768b6df7c25c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80';
+    return "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80";
   };
 
   return (
@@ -72,9 +75,9 @@ export const Login = () => {
           />
         </div>
 
-        <div className="w-1/3 bg-white rounded-r-xl px-5 py-24 space-y-10">
+        <div className="w-1/3 px-5 py-24 space-y-10 bg-white rounded-r-xl">
           <div className="flex flex-col items-center w-full mx-auto space-y-5">
-            <div className="text-2xl font-bold mb-4">
+            <div className="mb-4 text-2xl font-bold">
               <span className="text-[#6043D0]">Login</span> your account
             </div>
 
