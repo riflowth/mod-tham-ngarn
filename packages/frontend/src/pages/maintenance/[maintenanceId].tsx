@@ -1,8 +1,8 @@
 import { Dashboard } from '@components/dashboard/Dashboard';
+import { withUser } from '@components/hoc/withUser';
 import { MaintenanceBoard } from '@components/maintenancelog/MaintenanceBoard';
 import { MaintenancePartItems } from '@components/maintenancelog/MaintenancePartItems';
 import { TableComponent } from '@components/table/TableComponent';
-import { MaintenanceLog } from '@models/MaintenanceLog';
 import { MaintenancePart } from '@models/MaintenancePart';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -30,4 +30,4 @@ const MaintenancePage: NextPage = () => {
   );
 };
 
-export default MaintenancePage;
+export default withUser(MaintenancePage);
