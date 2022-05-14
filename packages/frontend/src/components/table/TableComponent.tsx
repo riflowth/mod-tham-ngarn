@@ -1,3 +1,4 @@
+import { MyDialog } from '@components/MyDiaLog';
 import { TableColumms } from "@components/table/TableColumns";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
@@ -98,31 +99,34 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 }
 
 type TableComponentProp = {
-  path: string;
-  title: string;
-  columns: string[];
-  children: React.ReactElement;
+  path: string,
+  title: string,
+  columns: string[],
+  children: React.ReactElement[]
 };
 
 interface ApiResponse<T extends Entity> {
   data: Array<T>;
 }
 
-export const TableComponent = <T,>({
+export const TableComponent = <T, >({ 
   path,
   title,
   columns,
-  children,
+  children, 
 }: TableComponentProp) => {
+  const [isClick, setIsClick] = React.useState(false)
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(8);
   const [data, setData] = React.useState<T[]>([]);
+
+  const openModal = () => setIsClick(true);
+  const closeModal = () => setIsClick(false);
 
   React.useEffect(() => {
     const loadData = async () => {
       try {
         const response = await fetch.get<ApiResponse<T>>(`/${path}`);
-        console.log(response);
         setData(response.data.data);
       } catch (e) {
         console.log(e);
@@ -152,18 +156,24 @@ export const TableComponent = <T,>({
   return (
     <div className="w-4/5 m-auto mt-10 ">
       <div>
-        <TableContainer component={Paper} className="mx-auto bg-zinc-700">
+        <TableContainer component={Paper} className="mx-auto ">
+          <div className='flex flex-row justify-between p-4'>
+            <div className="">
+              {title}
+            </div>
+            <button onClick={openModal} className='bg-violet-600 text-white rounded-md'>{`Add ${title}`}</button>
+          </div>
           <Table aria-label="custom pagination table">
             <TableColumms names={columns} />
-            <TableBody className="text-white">
-              {rowsPerPage > 0
-                ? React.cloneElement(children, {
-                    rows: data.slice(
-                      page * rowsPerPage,
-                      page * rowsPerPage + rowsPerPage
-                    ),
-                  })
-                : React.cloneElement(children, { rows: data })}
+            <TableBody>
+              {rowsPerPage > 0 ? (
+                React.cloneElement(children[0], { rows: data.slice(
+                  page * rowsPerPage,
+                  page * rowsPerPage + rowsPerPage
+                )})
+              ) : (
+                React.cloneElement(children[0], { rows: data })
+              )}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 61 * emptyRows }}>
                   <TableCell colSpan={6} />
@@ -191,6 +201,9 @@ export const TableComponent = <T,>({
           ActionsComponent={TablePaginationActions}
         />
       </div>
+      <MyDialog isModalOpen={isClick} close={closeModal} >
+        {children[1]}
+      </MyDialog>
     </div>
   );
 };
