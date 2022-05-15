@@ -1,6 +1,6 @@
 import { Dashboard } from '@components/dashboard/Dashboard';
 import { withUser } from '@components/hoc/withUser';
-import { MaintenanceBoard } from '@components/maintenancelog/MaintenanceBoard';
+import { MaintenanceBoard } from '@components/maintenancelog/MaintenanceLogBoard';
 import { MaintenancePartItems } from '@components/maintenancelog/MaintenancePartItems';
 import { TableComponent } from '@components/table/TableComponent';
 import { MaintenancePart } from '@models/MaintenancePart';
