@@ -23,6 +23,7 @@ const MaintenancePage: NextPage = () => {
           columns={['maintenanceId', 'partId', 'type', 'status', 'orderId']}
         >
           <MaintenancePartItems rows={[]} />
+          <div>deleteme</div>
         </TableComponent>
       </>
 

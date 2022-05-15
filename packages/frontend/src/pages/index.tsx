@@ -4,7 +4,9 @@ import { NextPage } from 'next';
 
 const IndexPage: NextPage = () => {
   return (
-    <Dashboard />
+    <Dashboard current="Home">
+      <div></div>
+    </Dashboard>
   );
 };
 

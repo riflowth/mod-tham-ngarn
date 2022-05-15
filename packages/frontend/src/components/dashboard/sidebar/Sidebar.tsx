@@ -1,17 +1,24 @@
 import { SidebarButton } from '@components/dashboard/sidebar/SidebarButton';
-import { ChipIcon, ClipboardListIcon, HomeIcon, UserIcon, ViewListIcon } from '@heroicons/react/outline';
+import { CashIcon, ChipIcon, ClipboardListIcon, HomeIcon, UserIcon, ViewListIcon } from '@heroicons/react/outline';
 import ModThamNgarnLogo from '@publics/mtn-logo.svg';
 import Image from 'next/image';
 
+type SidebarProp = {
+  current: string,
+};
+
 const sidebarMenus = [
   { icon: <HomeIcon />, text: 'Home', href: '/' },
-  { icon: <UserIcon />, text: 'User', href: '/' },
-  { icon: <ChipIcon />, text: 'Machine', href: '/' },
+  { icon: <UserIcon />, text: 'Staff', href: '/staffs' },
+  { icon: <ChipIcon />, text: 'Machine', href: '/machines' },
   { icon: <ViewListIcon />, text: 'Branch', href: '/branch' },
-  { icon: <ClipboardListIcon />, text: 'Ticket', href: '/' },
+  { icon: <ClipboardListIcon />, text: 'Ticket', href: '/maintenances' },
+  { icon: <CashIcon />, text: 'Bill', href: '/bills' },
 ];
 
-export const Sidebar = () => {
+export const Sidebar = ({
+  current,
+}: SidebarProp) => {
   return (
     <div className="h-screen bg-zinc-900 px-4 py-8">
       <div className="flex flex-row justify-center items-center space-x-2 mb-12 px-4">
@@ -34,7 +41,7 @@ export const Sidebar = () => {
               icon={menu.icon}
               text={menu.text}
               href={menu.href}
-              active={index === 0}
+              active={index === sidebarMenus.findIndex((menu) => menu.text === current)}
             />
           </a>
         ))}

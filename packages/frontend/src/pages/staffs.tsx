@@ -7,23 +7,27 @@ import { withUser } from "@components/hoc/withUser";
 
 const StaffsPage: NextPage = () => {
   return (
-    <Dashboard>
-      <TableComponent<Staff>
-        path={"staff"}
-        title={"Staffs"}
-        columns={[
-          "",
-          "Id",
-          "First Name",
-          "Last Name",
-          "Branch",
-          "Zone",
-          "Position",
-        ]}
-      >
-        <div>deleteme</div>
-        <StaffItems rows={[]} />
-      </TableComponent>
+    <Dashboard current="Staff">
+      <div className="w-full p-8 overflow-y-auto">
+        <TableComponent<Staff>
+          path={"staff"}
+          title={"Staffs"}
+          columns={[
+            "",
+            "Id",
+            "First Name",
+            "Last Name",
+            "Branch",
+            "Zone",
+            "Position",
+            "",
+            "",
+          ]}
+        >
+          <StaffItems rows={[]} />
+          <div>deleteme</div>
+        </TableComponent>
+      </div>
     </Dashboard>
   );
 };

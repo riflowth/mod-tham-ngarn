@@ -75,7 +75,7 @@ export const BranchBoard = () => {
   }, []);
 
   return (
-    <div className="w-full p-8">
+    <div className="w-full p-8 overflow-y-auto">
       <div className="flex flex-row justify-between items-center mb-4">
         <div className="text-white font-semibold text-lg">Branches</div>
 
