@@ -1,5 +1,6 @@
-import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
+import { ExternalLinkIcon, PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
 import { MaintenancePart } from "@models/MaintenancePart";
+import { Order } from '@models/Order';
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { TableHead } from "@mui/material";
@@ -12,15 +13,16 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import fetch from "@utils/Fetch";
+import moment from 'moment';
 import Router from "next/router";
 import * as React from "react";
 import Swal from "sweetalert2";
 
-function Row(props: { row: MaintenancePart }) {
+function Row(props: { row: Order }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
 
-  const deleteMaintenance = async (maintenanceId: number) => {
+  const deleteOrder = async (orderId: number) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -31,7 +33,7 @@ function Row(props: { row: MaintenancePart }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await fetch
-          .delete(`/maintenance/${maintenanceId}/part/${row.partId}`)
+          .delete(`/maintenance/${orderId}/part/${row.partId}`)
           .then(() => {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
             Router.reload();
@@ -40,23 +42,40 @@ function Row(props: { row: MaintenancePart }) {
       }
     });
   };
+
+  const handleOrderStatus = () => {
+    Swal.fire('Error', 'Not implemented yet', 'error');
+  }
+
   return (
     <React.Fragment>
       <TableRow style={{ width: "auto" }}>
         <TableCell style={{ width: 160, color: 'white' }} className="text-white">
-          {row.maintenanceId}
+          {row.orderId}
+        </TableCell>
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {row.machineId}
         </TableCell>
         <TableCell style={{ width: 160, color: 'white' }} className="text-white">
           {row.partId}
         </TableCell>
         <TableCell style={{ width: 160, color: 'white' }} className="text-white">
-          {row.type}
+          {row.billId}
+        </TableCell>
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {row.price}
+        </TableCell>
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {moment(row.arrivalDate).format('ddd D MMM YYYY')}
         </TableCell>
         <TableCell style={{ width: 160, color: 'white' }} className="text-white">
           {row.status}
-        </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
-          {row.orderId}
+          <button
+             className="w-10 h-10 p-2 mx-2 text-teal-500 bg-transparent rounded-md ring-1 ring-teal-500 hover:bg-teal-500 hover:text-white"
+            onClick={() => handleOrderStatus()}
+          >
+            <ExternalLinkIcon />
+          </button>
         </TableCell>
 
         <TableCell>
@@ -66,7 +85,7 @@ function Row(props: { row: MaintenancePart }) {
             </button>
             <button
               className="w-10 h-10 p-2 text-red-500 bg-transparent rounded-md ring-1 ring-red-500 hover:bg-red-500 hover:text-white"
-              onClick={() => deleteMaintenance(row.maintenanceId)}
+              onClick={() => deleteOrder(row.orderId)}
             >
               <TrashIcon />
             </button>
@@ -109,10 +128,10 @@ function Row(props: { row: MaintenancePart }) {
   );
 }
 
-export const MaintenancePartItems = ({
+export const OrderItems = ({
   rows,
 }: {
-  rows: Array<MaintenancePart>;
+  rows: Array<Order>;
 }) => {
   const rowElements = rows.map((row, i) => {
     return <Row key={i} row={row} />;

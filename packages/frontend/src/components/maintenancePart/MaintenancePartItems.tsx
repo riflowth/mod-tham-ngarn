@@ -1,5 +1,5 @@
-import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
-import { Staff } from "@models/Staff";
+import { ExternalLinkIcon, PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
+import { MaintenancePart } from "@models/MaintenancePart";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { TableHead } from "@mui/material";
@@ -12,22 +12,15 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import fetch from "@utils/Fetch";
-import Image from "next/image";
 import Router from "next/router";
 import * as React from "react";
 import Swal from "sweetalert2";
-import { MyDialog } from "@components/MyDiaLog";
-import { StaffModal } from '@components/staff/StaffModal';
 
-function Row(props: { row: Staff }) {
+function Row(props: { row: MaintenancePart }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
-  const [isClick, setIsClick] = React.useState(false)
 
-  const openModal = () => setIsClick(true);
-  const closeModal = () => setIsClick(false);
-
-  const deleteStaff = async (staffId: number) => {
+  const deleteMaintenance = async (maintenanceId: number) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -37,58 +30,53 @@ function Row(props: { row: Staff }) {
       cancelButtonText: "No, cancel!",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await fetch.delete(`/staff/${staffId}`);
-        Swal.fire("Deleted!", "Your file has been deleted.", "success");
-        Router.reload();
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        Swal.fire("Cancelled", "Your imaginary file is safe :)", "error");
+        await fetch
+          .delete(`/maintenance/${maintenanceId}/part/${row.partId}`)
+          .then(() => {
+            Swal.fire("Deleted!", "Your file has been deleted.", "success");
+            Router.reload();
+          })
+          .catch((error: any) => Swal.fire("Failed", error.response.data.message, "error"));
       }
     });
   };
 
+  const handleMaintenancePartStatus = () => {
+    Swal.fire('Error', 'Not implemented yet', 'error');
+  }
   return (
     <React.Fragment>
       <TableRow style={{ width: "auto" }}>
-        <TableCell>
-          <div className="relative w-10 h-10 overflow-hidden rounded-full bg-zinc-500">
-            <Image
-              src={`https://avatars.dicebear.com/api/micah/${row.staffId}.svg`}
-              alt=""
-              layout="fill"
-              objectFit="cover"
-            />
-          </div>
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {row.maintenanceId}
         </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }}>
-          {row.staffId}
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {row.partId}
         </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }}>
-          {row.fullName.split(" ")[0]}
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {row.type}
         </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }}>
-          {row.fullName.split(" ")[1]}
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {row.status}
+          <button
+              className="w-10 h-10 p-2 mx-2 text-teal-500 bg-transparent rounded-md ring-1 ring-teal-500 hover:bg-teal-500 hover:text-white"
+              onClick={() => handleMaintenancePartStatus()}
+            >
+              <ExternalLinkIcon />
+            </button>
         </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }}>
-          {row.branchId}
-        </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }}>
-          {row.zoneId}
-        </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }}>
-          {row.position}
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {row.orderId}
         </TableCell>
 
         <TableCell>
           <div className="flex flex-row space-x-4">
-            <button 
-              className="w-10 h-10 p-2 text-purple-400 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white"
-              onClick={openModal}  
-            >
+            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
               <PencilAltIcon />
             </button>
             <button
-              className="w-10 h-10 p-2 text-red-500 bg-transparent rounded-md ring-1 ring-red-500 hover:bg-red-500 hover:text-white text-zinc"
-              onClick={() => deleteStaff(row.staffId)}
+              className="w-10 h-10 p-2 text-red-500 bg-transparent rounded-md ring-1 ring-red-500 hover:bg-red-500 hover:text-white"
+              onClick={() => deleteMaintenance(row.maintenanceId)}
             >
               <TrashIcon />
             </button>
@@ -105,7 +93,7 @@ function Row(props: { row: Staff }) {
           </IconButton>
         </TableCell>
       </TableRow>
-      <TableRow className="w-full bg-zinc-500">
+      <TableRow className="w-full bg-gray-800">
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
@@ -118,9 +106,7 @@ function Row(props: { row: Staff }) {
                     <TableCell style={{ color: 'white' }}>Date</TableCell>
                     <TableCell style={{ color: 'white' }}>Customer</TableCell>
                     <TableCell style={{ color: 'white' }}>Amount</TableCell>
-                    <TableCell style={{ color: 'white' }}>
-                      Total price ($)
-                    </TableCell>
+                    <TableCell style={{ color: 'white' }}>Total price ($)</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>{/* เนิ้อหา */}</TableBody>
@@ -129,18 +115,17 @@ function Row(props: { row: Staff }) {
           </Collapse>
         </TableCell>
       </TableRow>
-      <MyDialog<Staff> isModalOpen={isClick} close={closeModal} action={'edit'} current={row} >
-        <StaffModal />
-      </MyDialog>
     </React.Fragment>
   );
 }
 
-export const StaffItems = ({ rows }: { rows: Array<Staff> }) => {
-  const [open, setOpen] = React.useState(false);
-  const rowElements = rows.map((row, i) => <Row key={i} row={row} />);
+export const MaintenancePartItems = ({
+  rows,
+}: {
+  rows: Array<MaintenancePart>;
+}) => {
+  const rowElements = rows.map((row, i) => {
+    return <Row key={i} row={row} />;
+  });
   return <>{rowElements}</>;
 };
-function redirects() {
-  throw new Error("Function not implemented.");
-}

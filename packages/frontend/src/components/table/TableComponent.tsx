@@ -214,7 +214,7 @@ export const TableComponent = <T,>({
           ActionsComponent={TablePaginationActions}
         />
       </div>
-      <MyDialog isModalOpen={isClick} close={closeModal} >
+      <MyDialog<T> isModalOpen={isClick} close={closeModal} action={'add'} >
         {children[1]}
       </MyDialog>
     </div>

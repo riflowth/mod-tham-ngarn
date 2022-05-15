@@ -1,14 +1,17 @@
 import { Dialog, Transition } from "@headlessui/react";
+import { Entity } from '@models/Entity';
 import { Fragment, useState, cloneElement, useEffect } from "react";
 import Swal from "sweetalert2";
 
-type MyDialogProp = {
+type MyDialogProp<T extends Entity> = {
   children: React.ReactElement;
   isModalOpen: boolean;
   close: Function;
+  action: string;
+  current?: T;
 };
 
-export function MyDialog({ children, isModalOpen, close }: MyDialogProp) {
+export function MyDialog<T>({ children, isModalOpen, close, action, current }: MyDialogProp<T>) {
   const [confirm, setConfirm] = useState(false);
 
   const openConfirm = async () => {
@@ -58,7 +61,7 @@ export function MyDialog({ children, isModalOpen, close }: MyDialogProp) {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform shadow-xl bg-zinc-700 rounded-2xl">
-                  {cloneElement(children, { confirm: confirm })}
+                  {cloneElement(children, { confirm: confirm, current: current, action: action })}
                   <div className="flex flex-row justify-around">
                     <div className="mt-4">
                       <button

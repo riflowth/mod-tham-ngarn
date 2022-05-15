@@ -1,28 +1,31 @@
+import { BillBoard } from '@components/bill/BillBoard';
+import { OrderItems } from '@components/order/OrderItems';
 import { Dashboard } from '@components/dashboard/Dashboard';
 import { withUser } from '@components/hoc/withUser';
 import { MaintenanceBoard } from '@components/maintenancelog/MaintenanceLogBoard';
 import { MaintenancePartItems } from '@components/maintenancePart/MaintenancePartItems';
 import { TableComponent } from '@components/table/TableComponent';
 import { MaintenancePart } from '@models/MaintenancePart';
+import { Order } from '@models/Order';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 
 const MaintenancePage: NextPage = () => {
   const router = useRouter();
-  const maintenanceId = Number(router.query.maintenanceId);
+  const billId = Number(router.query.billId);
 
   return (
-    <Dashboard current="Ticket">
+    <Dashboard current="Bill">
       <div className="h-full w-full p-8">
-        <MaintenanceBoard
-          maintenanceId={maintenanceId}
+        <BillBoard
+          billId={billId}
         />
-        <TableComponent<MaintenancePart>
-          path={`maintenance/${maintenanceId}/part`}
-          title={'Maintenance Parts'}
-          columns={['maintenanceId', 'partId', 'type', 'status', 'orderId', "", ""]}
+        <TableComponent<Order>
+          path={`bill/${billId}/order`}
+          title={'order'}
+          columns={['orderId', 'machineId', 'partId', 'billId', 'price', 'arrivalDate', 'status', '', '']}
         >
-          <MaintenancePartItems rows={[]} />
+          <OrderItems rows={[]} />
           <div>deleteme</div>
         </TableComponent>
       </div>

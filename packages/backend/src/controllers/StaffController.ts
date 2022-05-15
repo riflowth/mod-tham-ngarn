@@ -120,7 +120,7 @@ export class StaffController extends Controller {
       .setTelNo(telNo)
       .setSalary(salary)
       .setPosition(position)
-      .setDateOfBirth(new Date(dob));
+      .setDateOfBirth(dob ? new Date(dob) : undefined);
     const createdField = await this.staffService
       .addStaff(newStaff, roleToValidate, branchIdToValidate);
 
@@ -164,7 +164,7 @@ export class StaffController extends Controller {
       .setTelNo(telNo)
       .setSalary(salary)
       .setPosition(position)
-      .setDateOfBirth(new Date(dob));
+      .setDateOfBirth(dob ? new Date(dob) : undefined);
 
     const updatedField = await this.staffService
       .editStaff(parseStaffId, newStaff, roleToValidate, branchIdToValidate);
