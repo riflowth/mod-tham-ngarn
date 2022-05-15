@@ -31,7 +31,7 @@ export class MachineController extends Controller {
     this.machineService = machineService;
   }
 
-  @Authentication(Role.CEO)
+  // @Authentication(Role.CEO)
   @RouteMapping('/', Methods.GET)
   private async getAllMachines(req: Request, res: Response): Promise<void> {
     const readOptions: ReadOptions = {

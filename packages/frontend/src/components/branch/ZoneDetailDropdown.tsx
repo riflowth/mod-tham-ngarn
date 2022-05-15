@@ -1,3 +1,4 @@
+import { EditZoneModal } from '@components/branch/EditZoneModal';
 import { SpinnerIcon } from '@components/SpinnerIcon';
 import { Disclosure } from '@headlessui/react';
 import { CheckCircleIcon, TrashIcon, XCircleIcon } from '@heroicons/react/outline';
@@ -183,13 +184,18 @@ export const ZoneDetailDropdown = ({
                   </>
                 )}
 
-                <td className="px-2 py-3">
+                <td className="flex flex-row space-x-2 px-2 py-3">
                   <button
                     className="w-8 h-8 p-1.5 text-red-500 bg-transparent rounded-md ring-1 ring-red-500 hover:bg-red-500 hover:text-white"
                     onClick={() => deleteZone(zone.zoneId)}
                   >
                     <TrashIcon />
                   </button>
+                  <EditZoneModal
+                    zoneId={zone.zoneId}
+                    timeToStart={zone.timeToStart}
+                    timeToEnd={zone.timeToEnd}
+                  />
                 </td>
               </tr>
             ))}

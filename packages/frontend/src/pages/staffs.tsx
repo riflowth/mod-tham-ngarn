@@ -9,22 +9,25 @@ import { StaffModal } from '@components/staff/StaffModal';
 const StaffsPage: NextPage = () => {
   return (
     <Dashboard current="Staff">
-      <TableComponent<Staff>
-        path={"staff"}
-        title={"Staffs"}
-        columns={[
-          "",
-          "Id",
-          "First Name",
-          "Last Name",
-          "Branch",
-          "Zone",
-          "Position",
-        ]}
-      >
-        <StaffItems rows={[]} />
-        <StaffModal />
-      </TableComponent>
+      <div className="p-6 overflow-y-auto w-full">
+        <TableComponent<Staff>
+          path={"staff"}
+          title={"Staffs"}
+          columns={[
+            "",
+            "Id",
+            "First Name",
+            "Last Name",
+            "Branch",
+            "Zone",
+            "Position",
+            "",
+          ]}
+        >
+          <StaffItems rows={[]} />
+          <StaffModal />
+        </TableComponent>
+      </div>
     </Dashboard>
   );
 };

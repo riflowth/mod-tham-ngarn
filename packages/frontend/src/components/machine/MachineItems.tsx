@@ -99,7 +99,7 @@ function Row(props: { row: Machine }) {
     const response = await fetch.get(`/part/costs/${machineId}`);
     setTotalPrice(response.data.data);
   };
-  1;
+
   return (
     <React.Fragment>
       <TableRow style={{ width: "auto" }}>

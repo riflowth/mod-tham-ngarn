@@ -14,7 +14,7 @@ const MaintenancePage: NextPage = () => {
 
   return (
     <Dashboard current="Ticket">
-      <div className="h-full w-full p-8">
+      <div className="h-full w-full overflow-y-auto p-8">
         <MaintenanceBoard
           maintenanceId={maintenanceId}
         />

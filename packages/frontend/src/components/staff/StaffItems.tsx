@@ -1,23 +1,14 @@
+import { MyDialog } from "@components/MyDiaLog";
+import { StaffModal } from "@components/staff/StaffModal";
 import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
 import { Staff } from "@models/Staff";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { TableHead } from "@mui/material";
-import Box from "@mui/material/Box";
-import Collapse from "@mui/material/Collapse";
-import IconButton from "@mui/material/IconButton";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import Typography from "@mui/material/Typography";
 import fetch from "@utils/Fetch";
 import Image from "next/image";
 import Router from "next/router";
 import * as React from "react";
 import Swal from "sweetalert2";
-import { MyDialog } from "@components/MyDiaLog";
-import { StaffModal } from "@components/staff/StaffModal";
 
 function Row(props: { row: Staff }) {
   const { row } = props;
@@ -38,10 +29,10 @@ function Row(props: { row: Staff }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await fetch.delete(`/staff/${staffId}`);
-        Swal.fire("Deleted!", "Your file has been deleted.", "success");
+        Swal.fire("Deleted!", "Your staff has been deleted.", "success");
         Router.reload();
       } else if (result.dismiss === Swal.DismissReason.cancel) {
-        Swal.fire("Cancelled", "Your imaginary file is safe :)", "error");
+        Swal.fire("Cancelled", "Your staff is safe :)", "error");
       }
     });
   };

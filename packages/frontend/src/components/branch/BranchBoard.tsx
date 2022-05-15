@@ -2,6 +2,7 @@ import { BranchTable } from '@components/branch/BranchTable';
 import { NewBranchModal } from '@components/branch/NewBranchModal';
 import { Sorting, SortingButton } from '@components/SortingButton';
 import { PencilIcon } from '@heroicons/react/outline';
+import { useAuth } from '@hooks/auth/AuthContext';
 import fetch from '@utils/Fetch';
 import { useEffect, useState } from 'react';
 
@@ -56,12 +57,21 @@ const sortings: Sorting[] = [
 ];
 
 export const BranchBoard = () => {
+  const { user } = useAuth();
   const [branches, setBranches] = useState<Branch[]>([]);
   const [sortBy, setSortBy] = useState(sortings[0]);
 
   useEffect(() => {
     const loadBranchesData = async () => {
-      const branches = await fetch.get<ApiResponse<BranchResponse[]>>('/branch');
+      const branchPath = {
+        'CEO': '/branch', // ALL
+        'MANAGER': '/branch/me', // BRANCH
+        'TECHNICIAN': '/branch/me', // BRANCH
+        'PURCHASING': '/branch/me', // BRANCH
+        'OFFICER': '/branch/me', // ZONE
+      }[user!.role] || '';
+
+      const branches = await fetch.get<ApiResponse<BranchResponse[]>>(branchPath);
       const staffs = await fetch.get<ApiResponse<StaffResponse[]>>('/staff');
 
       const branchesData: Branch[] = branches.data.data.map((branch) => {
@@ -87,7 +97,7 @@ export const BranchBoard = () => {
         <div className="text-white font-semibold text-lg">Branches</div>
 
         <div className="flex flex-row space-x-2">
-          <NewBranchModal />
+          {user!.role === 'CEO' && <NewBranchModal />}
 
           <SortingButton
             sortings={sortings}

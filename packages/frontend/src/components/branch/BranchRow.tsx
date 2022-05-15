@@ -2,6 +2,7 @@ import { EditBranchModal } from '@components/branch/EditBranchModal';
 import { ZoneDetailDropdown } from '@components/branch/ZoneDetailDropdown';
 import { Disclosure } from '@headlessui/react';
 import { ChevronDownIcon, TrashIcon, XIcon } from '@heroicons/react/outline';
+import { useAuth } from '@hooks/auth/AuthContext';
 import { ClassUtils } from '@utils/CommonUtils';
 import fetch from '@utils/Fetch';
 import Image from 'next/image';
@@ -27,6 +28,7 @@ export const BranchRow = ({
   pendingTicket,
   last,
 }: BranchItemProp) => {
+  const { user } = useAuth();
   const router = useRouter();
 
   const deleteBranch = (branchId: string) => {
@@ -102,20 +104,22 @@ export const BranchRow = ({
             </td>
 
             <td className="px-6 py-5">
-              <div className="flex flex-rol space-x-2 items-center">
-                <button
-                  className="flex justify-center items-center border border-red-500 hover:bg-red-500 text-red-400 hover:text-white rounded-md w-10 h-10 p-2 transition ease-in duration-100"
-                  onClick={() => deleteBranch(id)}
-                >
-                  <TrashIcon />
-                </button>
-                <EditBranchModal
-                  branchId={id}
-                  manager={managerName}
-                  address={address}
-                  telNo={telNo}
-                />
-              </div>
+              {user!.role === 'CEO' && (
+                <div className="flex flex-rol space-x-2 items-center">
+                  <button
+                    className="flex justify-center items-center border border-red-500 hover:bg-red-500 text-red-400 hover:text-white rounded-md w-10 h-10 p-2 transition ease-in duration-100"
+                    onClick={() => deleteBranch(id)}
+                  >
+                    <TrashIcon />
+                  </button>
+                  <EditBranchModal
+                    branchId={id}
+                    manager={managerName}
+                    address={address}
+                    telNo={telNo}
+                  />
+                </div>
+              )}
             </td>
 
             <td className="px-6 py-5">

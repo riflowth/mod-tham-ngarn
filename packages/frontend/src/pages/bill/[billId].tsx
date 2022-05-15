@@ -13,7 +13,7 @@ const MaintenancePage: NextPage = () => {
   const billId = Number(router.query.billId);
 
   return (
-    <Dashboard current="Bill">
+    <Dashboard current="">
       <div className="h-full w-full p-8">
         <BillBoard
           billId={billId}

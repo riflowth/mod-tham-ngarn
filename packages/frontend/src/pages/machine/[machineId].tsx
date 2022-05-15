@@ -12,7 +12,7 @@ const MaintenancePage: NextPage = () => {
   const machineId = Number(router.query.machineId);
 
   return (
-    <Dashboard current="Bill">
+    <Dashboard current="Machine">
       <div className="w-full h-full p-8">
         <TableComponent<MachinePart>
           path={`machine/${machineId}/part`}

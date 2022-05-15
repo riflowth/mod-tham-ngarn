@@ -95,40 +95,6 @@ function Row(props: { row: Bill }) {
             </button>
           </div>
         </TableCell>
-        <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-            style={{ color: 'rgb(161, 161, 170)' }}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-      </TableRow>
-      <TableRow className="w-full bg-zinc-500">
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Typography className="text-white" gutterBottom component="div">
-                History
-              </Typography>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell style={{ color: 'white' }}>Date</TableCell>
-                    <TableCell style={{ color: 'white' }}>Customer</TableCell>
-                    <TableCell style={{ color: 'white' }}>Amount</TableCell>
-                    <TableCell style={{ color: 'white' }}>
-                      Total price ($)
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>{/* เนิ้อหา */}</TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
       </TableRow>
       <MyDialog<Bill> isModalOpen={isClick} close={closeModal} action={'edit'} current={row} >
         <BillModal />

@@ -21,7 +21,6 @@ const MaintenancesPage: NextPage = () => {
             "Report Date",
             "Maintenance Date",
             "",
-            "",
           ]}
         >
           <MaintenanceLogItems rows={[]} />

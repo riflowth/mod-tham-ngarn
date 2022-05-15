@@ -4,6 +4,7 @@ import StepContent from '@mui/material/StepContent';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
 import fetch from '@utils/Fetch';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 
@@ -119,7 +120,7 @@ export const MaintenanceBoard = ({
           <Stepper activeStep={activeStep} orientation="vertical">
             {steps.map((step) => (
               <Step key={step.label}>
-                <StepLabel>{step.label}</StepLabel>
+                <StepLabel><span className="text-zinc-300">{step.label}</span></StepLabel>
                 <StepContent>
                   <div className="mb-2 flex">
                     <div className="flex">
@@ -161,40 +162,40 @@ export const MaintenanceBoard = ({
         </div>
 
         <div className="flex flex-col w-full h-60 p-5 rounded-md bg-zinc-700">
-          <div className="flex flex-row w-full h-12 items-center overflow-hidden">
-            <span className="w-1/3 h-1/2 text-zinc-400 text-center font-mono">machine_id: </span>
-            <span className="w-2/3 h-1/2 text-zinc-200 text-right font-mono">{maintenanceLog.machineId}</span>
+          <div className="flex flex-row w-full h-12 justify-between items-center overflow-hidden">
+            <span className="h-1/2 text-zinc-400 text-center font-mono">Machine ID</span>
+            <span className="h-1/2 text-zinc-200 text-right font-mono">{maintenanceLog.machineId}</span>
           </div>
 
-          <div className="flex flex-row w-full h-12 items-center overflow-hidden">
-            <span className="w-1/3 h-1/2 text-zinc-400 text-center font-mono">reporter_id: </span>
-            <span className="w-2/3 h-1/2 text-zinc-200 text-right font-mono">{maintenanceLog.reporterId}</span>
+          <div className="flex flex-row w-full h-12 justify-between items-center overflow-hidden">
+            <span className="h-1/2 text-zinc-400 text-center font-mono">Reporter ID</span>
+            <span className="h-1/2 text-zinc-200 text-right font-mono">{maintenanceLog.reporterId}</span>
           </div>
 
-          <div className="flex flex-row w-full h-12 items-center overflow-hidden">
-            <span className="w-1/3 h-1/2 text-zinc-400 text-center font-mono">maintainer_id: </span>
-            <span className="w-2/3 h-1/2 text-zinc-200 text-right font-mono">{maintenanceLog.maintainerId}</span>
+          <div className="flex flex-row w-full h-12 justify-between items-center overflow-hidden">
+            <span className="h-1/2 text-zinc-400 text-center font-mono">Maintainer ID</span>
+            <span className="h-1/2 text-zinc-200 text-right font-mono">{maintenanceLog.maintainerId}</span>
           </div>
 
-          <div className="flex flex-row w-full h-12 items-center overflow-hidden">
-            <span className="w-1/3 h-1/2 text-zinc-400 text-center font-mono">report_date: </span>
-            <span className="w-2/3 h-1/2 text-zinc-200 text-right font-mono overflow-scroll">{maintenanceLog.reportDate?.toString()}</span>
+          <div className="flex flex-row w-full h-12 justify-between items-center overflow-hidden">
+            <span className="h-1/2 text-zinc-400 text-center font-mono">Report Date</span>
+            <span className="h-1/2 text-zinc-200 text-right font-mono">{moment(maintenanceLog.reportDate?.toString()).format('DD MMMM YYYY HH:mm a')}</span>
           </div>
 
-          <div className="flex flex-row w-full h-12 items-center">
-            <span className="w-1/3 h-1/2 text-zinc-400 text-center font-mono">maintenance_date: </span>
-            <span className="w-2/3 h-1/2 text-zinc-200 text-right font-mono overflow-scroll">{maintenanceLog.maintenanceDate?.toString()}</span>
+          <div className="flex flex-row w-full h-12 justify-between items-center">
+            <span className="h-1/2 text-zinc-400 text-center font-mono">maintenance_date: </span>
+            <span className="h-1/2 text-zinc-200 text-right font-mono">{moment(maintenanceLog.maintenanceDate?.toString()).format('DD MMMM YYYY HH:mm a')}</span>
           </div>
 
-          <div className="flex flex-row w-full h-12 items-center">
-            <span className="w-1/3 h-1/2 text-zinc-400 text-center font-mono">total price: </span>
-            <span className="w-2/3 h-1/2 text-zinc-200 text-right font-mono overflow-scroll">{new Intl.NumberFormat('th-TH').format(totalPrice) + ' ฿'}</span>
+          <div className="flex flex-row w-full h-12 justify-between items-center">
+            <span className="h-1/2 text-zinc-400 text-center font-mono">total price: </span>
+            <span className="h-1/2 text-zinc-200 text-right font-mono">{new Intl.NumberFormat('th-TH').format(totalPrice) + ' ฿'}</span>
           </div>
         </div>
 
         <div className="flex flex-col w-full max-h-60  overflow-hidden p-5 rounded-md bg-zinc-700">
           <h2 className="font-black text-2xl text-zinc-400 mb-6">Reason</h2>
-          <span className="text-zinc-200  overflow-scroll">{maintenanceLog.reason}</span>
+          <span className="text-zinc-200">{maintenanceLog.reason}</span>
         </div>
 
       </div>

@@ -24,7 +24,7 @@ export class StaffController extends Controller {
     this.staffService = staffService;
   }
 
-  @Authentication(Role.CEO)
+  // @Authentication(Role.CEO)
   @RouteMapping('/', Methods.GET)
   private async getAllStaff(req: Request, res: Response): Promise<void> {
     const readOptions: ReadOptions = {
