@@ -4,6 +4,7 @@ import { TableComponent } from "@components/table/TableComponent";
 import { BillItems } from "@components/bill/BillItems";
 import { Bill } from "@models/Bill";
 import { withUser } from "@components/hoc/withUser";
+import { BillModal } from "@components/bill/BillModal";
 
 const BillsPage: NextPage = () => {
   return (
@@ -15,7 +16,7 @@ const BillsPage: NextPage = () => {
           columns={["", "Id", "Stroe", "Oredered by", "", ""]}
         >
           <BillItems rows={[]} />
-          <div>deleteme</div>
+          <BillModal />
         </TableComponent>
       </div>
     </Dashboard>

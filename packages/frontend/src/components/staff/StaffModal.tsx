@@ -2,6 +2,8 @@ import { Staff } from "@models/Staff";
 import { useEffect, useState } from "react";
 import { InputBox } from "@components/InputBox";
 import fetch from "@utils/Fetch";
+import Swal from "sweetalert2";
+import Router from "next/router";
 
 type StaffModalProp = {
   confirm?: boolean;
@@ -33,8 +35,15 @@ export const StaffModal = ({ confirm, current }: StaffModalProp) => {
     const submit = async () => {
       try {
         if (confirm) {
-          const response = await fetch.post<ApiResponse>(`/staff`, input);
-          console.log(response);
+          await fetch
+            .post<ApiResponse>(`/staff`, input)
+            .then(() => {
+              Swal.fire("Added!", "Your info has been added.", "success");
+              Router.reload();
+            })
+            .catch((error: any) =>
+              Swal.fire("Failed", error.response.data.message, "error")
+            );
         }
       } catch (e) {
         console.log(e);
