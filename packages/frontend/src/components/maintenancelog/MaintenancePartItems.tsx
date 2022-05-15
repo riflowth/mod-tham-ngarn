@@ -1,4 +1,3 @@
-import { MaintenancePartStatusModal } from '@components/maintenancelog/MaintenancePartStatusModal';
 import { ExternalLinkIcon, PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
 import { MaintenancePart } from "@models/MaintenancePart";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
