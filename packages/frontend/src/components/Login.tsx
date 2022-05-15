@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from 'next/router';
 import { useState } from "react";
 import Swal from "sweetalert2";
+import ModThamNgarnLogo from '@publics/mtn-logo.svg';
 
 export const Login = () => {
   const { login, error } = useAuth();
@@ -56,25 +57,18 @@ export const Login = () => {
     }
   };
 
-  const image = () => {
-    return "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80";
-  };
-
   return (
     <div className="flex items-center justify-center w-full h-screen bg-zinc-800">
       <div className="flex justify-center w-full lg:max-w-7xl drop-shadow-2xl mx-12">
-        <div className="hidden lg:block relative w-2/3">
+        <div className="hidden lg:block relative bg-zinc-700 rounded-l-md w-2/3">
           <Image
-            loader={image}
-            src={image()}
+            src={ModThamNgarnLogo}
             layout="fill"
-            objectFit="cover"
-            className="rounded-l-xl"
             alt=""
           />
         </div>
 
-        <div className="w-full lg:w-1/3 px-5 py-24 space-y-10 bg-white rounded-xl lg:rounded-r-xl">
+        <div className="w-full lg:w-1/3 px-5 py-24 space-y-10 bg-white rounded-xl lg:rounded-l-none lg:rounded-r-xl">
           <div className="flex flex-col items-center w-full mx-auto space-y-5">
             <div className="mb-4 text-2xl font-bold">
               <span className="text-[#6043D0]">Login</span> your account
