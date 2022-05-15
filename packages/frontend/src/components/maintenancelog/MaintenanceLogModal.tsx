@@ -49,7 +49,7 @@ export const MaintenanceLogModal = ({ confirm, current }: MachineModalProp) => {
   return (
     <div className="space-y-2 text-white">
       <div className="p-2 font-semibold text-center rounded-md bg-violet-400 ">
-        Machine
+        MaintenanceLog
       </div>
       <form className="w-full space-y-2">
         <div className="flex flex-col justify-around space-y-1">
