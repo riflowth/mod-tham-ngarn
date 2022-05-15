@@ -43,6 +43,20 @@ export class BranchController extends Controller {
   }
 
   @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @RouteMapping('/:branchId/zone', Methods.GET)
+  private async getAllZoneByBranchId(req: Request, res: Response): Promise<void> {
+    const { branchId } = req.params;
+    const { limit, offset } = req.query;
+    const readOptions: ReadOptions = {
+      limit: Number(limit),
+      offset: Number(offset),
+    };
+
+    const zones = await this.branchService.getZonesByBranchId(Number(branchId), readOptions);
+    res.status(200).json({ data: zones });
+  }
+
+  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/:branchId', Methods.GET)
   @RequestBody('?branchId')
   private async getBranchByBranchId(req: Request, res: Response): Promise<void> {
