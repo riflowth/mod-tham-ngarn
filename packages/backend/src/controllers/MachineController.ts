@@ -1,6 +1,7 @@
 import { Authentication, Role } from '@/decorators/AuthenticationDecorator';
 import { Machine } from '@/entities/Machine';
 import { ReadOptions } from '@/repositories/ReadOptions';
+import { MachinePartService } from '@/services/MachinePartService';
 import { MachineService } from '@/services/MachineService';
 import { NumberUtils } from '@/utils/NumberUtils';
 import {
@@ -19,9 +20,14 @@ import {
 export class MachineController extends Controller {
 
   private readonly machineService: MachineService;
+  private readonly machinePartService: MachinePartService;
 
-  public constructor(machineService: MachineService) {
+  public constructor(
+    machinePartService: MachinePartService,
+    machineService: MachineService,
+  ) {
     super();
+    this.machinePartService = machinePartService;
     this.machineService = machineService;
   }
 
@@ -74,6 +80,16 @@ export class MachineController extends Controller {
     const machines = await this.machineService.getMachinesByBranchId(parseBranchId, readOptions);
 
     res.status(200).json({ data: machines });
+  }
+
+  @Authentication(Role.MANAGER, Role.CEO, Role.TECHNICIAN, Role.PURCHASING)
+  @RouteMapping('/:machineId/part', Methods.GET)
+  private async getMachinePartByMachineId(req: Request, res: Response): Promise<void> {
+    const parseMachineId = NumberUtils.parsePositiveInteger(req.params.machineId);
+
+    const machineParts = await this.machinePartService.getAllMachinePartByMachineId(parseMachineId);
+
+    res.status(200).json({ data: machineParts });
   }
 
   @Authentication(Role.MANAGER, Role.CEO, Role.PURCHASING, Role.TECHNICIAN)
