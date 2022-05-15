@@ -1,6 +1,10 @@
 import { MachineModal } from "@components/machine/MachineModal";
 import { MyDialog } from "@components/MyDiaLog";
-import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
+import {
+  ExternalLinkIcon,
+  PencilAltIcon,
+  TrashIcon,
+} from "@heroicons/react/outline";
 import { Machine } from "@models/Machine";
 import { MaintenanceLog } from "@models/MaintenanceLog";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -115,6 +119,12 @@ function Row(props: { row: Machine }) {
 
         <TableCell>
           <div className="flex flex-row space-x-4">
+            <button
+              className="w-10 h-10 p-2 text-teal-500 bg-transparent rounded-md ring-1 ring-teal-500 hover:bg-teal-500 hover:text-white"
+              onClick={() => Router.push(`/machine/${row.machineId}`)}
+            >
+              <ExternalLinkIcon />
+            </button>
             <button
               className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white"
               onClick={openModal}
