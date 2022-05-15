@@ -7,7 +7,7 @@ import Router from "next/router";
 
 type MachineModalProp = {
   confirm?: boolean;
-  current?: Machine;
+  current?: Machine & { storeName: string };
 };
 
 interface ApiResponse {
@@ -23,6 +23,8 @@ export const MachineModal = ({ confirm, current }: MachineModalProp) => {
     manufacturer: current?.manufacturer || "",
     registrationDate: current?.registrationDate || new Date(),
     retiredDate: current?.retiredDate || new Date(),
+    price: current?.price || 0,
+    storeName: current?.storeName || "",
   });
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,6 +110,24 @@ export const MachineModal = ({ confirm, current }: MachineModalProp) => {
             name="retiredDate"
             type="date"
             value={input.retiredDate.toString()}
+            onChange={handleInput}
+          />
+        </div>
+        <div className="flex flex-col justify-around space-y-1">
+          <label htmlFor="">price</label>
+          <InputBox
+            name="price"
+            type="number"
+            value={input.price}
+            onChange={handleInput}
+          />
+        </div>
+        <div className="flex flex-col justify-around space-y-1">
+          <label htmlFor="">Store Name</label>
+          <InputBox
+            name="storeName"
+            type="string"
+            value={input.storeName}
             onChange={handleInput}
           />
         </div>

@@ -135,6 +135,7 @@ export class Server extends Springpress {
       this.staffRepository,
     );
     this.machineService = new MachineService(
+      this.billRepository,
       this.machineRepository,
       this.machinePartRepository,
       this.maintenanceLogRepository,

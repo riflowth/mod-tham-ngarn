@@ -78,7 +78,7 @@ export class MachineController extends Controller {
 
   @Authentication(Role.MANAGER, Role.CEO, Role.PURCHASING, Role.TECHNICIAN)
   @RouteMapping('/', Methods.POST)
-  @RequestBody('zoneId', 'name', 'serial', 'manufacturer', 'registrationDate', 'retiredDate')
+  @RequestBody('zoneId', 'name', 'serial', 'manufacturer', 'registrationDate', 'retiredDate', 'storeName', 'price')
   private async addMachine(req: Request, res: Response): Promise<void> {
     const {
       zoneId,
@@ -87,6 +87,8 @@ export class MachineController extends Controller {
       manufacturer,
       registrationDate,
       retiredDate,
+      price,
+      storeName,
     } = req.body;
 
     const parseZoneId = NumberUtils.parsePositiveInteger(zoneId);
@@ -96,15 +98,17 @@ export class MachineController extends Controller {
       .setSerial(serial)
       .setManufacturer(manufacturer)
       .setRegistrationDate(new Date(registrationDate))
-      .setRetiredDate(new Date(retiredDate));
-    const createdField = await this.machineService.addMachine(newMachine, req.session.staffId);
+      .setRetiredDate(new Date(retiredDate))
+      .setPrice(price);
+    const createdField = await this.machineService
+      .addMachine(newMachine, req.session.staffId, storeName);
 
     res.status(200).json({ data: { createdField } });
   }
 
   @Authentication(Role.MANAGER, Role.CEO, Role.PURCHASING, Role.TECHNICIAN)
   @RouteMapping('/:machineId', Methods.PUT)
-  @RequestBody('?zoneId', '?name', '?serial', '?manufacturer', '?registrationDate', '?retiredDate')
+  @RequestBody('?zoneId', '?name', '?serial', '?manufacturer', '?registrationDate', '?retiredDate', '?price')
   private async editMachineByMachineId(req: Request, res: Response) :Promise<void> {
     const parseMachineId = NumberUtils.parsePositiveInteger(req.params.machineId);
 
@@ -119,6 +123,7 @@ export class MachineController extends Controller {
       manufacturer,
       registrationDate,
       retiredDate,
+      price,
     } = req.body;
 
     let parseZoneId: number;
@@ -132,6 +137,7 @@ export class MachineController extends Controller {
       .setSerial(serial)
       .setManufacturer(manufacturer)
       .setRegistrationDate(registrationDate ? new Date(registrationDate) : undefined)
+      .setPrice(price)
       .setRetiredDate(retiredDate ? new Date(retiredDate) : undefined);
     const updatedField = await this.machineService.editMachine(
       parseMachineId,
