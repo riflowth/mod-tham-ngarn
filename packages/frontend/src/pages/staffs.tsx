@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import { TableComponent } from "@components/table/TableComponent";
 import { StaffItems } from "@components/staff/StaffItems";
 import { Staff } from "@models/Staff";
-import { withUser } from '@components/hoc/withUser';
+import { withUser } from "@components/hoc/withUser";
 
 const StaffsPage: NextPage = () => {
   return (
@@ -21,6 +21,7 @@ const StaffsPage: NextPage = () => {
           "Position",
         ]}
       >
+        <div>deleteme</div>
         <StaffItems rows={[]} />
       </TableComponent>
     </Dashboard>
