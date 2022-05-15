@@ -1,4 +1,5 @@
 import { BranchTable } from '@components/branch/BranchTable';
+import { NewBranchModal } from '@components/branch/NewBranchModal';
 import { Sorting, SortingButton } from '@components/SortingButton';
 import { PencilIcon } from '@heroicons/react/outline';
 import fetch from '@utils/Fetch';
@@ -12,6 +13,7 @@ type BranchResponse = {
 };
 
 type StaffResponse = {
+  staffId: number,
   branchId: number,
   fullName: string,
   position: string,
@@ -22,6 +24,7 @@ type ApiResponse<T> = {
 };
 
 export type Branch = BranchResponse & {
+  managerId: number,
   managerName: string,
 };
 
@@ -65,7 +68,11 @@ export const BranchBoard = () => {
         const manager = staffs.data.data.find((staff) => {
           return (staff.position === 'MANAGER') && (staff.branchId === branch.branchId);
         });
-        return { ...branch, managerName: manager ? manager.fullName : '' };
+        return {
+          ...branch,
+          managerName: manager ? manager.fullName : '',
+          managerId: manager ? manager.staffId : -1,
+        };
       });
 
       setBranches(branchesData);
@@ -80,10 +87,7 @@ export const BranchBoard = () => {
         <div className="text-white font-semibold text-lg">Branches</div>
 
         <div className="flex flex-row space-x-2">
-          <button className="flex flex-row items-center text-white text-xs bg-violet-600 hover:bg-violet-700 rounded-md px-2 py-2 transition ease-in duration-100">
-            <div className="w-5 bg-violet-300 text-violet-700 mr-1 p-1 rounded-md"><PencilIcon /></div>
-            <div className="font-medium tracking-tight">NEW BRANCH</div>
-          </button>
+          <NewBranchModal />
 
           <SortingButton
             sortings={sortings}
