@@ -1,4 +1,4 @@
-import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
+import { ExternalLinkIcon, PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
 import { MaintenancePart } from "@models/MaintenancePart";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -40,6 +40,10 @@ function Row(props: { row: MaintenancePart }) {
       }
     });
   };
+
+  const handleMaintenancePartStatus = () => {
+    Swal.fire('Error', 'Not implemented yet', 'error');
+  }
   return (
     <React.Fragment>
       <TableRow style={{ width: "auto" }}>
@@ -54,6 +58,12 @@ function Row(props: { row: MaintenancePart }) {
         </TableCell>
         <TableCell style={{ width: 160, color: 'white' }} className="text-white">
           {row.status}
+          <button
+              className="w-10 h-10 p-2 mx-2 text-teal-500 bg-transparent rounded-md ring-1 ring-teal-500 hover:bg-teal-500 hover:text-white"
+              onClick={() => handleMaintenancePartStatus()}
+            >
+              <ExternalLinkIcon />
+            </button>
         </TableCell>
         <TableCell style={{ width: 160, color: 'white' }} className="text-white">
           {row.orderId}

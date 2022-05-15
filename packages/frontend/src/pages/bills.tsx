@@ -13,7 +13,7 @@ const BillsPage: NextPage = () => {
         <TableComponent<Bill>
           path={"bill"}
           title={"Bills"}
-          columns={["", "Id", "Stroe", "Oredered by", "", ""]}
+          columns={["", "Id", "Store", "Order by", "", ""]}
         >
           <BillItems rows={[]} />
           <BillModal />

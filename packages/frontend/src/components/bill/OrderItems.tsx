@@ -1,5 +1,6 @@
 import { ExternalLinkIcon, PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
-import { Bill } from "@models/Bill";
+import { MaintenancePart } from "@models/MaintenancePart";
+import { Order } from '@models/Order';
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { TableHead } from "@mui/material";
@@ -12,16 +13,16 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import fetch from "@utils/Fetch";
-import Image from "next/image";
+import moment from 'moment';
 import Router from "next/router";
 import * as React from "react";
 import Swal from "sweetalert2";
 
-function Row(props: { row: Bill }) {
+function Row(props: { row: Order }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
 
-  const deleteBill = async (billId: number) => {
+  const deleteOrder = async (orderId: number) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -32,54 +33,59 @@ function Row(props: { row: Bill }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await fetch
-          .delete(`/bill/${billId}`)
+          .delete(`/maintenance/${orderId}/part/${row.partId}`)
           .then(() => {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
             Router.reload();
           })
-          .catch((error: any) => Swal.fire("Failed", error, "error"));
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        Swal.fire("Cancelled", "Your imaginary file is safe :)", "error");
+          .catch((error: any) => Swal.fire("Failed", error.response.data.message, "error"));
       }
     });
   };
+
+  const handleOrderStatus = () => {
+    Swal.fire('Error', 'Not implemented yet', 'error');
+  }
+
   return (
     <React.Fragment>
-      <TableRow>
-        <TableCell>
-          <div className="relative w-10 h-10 overflow-hidden rounded-full bg-zinc-500">
-            <Image
-              src={`https://avatars.dicebear.com/api/micah/${row.orderBy}.svg`}
-              alt=""
-              layout="fill"
-              objectFit="cover"
-            />
-          </div>
+      <TableRow style={{ width: "auto" }}>
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {row.orderId}
         </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }}>
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {row.machineId}
+        </TableCell>
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {row.partId}
+        </TableCell>
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
           {row.billId}
         </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }}>
-          {row.storeName}
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {row.price}
         </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }}>
-          {row.orderBy}
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {moment(row.arrivalDate).format('ddd D MMM YYYY')}
+        </TableCell>
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
+          {row.status}
+          <button
+             className="w-10 h-10 p-2 mx-2 text-teal-500 bg-transparent rounded-md ring-1 ring-teal-500 hover:bg-teal-500 hover:text-white"
+            onClick={() => handleOrderStatus()}
+          >
+            <ExternalLinkIcon />
+          </button>
         </TableCell>
 
         <TableCell>
-          <div className="flex flex-row space-x-2">
-          <button
-              className="w-10 h-10 p-2 text-teal-500 bg-transparent rounded-md ring-1 ring-teal-500 hover:bg-teal-500 hover:text-white"
-              onClick={() => Router.push(`/bill/${row.billId}`)}
-            >
-              <ExternalLinkIcon />
-            </button>
+          <div className="flex flex-row space-x-4">
             <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
               <PencilAltIcon />
             </button>
             <button
               className="w-10 h-10 p-2 text-red-500 bg-transparent rounded-md ring-1 ring-red-500 hover:bg-red-500 hover:text-white"
-              onClick={() => deleteBill(row.billId)}
+              onClick={() => deleteOrder(row.orderId)}
             >
               <TrashIcon />
             </button>
@@ -96,7 +102,7 @@ function Row(props: { row: Bill }) {
           </IconButton>
         </TableCell>
       </TableRow>
-      <TableRow className="w-full bg-zinc-500">
+      <TableRow className="w-full bg-gray-800">
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
@@ -109,9 +115,7 @@ function Row(props: { row: Bill }) {
                     <TableCell style={{ color: 'white' }}>Date</TableCell>
                     <TableCell style={{ color: 'white' }}>Customer</TableCell>
                     <TableCell style={{ color: 'white' }}>Amount</TableCell>
-                    <TableCell style={{ color: 'white' }}>
-                      Total price ($)
-                    </TableCell>
+                    <TableCell style={{ color: 'white' }}>Total price ($)</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>{/* เนิ้อหา */}</TableBody>
@@ -124,7 +128,11 @@ function Row(props: { row: Bill }) {
   );
 }
 
-export const BillItems = ({ rows }: { rows: Array<Bill> }) => {
+export const OrderItems = ({
+  rows,
+}: {
+  rows: Array<Order>;
+}) => {
   const rowElements = rows.map((row, i) => {
     return <Row key={i} row={row} />;
   });
