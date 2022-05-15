@@ -1,5 +1,5 @@
 import { BillBoard } from '@components/bill/BillBoard';
-import { OrderItems } from '@components/bill/OrderItems';
+import { OrderItems } from '@components/order/OrderItems';
 import { Dashboard } from '@components/dashboard/Dashboard';
 import { withUser } from '@components/hoc/withUser';
 import { MaintenanceBoard } from '@components/maintenancelog/MaintenanceBoard';
