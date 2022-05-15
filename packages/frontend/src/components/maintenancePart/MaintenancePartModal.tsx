@@ -59,7 +59,7 @@ export const MaintenancePartModal = ({ confirm, current, maintenanceId }: Mainte
           <InputBox
             name="partId"
             type="number"
-            value={input.partId}
+            value={input.partId!}
             onChange={handleInput}
           />
         </div>
@@ -77,7 +77,7 @@ export const MaintenancePartModal = ({ confirm, current, maintenanceId }: Mainte
           <InputBox
             name="orderId"
             type="number"
-            value={input.orderId}
+            value={input.orderId!}
             onChange={handleInput}
           />
         </div>
