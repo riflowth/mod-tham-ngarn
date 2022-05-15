@@ -31,7 +31,11 @@ export const OrderModal = ({ confirm, current, billId }: OrderModalProp) => {
       try {
         if (confirm) {
           await fetch
-            .post<ApiResponse>(`/bill/${billId}/order`, input)
+            .post<ApiResponse>(`/bill/${billId}/order`, {
+              machineId: input.machineId == 0 ? undefined : input.machineId,
+              partId: input.partId == 0 ? undefined : input.partId,
+              price: input.price == 0 ? undefined : input.price,
+            })
             .then(() => {
               Swal.fire("Success!", "Your file has been add.", "success");
               Router.reload();
