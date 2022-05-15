@@ -7,8 +7,10 @@ import { MaintenanceLogRepository } from '@/repositories/maintenancelog/Maintena
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
+import { MachinePartStatus } from '@/services/MachinePartService';
 import { MaintenanceLogStatus, MaintenancePartStatus } from '@/services/MaintenanceLogService';
 import { OrderStatus } from '@/services/OrderService';
+import { EnumUtils } from '@/utils/EnumUtils';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { BadRequestException } from 'springpress';
 
@@ -97,6 +99,8 @@ export class MaintenancePartService {
     if (existedMaintenancePart) {
       throw new BadRequestException('Maintenance part already exists');
     }
+
+    await this.machinePartRepository.updateStatus(newPartId, MachinePartStatus.UNAVAILABLE);
 
     return this.maintenancePartRepository.create(
       newMaintenancePart.setStatus(MaintenancePartStatus.MAINTAINING),
@@ -190,6 +194,10 @@ export class MaintenancePartService {
     this.validateNonEmptyString(newStatus, 'newStatus');
     this.validatePositiveInteger(maintainerIdToValidate, 'maintainerId');
 
+    if (!EnumUtils.isIncludesInEnum(newStatus, MaintenancePartStatus)) {
+      throw new BadRequestException('status field only accept ORDERING, MAINTAINING, SUCCESS, FAILED');
+    }
+
     const maintenancePartToValidate = await this.maintenancePartRepository
       .readByPrimaryKey(maintenanceIdToSet, partIdToSet);
 
@@ -208,6 +216,10 @@ export class MaintenancePartService {
       maintainerIdToValidate,
       maintainerRoleToValidate,
     );
+
+    if (newStatus === MaintenancePartStatus.SUCCESS || newStatus === MaintenancePartStatus.FAILED) {
+      await this.machinePartRepository.updateStatus(partIdToSet, MachinePartStatus.AVAILABLE);
+    }
 
     const expectedMaintenancePartToEdit = new MaintenancePart()
       .setPrimaryKey([maintenanceIdToSet, partIdToSet]);
@@ -248,6 +260,8 @@ export class MaintenancePartService {
       maintainerIdToValidate,
       maintainerRoleToValidate,
     );
+
+    await this.machinePartRepository.updateStatus(partIdToDelete, MachinePartStatus.AVAILABLE);
 
     const expectedMaintenancePart = new MaintenancePart()
       .setPrimaryKey([maintenanceIdToDelete, partIdToDelete]);
@@ -352,7 +366,8 @@ export class MaintenancePartService {
   }
 
   private validateOrderProgress(orderRelatedToMaintenancePart: Order): void {
-    if (orderRelatedToMaintenancePart.getStatus() === OrderStatus.SHIPPING) {
+    console.log(orderRelatedToMaintenancePart);
+    if (orderRelatedToMaintenancePart?.getStatus() === OrderStatus.SHIPPING) {
       throw new BadRequestException('Order is shipping so it cannot change');
     }
   }

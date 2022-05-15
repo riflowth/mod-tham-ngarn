@@ -12,8 +12,8 @@ const MaintenancePage: NextPage = () => {
   const maintenanceId = Number(router.query.maintenanceId);
 
   return (
-    <Dashboard>
-      <>
+    <Dashboard current="Ticket">
+      <div className="h-full w-full p-8">
         <MaintenanceBoard
           maintenanceId={maintenanceId}
         />
@@ -25,7 +25,7 @@ const MaintenancePage: NextPage = () => {
           <MaintenancePartItems rows={[]} />
           <div>deleteme</div>
         </TableComponent>
-      </>
+      </div>
 
     </Dashboard>
   );

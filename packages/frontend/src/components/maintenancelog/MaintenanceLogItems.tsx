@@ -1,36 +1,21 @@
-import { Disclosure, Transition } from "@headlessui/react";
-import * as React from "react";
-import { useTheme } from "@mui/material/styles";
+import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
+import { MaintenanceLog } from "@models/MaintenanceLog";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import { TableHead } from "@mui/material";
 import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
+import IconButton from "@mui/material/IconButton";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableFooter from "@mui/material/TableFooter";
-import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
-import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-import LastPageIcon from "@mui/icons-material/LastPage";
-import { TableHead } from "@mui/material";
-import { MyDialog } from "@components/MyDiaLog";
-import axios, { AxiosResponse } from "axios";
-import { TableColumms } from "@components/table/TableColumns";
-import { Entity } from "@models/Entity";
-import { MaintenanceLog } from "@models/MaintenanceLog";
-import { ChevronDoubleRightIcon } from "@heroicons/react/solid";
-import { ChevronDoubleDownIcon } from "@heroicons/react/solid";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Typography from "@mui/material/Typography";
-import Collapse from "@mui/material/Collapse";
-import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
-import Swal from "sweetalert2";
 import fetch from "@utils/Fetch";
 import Router from "next/router";
+import * as React from "react";
+import Swal from "sweetalert2";
+import moment from 'moment';
 
 function Row(props: { row: MaintenanceLog }) {
   const { row } = props;
@@ -61,32 +46,34 @@ function Row(props: { row: MaintenanceLog }) {
   return (
     <React.Fragment>
       <TableRow style={{ width: "auto" }}>
-        <TableCell style={{ width: 160 }} className="text-white">
+        <TableCell style={{ width: 160, color: 'white' }}>
           {row.maintenanceId}
         </TableCell>
-        <TableCell style={{ width: 160 }} className="text-white">
+        <TableCell style={{ width: 160, color: 'white' }}>
           {row.machineId}
         </TableCell>
-        <TableCell style={{ width: 160 }} className="text-white">
-          {row.status}
+        <TableCell style={{ width: 160, color: 'white' }}>
+          <div className="bg-violet-500 rounded-md text-xs text-center">
+            {row.status}
+          </div>
         </TableCell>
-        <TableCell style={{ width: 160 }} className="text-white">
+        <TableCell style={{ width: 160, color: 'white' }}>
           {row.reporterId}
         </TableCell>
-        <TableCell style={{ width: 160 }} className="text-white">
-          {row.reportDate.toString()}
+        <TableCell style={{ width: 160, color: 'white' }}>
+          {moment(row.reportDate).format('ddd D MMM YYYY')}
         </TableCell>
-        <TableCell style={{ width: 160 }} className="text-white">
-          {row.maintenanceDate?.toString()}
+        <TableCell style={{ width: 160, color: 'white' }}>
+          {moment(row.maintenanceDate).format('ddd D MMM YYYY')}
         </TableCell>
 
         <TableCell>
-          <div className="flex justify-around">
+          <div className="flex flex-row space-x-4">
             <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
               <PencilAltIcon />
             </button>
             <button
-              className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white"
+              className="w-10 h-10 p-2 text-red-500 bg-transparent rounded-md ring-1 ring-red-500 hover:bg-red-500 hover:text-white"
               onClick={() => deleteMaintenance(row.maintenanceId)}
             >
               <TrashIcon />
@@ -98,13 +85,13 @@ function Row(props: { row: MaintenanceLog }) {
             aria-label="expand row"
             size="small"
             onClick={() => setOpen(!open)}
-            className="text-white bg-violet-700 hover:bg-violet-400"
+            style={{ color: 'rgb(161, 161, 170)' }}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
       </TableRow>
-      <TableRow className="w-full bg-gray-800">
+      <TableRow className="w-full bg-zinc-500">
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
@@ -114,10 +101,10 @@ function Row(props: { row: MaintenanceLog }) {
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell className="text-white">Date</TableCell>
-                    <TableCell className="text-white">Customer</TableCell>
-                    <TableCell className="text-white">Amount</TableCell>
-                    <TableCell className="text-white">
+                    <TableCell style={{ color: 'white' }}>Date</TableCell>
+                    <TableCell style={{ color: 'white' }}>Customer</TableCell>
+                    <TableCell style={{ color: 'white' }}>Amount</TableCell>
+                    <TableCell style={{ color: 'white' }}>
                       Total price ($)
                     </TableCell>
                   </TableRow>

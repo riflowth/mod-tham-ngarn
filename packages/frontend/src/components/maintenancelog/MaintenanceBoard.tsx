@@ -1,10 +1,10 @@
-import Stepper from '@mui/material/Stepper';
+import { PencilIcon, TicketIcon } from '@heroicons/react/outline';
 import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
+import StepLabel from '@mui/material/StepLabel';
+import Stepper from '@mui/material/Stepper';
 import fetch from '@utils/Fetch';
 import { useEffect, useState } from 'react';
-import { PencilIcon, TicketIcon } from '@heroicons/react/outline';
 import Swal from 'sweetalert2';
 
 type MaintenanceLog = {
@@ -104,13 +104,14 @@ export const MaintenanceBoard = ({
   }
 
   return (
-    <div className="w-full overflow-y-auto p-8">
+    <div className="w-full overflow-y-auto mb-4">
       <div className="flex flex-row items-center mb-4">
         <h1 className="text-white font-semibold text-lg mr-2">Maintenance</h1>
         <span className="font-light text-sm text-zinc-400 font-mono">(id: {maintenanceLog.maintenanceId})</span>
       </div>
 
       <div className="flex flex-col lg:flex-row space-y-4 lg:space-x-4">
+        
         <div className="flex p-5 rounded-md bg-zinc-700">
           <Stepper activeStep={activeStep} orientation="vertical">
             {steps.map((step) => (
