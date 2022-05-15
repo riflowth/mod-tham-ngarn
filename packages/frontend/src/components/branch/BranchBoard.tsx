@@ -34,14 +34,14 @@ const sortings: Sorting[] = [
       return 0;
     }
   },
-  {
-    text: 'Issue Count',
-    sort: (a: any, b: any) => {
-      if (a.address < b.address) return -1;
-      if (a.address > b.address) return 1;
-      return 0;
-    }
-  },
+  // {
+  //   text: 'Issue Count',
+  //   sort: (a: any, b: any) => {
+  //     if (a.address < b.address) return -1;
+  //     if (a.address > b.address) return 1;
+  //     return 0;
+  //   }
+  // },
   {
     text: 'Manager Name',
     sort: (a: any, b: any) => {
