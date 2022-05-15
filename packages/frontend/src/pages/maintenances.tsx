@@ -8,7 +8,7 @@ import { withUser } from "@components/hoc/withUser";
 const MaintenancesPage: NextPage = () => {
   return (
     <Dashboard current="Ticket">
-      <div className="p-8 overflow-y-auto w-full">
+      <div className="w-full p-8 overflow-y-auto">
         <TableComponent<MaintenanceLog>
           path={"maintenance"}
           title={"Maintenance Logs"}

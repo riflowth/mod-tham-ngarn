@@ -36,7 +36,9 @@ function Row(props: { row: Machine }) {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
             Router.reload();
           })
-          .catch((error: any) => Swal.fire("Failed", error, "error"));
+          .catch((error: any) =>
+            Swal.fire("Failed", error.response.data.message, "error")
+          );
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         Swal.fire("Cancelled", "Your imaginary file is safe :)", "error");
       }
@@ -45,19 +47,17 @@ function Row(props: { row: Machine }) {
   return (
     <React.Fragment>
       <TableRow style={{ width: "auto" }}>
-        <TableCell style={{ width: 160, color: 'white' }}>
+        <TableCell style={{ width: 160, color: "white" }}>
           {row.machineId}
         </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }}>
-          {row.name}
-        </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }}>
+        <TableCell style={{ width: 160, color: "white" }}>{row.name}</TableCell>
+        <TableCell style={{ width: 160, color: "white" }}>
           {row.zoneId}
         </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }}>
+        <TableCell style={{ width: 160, color: "white" }}>
           {row.serial}
         </TableCell>
-        <TableCell style={{ width: 160, color: 'white' }}>
+        <TableCell style={{ width: 160, color: "white" }}>
           {row.manufacturer}
         </TableCell>
 
@@ -79,7 +79,7 @@ function Row(props: { row: Machine }) {
             aria-label="expand row"
             size="small"
             onClick={() => setOpen(!open)}
-            style={{ color: 'rgb(161, 161, 170)' }}
+            style={{ color: "rgb(161, 161, 170)" }}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
@@ -95,10 +95,10 @@ function Row(props: { row: Machine }) {
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell style={{ color: 'white' }}>Date</TableCell>
-                    <TableCell style={{ color: 'white' }}>Customer</TableCell>
-                    <TableCell style={{ color: 'white' }}>Amount</TableCell>
-                    <TableCell style={{ color: 'white' }}>
+                    <TableCell style={{ color: "white" }}>Date</TableCell>
+                    <TableCell style={{ color: "white" }}>Customer</TableCell>
+                    <TableCell style={{ color: "white" }}>Amount</TableCell>
+                    <TableCell style={{ color: "white" }}>
                       Total price ($)
                     </TableCell>
                   </TableRow>

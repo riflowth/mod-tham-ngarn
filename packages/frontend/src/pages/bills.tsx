@@ -8,13 +8,12 @@ import { withUser } from "@components/hoc/withUser";
 const BillsPage: NextPage = () => {
   return (
     <Dashboard current="Bill">
-      <div className="p-8 overflow-y-auto w-full">
+      <div className="w-full p-8 overflow-y-auto">
         <TableComponent<Bill>
           path={"bill"}
           title={"Bills"}
           columns={["", "Id", "Stroe", "Oredered by", "", ""]}
         >
-          <div>deleteme</div>
           <BillItems rows={[]} />
           <div>deleteme</div>
         </TableComponent>

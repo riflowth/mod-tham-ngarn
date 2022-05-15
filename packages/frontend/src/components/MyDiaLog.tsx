@@ -1,25 +1,24 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState, cloneElement, useEffect } from "react";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 type MyDialogProp = {
-  children: React.ReactElement,
-  isModalOpen: boolean,
-  close: Function,
+  children: React.ReactElement;
+  isModalOpen: boolean;
+  close: Function;
 };
 
 export function MyDialog({ children, isModalOpen, close }: MyDialogProp) {
-
   const [confirm, setConfirm] = useState(false);
 
   const openConfirm = async () => {
     const value = await Swal.fire({
-      icon: 'question',
-      title: 'Confirm Action',
+      icon: "question",
+      title: "Confirm Action",
       showCancelButton: true,
       toast: true,
-      width: '20rem',
-      confirmButtonText: 'Confirm',
+      width: "20rem",
+      confirmButtonText: "Confirm",
     });
     if (value.isConfirmed) {
       setConfirm(true);
@@ -58,13 +57,13 @@ export function MyDialog({ children, isModalOpen, close }: MyDialogProp) {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+                <Dialog.Panel className="w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform shadow-xl bg-zinc-700 rounded-2xl">
                   {cloneElement(children, { confirm: confirm })}
                   <div className="flex flex-row justify-around">
                     <div className="mt-4">
                       <button
                         type="button"
-                        className="inline-flex justify-center px-4 py-2 text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md focus:outline-none hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                        className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md bg-violet-500 focus:outline-none hover:bg-violet-400 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                         onClick={openConfirm}
                       >
                         OK
@@ -73,7 +72,7 @@ export function MyDialog({ children, isModalOpen, close }: MyDialogProp) {
                     <div className="mt-4">
                       <button
                         type="button"
-                        className="inline-flex justify-center px-4 py-2 text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md focus:outline-none hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                        className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md bg-violet-500 focus:outline-none hover:bg-violet-400 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                         onClick={() => close()}
                       >
                         Cancel
