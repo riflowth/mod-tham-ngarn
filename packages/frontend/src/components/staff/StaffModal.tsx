@@ -49,7 +49,7 @@ export const StaffModal = ({ confirm, current }: StaffModalProp) => {
       <div className="p-2 font-semibold text-center rounded-md bg-violet-400 ">
         Staff
       </div>
-      <form className="w-full mx-auto space-y-2">
+      <form className="w-full space-y-2">
         <div className="flex flex-col justify-around space-y-1">
           <label className="">Full Name</label>
           <InputBox

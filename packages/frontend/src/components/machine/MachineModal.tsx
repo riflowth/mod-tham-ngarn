@@ -43,10 +43,12 @@ export const MachineModal = ({ confirm, current }: MachineModalProp) => {
   }, [confirm, input]);
 
   return (
-    <>
-      <div>Machine</div>
-      <form>
-        <div>
+    <div className="space-y-2 text-white">
+      <div className="p-2 font-semibold text-center rounded-md bg-violet-400 ">
+        Machine
+      </div>
+      <form className="w-full space-y-2">
+        <div className="flex flex-col justify-around space-y-1">
           <label>Name</label>
           <InputBox
             name="name"
@@ -55,7 +57,7 @@ export const MachineModal = ({ confirm, current }: MachineModalProp) => {
             onChange={handleInput}
           />
         </div>
-        <div>
+        <div className="flex flex-col justify-around space-y-1">
           <label htmlFor="">ZoneId</label>
           <InputBox
             name="zoneId"
@@ -64,7 +66,7 @@ export const MachineModal = ({ confirm, current }: MachineModalProp) => {
             onChange={handleInput}
           />
         </div>
-        <div>
+        <div className="flex flex-col justify-around space-y-1">
           <label htmlFor="">Serial</label>
           <InputBox
             name="serial"
@@ -73,7 +75,7 @@ export const MachineModal = ({ confirm, current }: MachineModalProp) => {
             onChange={handleInput}
           />
         </div>
-        <div>
+        <div className="flex flex-col justify-around space-y-1">
           <label htmlFor="">Manufacturer</label>
           <InputBox
             name="manufacturer"
@@ -82,7 +84,7 @@ export const MachineModal = ({ confirm, current }: MachineModalProp) => {
             onChange={handleInput}
           />
         </div>
-        <div>
+        <div className="flex flex-col justify-around space-y-1">
           <label htmlFor="">Registration date</label>
           <InputBox
             name="registrationDate"
@@ -91,7 +93,7 @@ export const MachineModal = ({ confirm, current }: MachineModalProp) => {
             onChange={handleInput}
           />
         </div>
-        <div>
+        <div className="flex flex-col justify-around space-y-1">
           <label htmlFor="">Retired date</label>
           <InputBox
             name="retiredDate"
@@ -101,6 +103,6 @@ export const MachineModal = ({ confirm, current }: MachineModalProp) => {
           />
         </div>
       </form>
-    </>
+    </div>
   );
 };
