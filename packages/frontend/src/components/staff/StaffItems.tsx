@@ -95,6 +95,9 @@ function Row(props: { row: Staff }) {
           </div>
         </TableCell>
       </TableRow>
+      <MyDialog<Staff> isModalOpen={isClick} close={closeModal} action={'edit'} current={row} >
+        <StaffModal />
+      </MyDialog>
     </React.Fragment>
   );
 }
