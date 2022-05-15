@@ -160,17 +160,18 @@ export class MachinePartService {
     }
 
     const machinePartToRead = await this.getAllMachinePartByMachineId(machineId);
-    let totalCost = 0;
-    machinePartToRead.forEach(async (machinePart) => {
+
+    const orders = await Promise.all(machinePartToRead.map((machinePart) => {
       const targetOrder = new Order().setPartId(machinePart.getPartId());
-      const [order] = await this.orderRepository.read(targetOrder);
-      if (!order) {
-        totalCost += 0;
-      } else {
-        totalCost += order.getPrice();
-      }
-    });
-    return totalCost;
+      return this.orderRepository.read(targetOrder);
+    }));
+
+    const cost = orders.reduce((acc, order) => {
+      const price = (order.length !== 0) ? order[0].getPrice() : 0;
+      return acc + price;
+    }, 0);
+
+    return cost;
   }
 
 }
