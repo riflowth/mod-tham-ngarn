@@ -21,7 +21,7 @@ export const BillModal = ({ confirm, current }: MachineModalProp) => {
     billId: current?.billId || 0,
     storeName: current?.storeName || "",
     orderDate: current?.orderDate || new Date(),
-    orderBy: current?.orderBy || user?.staffId,
+    orderBy: user?.staffId,
   });
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,15 +71,6 @@ export const BillModal = ({ confirm, current }: MachineModalProp) => {
             name="orderDate"
             type="date"
             value={input.orderDate.toString()}
-            onChange={handleInput}
-          />
-        </div>
-        <div className="flex flex-col justify-around space-y-1">
-          <label htmlFor="">Order by</label>
-          <InputBox
-            name="orderBy"
-            type="disabled"
-            value={user?.staffId!}
             onChange={handleInput}
           />
         </div>
