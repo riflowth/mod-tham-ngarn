@@ -25,6 +25,7 @@ type ApiResponse = {
 function Row(props: { row: Machine }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
+  const [totalPrice, setTotalPrice] = React.useState(0);
   const [maintenanceLog, setMaintenanceLog] = React.useState<MaintenanceLog[]>(
     []
   );
@@ -83,6 +84,12 @@ function Row(props: { row: Machine }) {
       }
     });
   };
+
+  const getTotalPrice = async (machineId: number) => {
+    const response = await fetch.get(`/part/costs/${machineId}`);
+    setTotalPrice(response.data.data);
+  };
+  1;
   return (
     <React.Fragment>
       <TableRow style={{ width: "auto" }}>
@@ -119,6 +126,7 @@ function Row(props: { row: Machine }) {
             size="small"
             onClick={() => {
               getMaintenanceLog(row.machineId);
+              getTotalPrice(row.machineId);
               setOpen(!open);
             }}
             style={{ color: "rgb(161, 161, 170)" }}
@@ -134,6 +142,7 @@ function Row(props: { row: Machine }) {
               <Typography className="text-white" gutterBottom component="div">
                 History
               </Typography>
+
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
@@ -158,6 +167,7 @@ function Row(props: { row: Machine }) {
                   {valided ? (
                     maintenanceLog.map((log) => {
                       const bgStatus = checkStatus(log.status);
+
                       return (
                         <TableRow key={log.maintenanceId}>
                           <TableCell>{log.maintenanceId}</TableCell>
@@ -189,6 +199,12 @@ function Row(props: { row: Machine }) {
                   )}
                 </TableBody>
               </Table>
+              <div className="flex justify-end w-full p-2 text-white">
+                <p className="p-2 rounded-md bg-zinc-900">
+                  Total Price:{" "}
+                  {new Intl.NumberFormat("th-TH").format(totalPrice)} bath
+                </p>
+              </div>
             </Box>
           </Collapse>
         </TableCell>
