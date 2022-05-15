@@ -3,7 +3,7 @@ import { OrderItems } from '@components/order/OrderItems';
 import { Dashboard } from '@components/dashboard/Dashboard';
 import { withUser } from '@components/hoc/withUser';
 import { MaintenanceBoard } from '@components/maintenancelog/MaintenanceLogBoard';
-import { MaintenancePartItems } from '@components/maintenancelog/MaintenancePartItems';
+import { MaintenancePartItems } from '@components/maintenancePart/MaintenancePartItems';
 import { TableComponent } from '@components/table/TableComponent';
 import { MaintenancePart } from '@models/MaintenancePart';
 import { Order } from '@models/Order';
