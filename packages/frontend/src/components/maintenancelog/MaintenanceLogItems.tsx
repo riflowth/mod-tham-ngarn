@@ -69,6 +69,12 @@ function Row(props: { row: MaintenanceLog }) {
 
         <TableCell>
           <div className="flex flex-row space-x-4">
+            <button
+              className="w-10 h-10 p-2 text-teal-500 bg-transparent rounded-md ring-1 ring-teal-500 hover:bg-teal-500 hover:text-white"
+              onClick={() => Router.push(`/maintenance/${row.maintenanceId}`)}
+            >
+              <ExternalLinkIcon />
+            </button>
             <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
               <PencilAltIcon />
             </button>
@@ -78,13 +84,6 @@ function Row(props: { row: MaintenanceLog }) {
             >
               <TrashIcon />
             </button>
-            <button
-              className="w-10 h-10 p-2 text-green-500 bg-transparent rounded-md ring-1 ring-green-500 hover:bg-green-500 hover:text-white"
-              onClick={() => Router.push(`/maintenance/${row.maintenanceId}`)}
-            >
-              <ExternalLinkIcon />
-            </button>
-            
           </div>
         </TableCell>
         <TableCell>
