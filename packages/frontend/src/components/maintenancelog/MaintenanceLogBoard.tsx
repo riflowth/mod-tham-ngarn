@@ -188,7 +188,7 @@ export const MaintenanceBoard = ({
 
           <div className="flex flex-row w-full h-12 items-center">
             <span className="w-1/3 h-1/2 text-zinc-400 text-center font-mono">total price: </span>
-            <span className="w-2/3 h-1/2 text-zinc-200 text-right font-mono overflow-scroll">{totalPrice}</span>
+            <span className="w-2/3 h-1/2 text-zinc-200 text-right font-mono overflow-scroll">{new Intl.NumberFormat('th-TH').format(totalPrice) + ' ฿'}</span>
           </div>
         </div>
 

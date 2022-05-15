@@ -43,7 +43,8 @@ export class BranchService {
     const [relatedAddress] = await this.addressRepository.read(relatedAddressToRead);
 
     if (!relatedAddress) {
-      throw new BadRequestException('Postal code related to branch does not existed');
+      const addressToAdd = new Address().setPostalCode(newBranch.getPostalCode());
+      await this.addressRepository.create(addressToAdd);
     }
 
     return this.branchRepository.create(newBranch);

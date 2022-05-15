@@ -48,18 +48,17 @@ export const StaffModal = ({ confirm, current, action }: StaffModalProp) => {
             );
           } else if (action == 'edit') {
             await fetch
-            .put<ApiResponse>(`/staff/${current?.staffId}`, {
-              staffId: input.staffId == current?.staffId ? undefined : input.staffId,
-              password: input.password == '' ? undefined : input.password,
-              fullName: input.fullName == current?.fullName ? undefined : input.fullName,
-              branchId: input.branchId == current?.branchId ? undefined : input.branchId,
-              zoneId: input.zoneId == current?.zoneId ? undefined : input.zoneId,
-              telNo: input.telNo == current?.telNo ? undefined : input.telNo,
-              salary: input.salary == current?.salary ? undefined : input.salary,
-              position: input.position == current?.position ? undefined : input.position,
-              dob: input.dob == current?.dateOfBirth ? undefined : input.dob,
+              .put<ApiResponse>(`/staff/${current?.staffId}`, {
+                password: input.password == '' ? undefined : input.password,
+                fullName: input.fullName == current?.fullName ? undefined : input.fullName,
+                branchId: input.branchId == current?.branchId ? undefined : input.branchId,
+                zoneId: input.zoneId == current?.zoneId ? undefined : input.zoneId,
+                telNo: input.telNo == current?.telNo ? undefined : input.telNo,
+                salary: input.salary == current?.salary ? undefined : input.salary,
+                position: input.position == current?.position ? undefined : input.position,
+                dob: input.dob == current?.dateOfBirth ? undefined : input.dob,
             }).then(() => {
-              Swal.fire("Added!", "Your info has been updated.", "success");
+              Swal.fire("Success!", "Your info has been updated.", "success");
               Router.reload();
             }).catch((error: any) =>
               Swal.fire("Failed", error.response.data.message, "error")
