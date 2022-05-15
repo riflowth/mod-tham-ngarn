@@ -16,10 +16,16 @@ import Image from "next/image";
 import Router from "next/router";
 import * as React from "react";
 import Swal from "sweetalert2";
+import { MyDialog } from "@components/MyDiaLog";
+import { StaffModal } from '@components/staff/StaffModal';
 
 function Row(props: { row: Staff }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
+  const [isClick, setIsClick] = React.useState(false)
+
+  const openModal = () => setIsClick(true);
+  const closeModal = () => setIsClick(false);
 
   const deleteStaff = async (staffId: number) => {
     Swal.fire({
@@ -74,7 +80,10 @@ function Row(props: { row: Staff }) {
 
         <TableCell>
           <div className="flex flex-row space-x-4">
-            <button className="w-10 h-10 p-2 text-purple-400 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
+            <button 
+              className="w-10 h-10 p-2 text-purple-400 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white"
+              onClick={openModal}  
+            >
               <PencilAltIcon />
             </button>
             <button
@@ -120,6 +129,9 @@ function Row(props: { row: Staff }) {
           </Collapse>
         </TableCell>
       </TableRow>
+      <MyDialog<Staff> isModalOpen={isClick} close={closeModal} action={'edit'} current={row} >
+        <StaffModal />
+      </MyDialog>
     </React.Fragment>
   );
 }
