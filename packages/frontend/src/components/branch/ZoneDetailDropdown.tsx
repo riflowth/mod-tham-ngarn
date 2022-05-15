@@ -1,9 +1,10 @@
 import { SpinnerIcon } from '@components/SpinnerIcon';
 import { Disclosure } from '@headlessui/react';
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/outline';
+import { CheckCircleIcon, TrashIcon, XCircleIcon } from '@heroicons/react/outline';
 import { ClassUtils } from '@utils/CommonUtils';
 import fetch from '@utils/Fetch';
 import { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 
 type ZoneDetailDropdownProp = {
   isOpen: boolean,
@@ -42,46 +43,64 @@ export const ZoneDetailDropdown = ({
 
   useEffect(() => {
     if (!isOpen) return;
-
-    const fetchZoneData = async () => {
-      const machines = await fetch.get<ApiResponse>(`/machine/branch/${branchId}`);
-      const machineStatus = await Promise.all(machines.data.data
-        .map((machine) => fetch
-          .get(`/part/status/` + machine.machineId)
-          .then((data) => { return { status: data.data, id: machine.machineId }; })));
-
-      const zones: Zone[] = [];
-
-      machines.data.data.forEach((machine) => {
-        const zone = zones.find((zone: any) => zone.zoneId === machine.zoneId);
-        const status = machineStatus.find((status) => status.id === machine.machineId);
-
-        if (!zone) {
-          zones.push({
-            zoneId: machine.zoneId,
-            machines: [{
-              id: machine.machineId,
-              status: status ? status.status.data : 'UNAVAILABLE',
-            }],
-          });
-        } else {
-          zone.machines.push({
-            id: machine.machineId,
-            status: status ? status.status.data : 'UNAVAILABLE',
-          });
-        }
-      });
-
-      zoneData.map((zone) => {
-        console.log(zone.machines);
-      });
-
-      setZoneData(zones);
-      setIsLoading(false);
-    };
-
     fetchZoneData();
   }, [isOpen]);
+
+  const fetchZoneData = async () => {
+    const machines = await fetch.get<ApiResponse>(`/machine/branch/${branchId}`);
+    const machineStatus = await Promise.all(machines.data.data
+      .map((machine) => fetch
+        .get(`/part/status/` + machine.machineId)
+        .then((data) => { return { status: data.data, id: machine.machineId }; })));
+
+    const zones: Zone[] = [];
+
+    machines.data.data.forEach((machine) => {
+      const zone = zones.find((zone: any) => zone.zoneId === machine.zoneId);
+      const status = machineStatus.find((status) => status.id === machine.machineId);
+
+      if (!zone) {
+        zones.push({
+          zoneId: machine.zoneId,
+          machines: [{
+            id: machine.machineId,
+            status: status ? status.status.data : 'UNAVAILABLE',
+          }],
+        });
+      } else {
+        zone.machines.push({
+          id: machine.machineId,
+          status: status ? status.status.data : 'UNAVAILABLE',
+        });
+      }
+    });
+
+    setZoneData(zones);
+    setIsLoading(false);
+  };
+
+  const deleteZone = async (zoneId: number) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await fetch
+          .delete(`/zone/${zoneId}`)
+          .then(() => {
+            Swal.fire("Deleted!", "This Zone has been deleted.", "success");
+            fetchZoneData();
+          })
+          .catch((error: any) => Swal.fire("Failed", error.response.data.message, "error"));
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire("Cancelled", "Your Zone is safe :)", "error");
+      }
+    });
+  };
 
   return (
     <Disclosure.Panel className={ClassUtils.concat(
@@ -131,6 +150,14 @@ export const ZoneDetailDropdown = ({
                       {zone.machines.filter((machine) => machine.status === 'UNAVAILABLE').length}
                     </span>
                   </div>
+                </td>
+                <td className="px-2 py-3">
+                  <button
+                    className="w-8 h-8 p-1.5 text-red-500 bg-transparent rounded-md ring-1 ring-red-500 hover:bg-red-500 hover:text-white"
+                    onClick={() => deleteZone(zone.zoneId)}
+                  >
+                    <TrashIcon />
+                  </button>
                 </td>
               </tr>
             ))}
