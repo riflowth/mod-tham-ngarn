@@ -1,4 +1,5 @@
 import { MaintenancePartModal } from '@components/maintenancePart/MaintenancePartModal';
+import { UpdateMaintenancePartStatusModal } from '@components/maintenancePart/UpdateMaintenancePartStatusModal';
 import { MyDialog } from '@components/MyDiaLog';
 import { ExternalLinkIcon, PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
 import { MaintenancePart } from "@models/MaintenancePart";
@@ -25,6 +26,11 @@ function Row(props: { row: MaintenancePart }) {
 
   const openModal = () => setIsClick(true);
   const closeModal = () => setIsClick(false);
+
+  const [isClickUpdate, setIsClickUpdate] = React.useState(false);
+
+  const openUpdateModal = () => setIsClickUpdate(true);
+  const closeUpdateModal = () => setIsClickUpdate(false);
 
   const deleteMaintenance = async (maintenanceId: number) => {
     Swal.fire({
@@ -66,7 +72,7 @@ function Row(props: { row: MaintenancePart }) {
           {row.status}
           <button
               className="w-10 h-10 p-2 mx-2 text-teal-500 bg-transparent rounded-md ring-1 ring-teal-500 hover:bg-teal-500 hover:text-white"
-              onClick={() => handleMaintenancePartStatus()}
+              onClick={() => openUpdateModal()}
             >
               <ExternalLinkIcon />
             </button>
@@ -123,6 +129,9 @@ function Row(props: { row: MaintenancePart }) {
       </TableRow>
       <MyDialog<MaintenancePart> isModalOpen={isClick} close={closeModal} action={'edit'} current={row} >
         <MaintenancePartModal maintenanceId={row.maintenanceId}/>
+      </MyDialog>
+      <MyDialog<MaintenancePart> isModalOpen={isClickUpdate} close={closeUpdateModal} action={'im very hungry'} current={row}>
+        <UpdateMaintenancePartStatusModal maintenanceId={row.maintenanceId} partId={row.partId} />
       </MyDialog>
     </React.Fragment>
   );
