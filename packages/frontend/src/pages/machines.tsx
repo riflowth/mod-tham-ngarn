@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import { TableComponent } from "@components/table/TableComponent";
 import { MachineItems } from "@components/machine/MachineItems";
 import { Machine } from "@models/Machine";
-import { withUser } from '@components/hoc/withUser';
+import { withUser } from "@components/hoc/withUser";
 
 const MachinesPage: NextPage = () => {
   return (
@@ -14,6 +14,7 @@ const MachinesPage: NextPage = () => {
           title={"Machines"}
           columns={["Id", "Name", "Zone", "Serial", "Manufacturer", "", ""]}
         >
+          <div>deleteme</div>
           <MachineItems rows={[]} />
           <div>deleteme</div>
         </TableComponent>

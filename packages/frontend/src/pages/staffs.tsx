@@ -3,12 +3,12 @@ import { NextPage } from "next";
 import { TableComponent } from "@components/table/TableComponent";
 import { StaffItems } from "@components/staff/StaffItems";
 import { Staff } from "@models/Staff";
-import { withUser } from '@components/hoc/withUser';
+import { withUser } from "@components/hoc/withUser";
 
 const StaffsPage: NextPage = () => {
   return (
     <Dashboard current="Staff">
-      <div className="p-8 overflow-y-auto w-full">
+      <div className="w-full p-8 overflow-y-auto">
         <TableComponent<Staff>
           path={"staff"}
           title={"Staffs"}
