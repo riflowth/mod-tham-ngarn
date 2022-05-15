@@ -20,7 +20,7 @@ const MaintenancePage: NextPage = () => {
         <TableComponent<MaintenancePart>
           path={`maintenance/${maintenanceId}/part`}
           title={'Maintenance Parts'}
-          columns={['maintenanceId', 'partId', 'type', 'status', 'orderId']}
+          columns={['maintenanceId', 'partId', 'type', 'status', 'orderId', "", ""]}
         >
           <MaintenancePartItems rows={[]} />
           <div>deleteme</div>

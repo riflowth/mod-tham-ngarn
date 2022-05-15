@@ -43,29 +43,29 @@ function Row(props: { row: MaintenancePart }) {
   return (
     <React.Fragment>
       <TableRow style={{ width: "auto" }}>
-        <TableCell style={{ width: 160 }} className="text-white">
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
           {row.maintenanceId}
         </TableCell>
-        <TableCell style={{ width: 160 }} className="text-white">
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
           {row.partId}
         </TableCell>
-        <TableCell style={{ width: 160 }} className="text-white">
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
           {row.type}
         </TableCell>
-        <TableCell style={{ width: 160 }} className="text-white">
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
           {row.status}
         </TableCell>
-        <TableCell style={{ width: 160 }} className="text-white">
+        <TableCell style={{ width: 160, color: 'white' }} className="text-white">
           {row.orderId}
         </TableCell>
 
         <TableCell>
-          <div className="flex justify-around">
+          <div className="flex flex-row space-x-4">
             <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
               <PencilAltIcon />
             </button>
             <button
-              className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white"
+              className="w-10 h-10 p-2 text-red-500 bg-transparent rounded-md ring-1 ring-red-500 hover:bg-red-500 hover:text-white"
               onClick={() => deleteMaintenance(row.maintenanceId)}
             >
               <TrashIcon />
@@ -77,7 +77,7 @@ function Row(props: { row: MaintenancePart }) {
             aria-label="expand row"
             size="small"
             onClick={() => setOpen(!open)}
-            className="text-white bg-violet-700 hover:bg-violet-400"
+            style={{ color: 'rgb(161, 161, 170)' }}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
@@ -93,10 +93,10 @@ function Row(props: { row: MaintenancePart }) {
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell className="text-white">Date</TableCell>
-                    <TableCell className="text-white">Customer</TableCell>
-                    <TableCell className="text-white">Amount</TableCell>
-                    <TableCell className="text-white">
+                    <TableCell style={{ color: 'white' }}>Date</TableCell>
+                    <TableCell style={{ color: 'white' }}>Customer</TableCell>
+                    <TableCell style={{ color: 'white' }}>Amount</TableCell>
+                    <TableCell style={{ color: 'white' }}>
                       Total price ($)
                     </TableCell>
                   </TableRow>
