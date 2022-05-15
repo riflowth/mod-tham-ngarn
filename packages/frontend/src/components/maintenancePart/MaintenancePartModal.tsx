@@ -17,9 +17,9 @@ interface ApiResponse {
 
 export const MaintenancePartModal = ({ confirm, current, maintenanceId }: MaintenancePartModalProp) => {
   const [input, setInput] = useState({
-    partId: current?.partId || 0,
+    partId: current?.partId || null,
     type: current?.type || "",  
-    orderId: current?.orderId || 0,
+    orderId: current?.orderId || null,
   });
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {

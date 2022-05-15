@@ -17,8 +17,8 @@ interface ApiResponse {
 
 export const OrderModal = ({ confirm, current, billId }: OrderModalProp) => {
   const [input, setInput] = useState({
-    machineId: current?.machineId || 0,
-    partId: current?.partId || 0,
+    machineId: current?.machineId || null,
+    partId: current?.partId || null,
     price: current?.price || 0,
   });
 
