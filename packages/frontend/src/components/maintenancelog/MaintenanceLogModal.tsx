@@ -5,16 +5,17 @@ import fetch from "@utils/Fetch";
 import Swal from "sweetalert2";
 import Router from "next/router";
 
-type MachineModalProp = {
+type MaintenanceLogModalProp = {
   confirm?: boolean;
   current?: MaintenanceLog;
+  action?: string;
 };
 
 interface ApiResponse {
   data: Array<MaintenanceLog>;
 }
 
-export const MaintenanceLogModal = ({ confirm, current }: MachineModalProp) => {
+export const MaintenanceLogModal = ({ confirm, current, action }: MaintenanceLogModalProp) => {
   const [input, setInput] = useState({
     machineId: current?.machineId || 0,
     reason: current?.reason || "",
@@ -28,15 +29,29 @@ export const MaintenanceLogModal = ({ confirm, current }: MachineModalProp) => {
     const submit = async () => {
       try {
         if (confirm) {
-          await fetch
-            .post<ApiResponse>(`/maintenance`, input)
-            .then(() => {
-              Swal.fire("Success!", "Your file has been add.", "success");
-              Router.reload();
-            })
-            .catch((error: any) =>
-              Swal.fire("Failed", error.response.data.message, "error")
-            );
+          if (action === 'add') {
+            await fetch
+              .post<ApiResponse>(`/maintenance`, input)
+              .then(() => {
+                Swal.fire("Success!", "Your file has been add.", "success");
+                Router.reload();
+              })
+              .catch((error: any) =>
+                Swal.fire("Failed", error.response.data.message, "error")
+              );
+          } else if (action === 'edit') {
+            await fetch
+              .put<ApiResponse>(`/maintenance/${current?.maintenanceId}`, {
+                reason: input.reason == current?.reason ? undefined : input.reason,
+              })
+              .then(() => {
+                Swal.fire("Success!", "Your file has been edit.", "success");
+                Router.reload();
+              })
+              .catch((error: any) =>
+                Swal.fire("Failed", error.response.data.message, "error")
+              );
+          }
         }
       } catch (e) {
         console.log(e);
@@ -52,7 +67,7 @@ export const MaintenanceLogModal = ({ confirm, current }: MachineModalProp) => {
         MaintenanceLog
       </div>
       <form className="w-full space-y-2">
-        <div className="flex flex-col justify-around space-y-1">
+        {action !== 'edit' && <div className="flex flex-col justify-around space-y-1">
           <label>MachineId</label>
           <InputBox
             name="machineId"
@@ -60,7 +75,7 @@ export const MaintenanceLogModal = ({ confirm, current }: MachineModalProp) => {
             value={input.machineId}
             onChange={handleInput}
           />
-        </div>
+        </div>}
         <div className="flex flex-col justify-around space-y-1">
           <label htmlFor="">Reason</label>
           <InputBox

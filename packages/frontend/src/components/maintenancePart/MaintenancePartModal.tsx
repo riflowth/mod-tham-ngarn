@@ -8,6 +8,7 @@ import { MaintenancePart } from '@models/MaintenancePart';
 type MaintenancePartModalProp = {
   confirm?: boolean;
   current?: MaintenancePart;
+  action?: string;
   maintenanceId?: number;
 };
 
@@ -15,10 +16,10 @@ interface ApiResponse {
   data: Array<MaintenancePart>;
 }
 
-export const MaintenancePartModal = ({ confirm, current, maintenanceId }: MaintenancePartModalProp) => {
+export const MaintenancePartModal = ({ confirm, current, action, maintenanceId }: MaintenancePartModalProp) => {
   const [input, setInput] = useState({
     partId: current?.partId || null,
-    type: current?.type || "",  
+    type: current?.type || "",
     orderId: current?.orderId || null,
   });
 
@@ -30,15 +31,30 @@ export const MaintenancePartModal = ({ confirm, current, maintenanceId }: Mainte
     const submit = async () => {
       try {
         if (confirm) {
-          await fetch
-            .post<ApiResponse>(`/maintenance/${maintenanceId}/part`, input)
-            .then(() => {
-              Swal.fire("Success!", "Your file has been add.", "success");
-              Router.reload();
-            })
-            .catch((error: any) =>
-              Swal.fire("Failed", error.response.data.message, "error")
-            );
+          if (action === 'add') {
+            await fetch
+              .post<ApiResponse>(`/maintenance/${maintenanceId}/part`, input)
+              .then(() => {
+                Swal.fire("Success!", "Your file has been add.", "success");
+                Router.reload();
+              })
+              .catch((error: any) =>
+                Swal.fire("Failed", error.response.data.message, "error")
+              );
+          } else if (action === 'edit') {
+            await fetch
+              .put<ApiResponse>(`/maintenance/${maintenanceId}/part/${current?.partId}`, {
+                type: input.type == current?.type ? undefined : input.type,
+                orderId: input.orderId == current?.orderId ? undefined : input.orderId,
+              })
+              .then(() => {
+                Swal.fire("Success!", "Your file has been edit.", "success");
+                Router.reload();
+              })
+              .catch((error: any) =>
+                Swal.fire("Failed", error.response.data.message, "error")
+              );
+          }
         }
       } catch (e) {
         console.log(e);

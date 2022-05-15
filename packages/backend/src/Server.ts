@@ -191,7 +191,10 @@ export class Server extends Springpress {
     registry.register(new OrderController(this.orderService), authMiddleware);
     registry.register(new StaffController(this.staffService), authMiddleware);
     registry.register(new ZoneController(this.zoneService), authMiddleware);
-    registry.register(new MachineController(this.machineService), authMiddleware);
+    registry.register(
+      new MachineController(this.machinePartService, this.machineService),
+      authMiddleware,
+    );
   }
 
   private async connectDatabase(): Promise<void> {

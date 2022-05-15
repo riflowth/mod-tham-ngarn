@@ -1,3 +1,5 @@
+import { MachineModal } from "@components/machine/MachineModal";
+import { MyDialog } from "@components/MyDiaLog";
 import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
 import { Machine } from "@models/Machine";
 import { MaintenanceLog } from "@models/MaintenanceLog";
@@ -25,10 +27,14 @@ type ApiResponse = {
 function Row(props: { row: Machine }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
+  const [isClick, setIsClick] = React.useState(false);
   const [totalPrice, setTotalPrice] = React.useState(0);
   const [maintenanceLog, setMaintenanceLog] = React.useState<MaintenanceLog[]>(
     []
   );
+  const openModal = () => setIsClick(true);
+  const closeModal = () => setIsClick(false);
+
   const [valided, setValided] = React.useState(false);
   React.useEffect(() => {
     if (maintenanceLog) {
@@ -109,7 +115,10 @@ function Row(props: { row: Machine }) {
 
         <TableCell>
           <div className="flex flex-row space-x-4">
-            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
+            <button
+              className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white"
+              onClick={openModal}
+            >
               <PencilAltIcon />
             </button>
             <button
@@ -209,6 +218,14 @@ function Row(props: { row: Machine }) {
           </Collapse>
         </TableCell>
       </TableRow>
+      <MyDialog<Machine>
+        isModalOpen={isClick}
+        close={closeModal}
+        action={"edit"}
+        current={row}
+      >
+        <MachineModal />
+      </MyDialog>
     </React.Fragment>
   );
 }

@@ -1,3 +1,5 @@
+import { MaintenancePartModal } from '@components/maintenancePart/MaintenancePartModal';
+import { MyDialog } from '@components/MyDiaLog';
 import { ExternalLinkIcon, PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
 import { MaintenancePart } from "@models/MaintenancePart";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -19,6 +21,10 @@ import Swal from "sweetalert2";
 function Row(props: { row: MaintenancePart }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
+  const [isClick, setIsClick] = React.useState(false);
+
+  const openModal = () => setIsClick(true);
+  const closeModal = () => setIsClick(false);
 
   const deleteMaintenance = async (maintenanceId: number) => {
     Swal.fire({
@@ -71,7 +77,7 @@ function Row(props: { row: MaintenancePart }) {
 
         <TableCell>
           <div className="flex flex-row space-x-4">
-            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
+            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white" onClick={openModal}>
               <PencilAltIcon />
             </button>
             <button
@@ -115,6 +121,9 @@ function Row(props: { row: MaintenancePart }) {
           </Collapse>
         </TableCell>
       </TableRow>
+      <MyDialog<MaintenancePart> isModalOpen={isClick} close={closeModal} action={'edit'} current={row} >
+        <MaintenancePartModal maintenanceId={row.maintenanceId}/>
+      </MyDialog>
     </React.Fragment>
   );
 }

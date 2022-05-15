@@ -16,10 +16,16 @@ import Router from "next/router";
 import * as React from "react";
 import Swal from "sweetalert2";
 import moment from 'moment';
+import { MyDialog } from '@components/MyDiaLog';
+import { MaintenanceLogModal } from '@components/maintenancelog/MaintenanceLogModal';
 
 function Row(props: { row: MaintenanceLog }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
+  const [isClick, setIsClick] = React.useState(false);
+
+  const openModal = () => setIsClick(true);
+  const closeModal = () => setIsClick(false);
 
   const deleteMaintenance = async (maintenanceId: number) => {
     Swal.fire({
@@ -75,7 +81,7 @@ function Row(props: { row: MaintenanceLog }) {
             >
               <ExternalLinkIcon />
             </button>
-            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
+            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white" onClick={openModal}>
               <PencilAltIcon />
             </button>
             <button
@@ -121,6 +127,9 @@ function Row(props: { row: MaintenanceLog }) {
           </Collapse>
         </TableCell>
       </TableRow>
+      <MyDialog<MaintenanceLog> isModalOpen={isClick} close={closeModal} action={'edit'} current={row} >
+        <MaintenanceLogModal />
+      </MyDialog>
     </React.Fragment>
   );
 }
