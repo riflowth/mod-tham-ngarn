@@ -1,23 +1,25 @@
-import { MaintenanceLog } from "@models/MaintenanceLog";
 import { useEffect, useState } from "react";
 import { InputBox } from "@components/InputBox";
 import fetch from "@utils/Fetch";
 import Swal from "sweetalert2";
 import Router from "next/router";
+import { MaintenancePart } from '@models/MaintenancePart';
 
-type MachineModalProp = {
+type MaintenancePartModalProp = {
   confirm?: boolean;
-  current?: MaintenanceLog;
+  current?: MaintenancePart;
+  maintenanceId?: number;
 };
 
 interface ApiResponse {
-  data: Array<MaintenanceLog>;
+  data: Array<MaintenancePart>;
 }
 
-export const MaintenanceLogModal = ({ confirm, current }: MachineModalProp) => {
+export const MaintenancePartModal = ({ confirm, current, maintenanceId }: MaintenancePartModalProp) => {
   const [input, setInput] = useState({
-    machineId: current?.machineId || 0,
-    reason: current?.reason || "",
+    partId: current?.partId || 0,
+    type: current?.type || "",  
+    orderId: current?.orderId || 0,
   });
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,7 +31,7 @@ export const MaintenanceLogModal = ({ confirm, current }: MachineModalProp) => {
       try {
         if (confirm) {
           await fetch
-            .post<ApiResponse>(`/maintenance`, input)
+            .post<ApiResponse>(`/maintenance/${maintenanceId}/part`, input)
             .then(() => {
               Swal.fire("Success!", "Your file has been add.", "success");
               Router.reload();
@@ -49,24 +51,33 @@ export const MaintenanceLogModal = ({ confirm, current }: MachineModalProp) => {
   return (
     <div className="space-y-2 text-white">
       <div className="p-2 font-semibold text-center rounded-md bg-violet-400 ">
-        MaintenanceLog
+        MaintenancePart
       </div>
       <form className="w-full space-y-2">
         <div className="flex flex-col justify-around space-y-1">
-          <label>MachineId</label>
+          <label>PartId</label>
           <InputBox
-            name="machineId"
+            name="partId"
             type="number"
-            value={input.machineId}
+            value={input.partId}
             onChange={handleInput}
           />
         </div>
         <div className="flex flex-col justify-around space-y-1">
-          <label htmlFor="">Reason</label>
+          <label htmlFor="">Type</label>
           <InputBox
-            name="reason"
+            name="type"
             type="string"
-            value={input.reason}
+            value={input.type}
+            onChange={handleInput}
+          />
+        </div>
+        <div className="flex flex-col justify-around space-y-1">
+          <label htmlFor="">OrderId</label>
+          <InputBox
+            name="orderId"
+            type="number"
+            value={input.orderId}
             onChange={handleInput}
           />
         </div>
