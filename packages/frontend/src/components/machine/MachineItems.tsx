@@ -1,5 +1,6 @@
 import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
 import { Machine } from "@models/Machine";
+import { MaintenanceLog } from "@models/MaintenanceLog";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { TableHead } from "@mui/material";
@@ -12,14 +13,52 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import fetch from "@utils/Fetch";
+import moment from "moment";
 import Router from "next/router";
 import * as React from "react";
 import Swal from "sweetalert2";
 
+type ApiResponse = {
+  data: MaintenanceLog[];
+};
+
 function Row(props: { row: Machine }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
+  const [maintenanceLog, setMaintenanceLog] = React.useState<MaintenanceLog[]>(
+    []
+  );
+  const [valided, setValided] = React.useState(false);
+  React.useEffect(() => {
+    if (maintenanceLog) {
+      setValided(true);
+    }
+  }, [maintenanceLog]);
 
+  const checkStatus = (status: string) => {
+    if (status === "SUCCESS") {
+      return "bg-green-500";
+    } else if (status === "PENDING") {
+      return "bg-yellow-500";
+    } else if (status === "FAILED") {
+      return "bg-red-500";
+    } else {
+      return "bg-blue-300";
+    }
+  };
+
+  const getMaintenanceLog = async (machineId: number) => {
+    if (!open) {
+      try {
+        const response = await fetch.get<ApiResponse>(
+          `maintenance/machine/${machineId}`
+        );
+        setMaintenanceLog(response.data.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
   const deleteMachine = async (machineId: number) => {
     Swal.fire({
       title: "Are you sure?",
@@ -78,7 +117,10 @@ function Row(props: { row: Machine }) {
           <IconButton
             aria-label="expand row"
             size="small"
-            onClick={() => setOpen(!open)}
+            onClick={() => {
+              getMaintenanceLog(row.machineId);
+              setOpen(!open);
+            }}
             style={{ color: "rgb(161, 161, 170)" }}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -95,15 +137,57 @@ function Row(props: { row: Machine }) {
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell style={{ color: "white" }}>Date</TableCell>
-                    <TableCell style={{ color: "white" }}>Customer</TableCell>
-                    <TableCell style={{ color: "white" }}>Amount</TableCell>
                     <TableCell style={{ color: "white" }}>
-                      Total price ($)
+                      MaintenanceId
                     </TableCell>
+                    <TableCell style={{ color: "white" }}>
+                      MaintainerId
+                    </TableCell>
+                    <TableCell style={{ color: "white" }}>
+                      MaintenanceDate
+                    </TableCell>
+                    <TableCell style={{ color: "white" }}>Reason</TableCell>
+                    <TableCell style={{ color: "white" }}>ReporterId</TableCell>
+                    <TableCell style={{ color: "white" }}>
+                      ReporterDate
+                    </TableCell>
+                    <TableCell style={{ color: "white" }}>Status</TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>{/* เนิ้อหา */}</TableBody>
+                <TableBody>
+                  {valided ? (
+                    maintenanceLog.map((log) => {
+                      const bgStatus = checkStatus(log.status);
+                      return (
+                        <TableRow key={log.maintenanceId}>
+                          <TableCell>{log.maintenanceId}</TableCell>
+                          <TableCell>
+                            {log.maintainerId
+                              ? log.maintainerId
+                              : "no maintainer"}
+                          </TableCell>
+                          <TableCell>
+                            {moment(log.maintenanceDate).format(
+                              "ddd D MMM YYYY"
+                            )}
+                          </TableCell>
+                          <TableCell>{log.reason}</TableCell>
+                          <TableCell>{log.reporterId}</TableCell>
+
+                          <TableCell>
+                            {moment(log.reportDate).format("ddd D MMM YYYY")}
+                          </TableCell>
+
+                          <TableCell className={`${bgStatus}`}>
+                            {log.status}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  ) : (
+                    <div>No maintenanceLog naja</div>
+                  )}
+                </TableBody>
               </Table>
             </Box>
           </Collapse>
