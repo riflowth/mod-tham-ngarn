@@ -8,13 +8,18 @@ import Router from "next/router";
 type MachineModalProp = {
   confirm?: boolean;
   current?: Machine & { storeName: string };
+  action?: string;
 };
 
 interface ApiResponse {
   data: Array<Machine>;
 }
 
-export const MachineModal = ({ confirm, current }: MachineModalProp) => {
+export const MachineModal = ({
+  confirm,
+  current,
+  action,
+}: MachineModalProp) => {
   const [input, setInput] = useState({
     machineId: current?.machineId || 0,
     name: current?.name || "",
@@ -35,15 +40,54 @@ export const MachineModal = ({ confirm, current }: MachineModalProp) => {
     const submit = async () => {
       try {
         if (confirm) {
-          await fetch
-            .post<ApiResponse>(`/machine`, input)
-            .then(() => {
-              Swal.fire("Success!", "Your file has been added.", "success");
-              Router.reload();
-            })
-            .catch((error: any) =>
-              Swal.fire("Failed", error.response.data.message, "error")
-            );
+          if (action == "add") {
+            await fetch
+              .post<ApiResponse>(`/machine`, input)
+              .then(() => {
+                Swal.fire("Success!", "Your file has been added.", "success");
+                Router.reload();
+              })
+              .catch((error: any) =>
+                Swal.fire("Failed", error.response.data.message, "error")
+              );
+          } else if (action == "edit") {
+            await fetch
+              .put<ApiResponse>(`/machine/${current?.machineId}`, {
+                machineId:
+                  input.machineId == current?.machineId
+                    ? undefined
+                    : input.machineId,
+                name: input.name == current?.name ? undefined : input.name,
+                zoneId:
+                  input.zoneId == current?.zoneId ? undefined : input.zoneId,
+                serial:
+                  input.serial == current?.serial ? undefined : input.serial,
+                manufacturer:
+                  input.manufacturer == current?.manufacturer
+                    ? undefined
+                    : input.manufacturer,
+                registrationDate:
+                  input.registrationDate == current?.registrationDate
+                    ? undefined
+                    : input.registrationDate,
+                retiredDate:
+                  input.retiredDate == current?.retiredDate
+                    ? undefined
+                    : input.retiredDate,
+                price: input.price == current?.price ? undefined : input.price,
+                storeName:
+                  input.storeName == current?.storeName
+                    ? undefined
+                    : input.storeName,
+              })
+              .then(() => {
+                Swal.fire("Added!", "Your info has been updated.", "success");
+                Router.reload();
+              })
+              .catch((error: any) =>
+                Swal.fire("Failed", error.response.data.message, "error")
+              );
+          }
         }
       } catch (e) {
         console.log(e);
@@ -51,7 +95,7 @@ export const MachineModal = ({ confirm, current }: MachineModalProp) => {
     };
 
     submit();
-  }, [confirm, input]);
+  }, [confirm]);
 
   return (
     <div className="space-y-2 text-white">
