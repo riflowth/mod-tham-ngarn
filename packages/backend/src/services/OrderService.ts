@@ -50,6 +50,11 @@ export class OrderService {
     return this.orderRepository.read(expectedOrders, readOptions);
   }
 
+  public async getOrdersPriceByMaintenanceId(maintenanceId: number): Promise<number> {
+    this.validatePositiveInteger(maintenanceId, 'MaintenanceId');
+    return this.orderRepository.readPriceByMaintenanceId(maintenanceId);
+  }
+
   public async addOrder(
     newOrder: Order,
     ordererIdToValidate: number,

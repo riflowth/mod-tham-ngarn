@@ -51,6 +51,7 @@ export const MaintenanceBoard = ({
   maintenanceId,
 }: MaintenanceBoardProps) => {
   const [maintenanceLog, setMaintenanceLog] = useState<MaintenanceLog>();
+  const [totalPrice, setTotalPrice] = useState(0);
 
   const initialStep = maintenanceLog ? Object.keys(MaintenanceLogStatus).indexOf(maintenanceLog.status) : 0;
   const [activeStep, setActiveStep] = useState(initialStep);
@@ -59,7 +60,9 @@ export const MaintenanceBoard = ({
     const fetchData = async () => {
       try {
         const response = await fetch.get<ApiResponse<MaintenanceLog>>(`/maintenance/${maintenanceId}`);
+        const response2 = await fetch.get<ApiResponse<any>>(`bill/maintenance/${maintenanceId}`);
         setMaintenanceLog(response.data.data);
+        setTotalPrice(response2.data.data.totalPrice);
         setActiveStep(Object.keys(MaintenanceLogStatus).indexOf(response.data.data.status));
       } catch (e) {
         // TODO
@@ -181,6 +184,11 @@ export const MaintenanceBoard = ({
           <div className="flex flex-row w-full h-12 items-center">
             <span className="w-1/3 h-1/2 text-zinc-400 text-center font-mono">maintenance_date: </span>
             <span className="w-2/3 h-1/2 text-zinc-200 text-right font-mono overflow-scroll">{maintenanceLog.maintenanceDate?.toString()}</span>
+          </div>
+
+          <div className="flex flex-row w-full h-12 items-center">
+            <span className="w-1/3 h-1/2 text-zinc-400 text-center font-mono">total price: </span>
+            <span className="w-2/3 h-1/2 text-zinc-200 text-right font-mono overflow-scroll">{totalPrice}</span>
           </div>
         </div>
 

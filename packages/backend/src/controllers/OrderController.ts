@@ -37,6 +37,16 @@ export class OrderController extends Controller {
   }
 
   @Authentication(Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @RouteMapping('/maintenance/:maintenanceId', Methods.GET)
+  private async getOrdersPriceByMaintenanceId(req: Request, res: Response): Promise<void> {
+    const { maintenanceId } = req.params;
+
+    const price = await this.orderService.getOrdersPriceByMaintenanceId(Number(maintenanceId));
+
+    res.status(200).json({ data: price });
+  }
+
+  @Authentication(Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/:billId/order', Methods.POST)
   @RequestBody('?machineId', '?partId', '?price')
   private async addOrder(req: Request, res: Response): Promise<void> {
