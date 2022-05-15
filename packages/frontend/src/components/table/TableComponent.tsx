@@ -163,7 +163,7 @@ export const TableComponent = <T,>({
           borderTopRightRadius: '0.375rem'
         }}
       >
-        <div className='flex flex-row justify-between bg-zinc-700 text-white rounded-md p-4'>
+        <div className='flex flex-row justify-between bg-zinc-600 text-white rounded-md p-4'>
           <div className="">
             {title}
           </div>
@@ -185,7 +185,6 @@ export const TableComponent = <T,>({
             {emptyRows > 0 && (
               <TableRow
                 style={{ height: 61 * emptyRows }}
-                classes="text-white"
               >
                 <TableCell colSpan={6} />
               </TableRow>
@@ -193,7 +192,7 @@ export const TableComponent = <T,>({
           </TableBody>
         </Table>
       </TableContainer>
-      <div className="flex items-end justify-center bg-zinc-700 rounded-b-md">
+      <div className="flex items-end justify-center bg-zinc-500 rounded-b-md">
         <TablePagination
           rowsPerPageOptions={[3, 5, 8]}
           colSpan={3}
@@ -207,7 +206,7 @@ export const TableComponent = <T,>({
             native: true,
           }}
           style={{
-            backgroundColor: 'rgb(63 63 70)',
+            backgroundColor: 'rgb(113 113 122)',
             borderBottom: 0,
           }}
           onPageChange={handleChangePage}

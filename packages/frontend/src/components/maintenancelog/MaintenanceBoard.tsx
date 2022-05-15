@@ -1,10 +1,10 @@
-import Stepper from '@mui/material/Stepper';
+import { PencilIcon, TicketIcon } from '@heroicons/react/outline';
 import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
+import StepLabel from '@mui/material/StepLabel';
+import Stepper from '@mui/material/Stepper';
 import fetch from '@utils/Fetch';
 import { useEffect, useState } from 'react';
-import { PencilIcon, TicketIcon } from '@heroicons/react/outline';
 import Swal from 'sweetalert2';
 
 type MaintenanceLog = {

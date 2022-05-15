@@ -14,7 +14,7 @@ type TableColumnsProp = {
 export const TableColumms = ({ names }: TableColumnsProp) => {
   const nameElements = names.map((name: string, i: number): React.ReactNode => {
     return (
-      <TableCell className="text-gray-300" key={i}>
+      <TableCell style={{ color: 'white' }} key={i}>
         {name}
       </TableCell>
     );
