@@ -14,16 +14,10 @@ interface ApiResponse {
   data: Array<MaintenanceLog>;
 }
 
-export const MachineModal = ({ confirm, current }: MachineModalProp) => {
+export const MaintenanceLogModal = ({ confirm, current }: MachineModalProp) => {
   const [input, setInput] = useState({
-    maintenanceId: current?.maintenanceId || 0,
     machineId: current?.machineId || 0,
-    reporterId: current?.reporterId || 0,
-    maintainerId: current?.maintainerId || "",
-    reportDate: current?.reportDate || new Date(),
-    maintenanceDate: current?.maintenanceDate || new Date(),
     reason: current?.reason || "",
-    status: current?.status || "",
   });
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +29,7 @@ export const MachineModal = ({ confirm, current }: MachineModalProp) => {
       try {
         if (confirm) {
           await fetch
-            .post<ApiResponse>(`/machine`, input)
+            .post<ApiResponse>(`/maintenance`, input)
             .then(() => {
               Swal.fire("Success!", "Your file has been add.", "success");
               Router.reload();
@@ -68,56 +62,11 @@ export const MachineModal = ({ confirm, current }: MachineModalProp) => {
           />
         </div>
         <div className="flex flex-col justify-around space-y-1">
-          <label htmlFor="">ReporterId</label>
-          <InputBox
-            name="reporterId"
-            type="number"
-            value={input.reporterId}
-            onChange={handleInput}
-          />
-        </div>
-        <div className="flex flex-col justify-around space-y-1">
-          <label htmlFor="">MaintainerId</label>
-          <InputBox
-            name="maintainerId"
-            type="text"
-            value={input.maintainerId}
-            onChange={handleInput}
-          />
-        </div>
-        <div className="flex flex-col justify-around space-y-1">
-          <label htmlFor="">Report date</label>
-          <InputBox
-            name="reportDate"
-            type="date"
-            value={input.reportDate.toString()}
-            onChange={handleInput}
-          />
-        </div>
-        <div className="flex flex-col justify-around space-y-1">
-          <label htmlFor="">Maintenance date</label>
-          <InputBox
-            name="maintenanceDate"
-            type="date"
-            value={input.maintenanceDate.toString()}
-            onChange={handleInput}
-          />
-        </div>
-        <div className="flex flex-col justify-around space-y-1">
           <label htmlFor="">Reason</label>
           <InputBox
             name="reason"
-            type="date"
+            type="string"
             value={input.reason}
-            onChange={handleInput}
-          />
-        </div>
-        <div className="flex flex-col justify-around space-y-1">
-          <label htmlFor="">Status</label>
-          <InputBox
-            name="status"
-            type="date"
-            value={input.status}
             onChange={handleInput}
           />
         </div>

@@ -4,6 +4,7 @@ import { InputBox } from "@components/InputBox";
 import fetch from "@utils/Fetch";
 import Swal from "sweetalert2";
 import Router from "next/router";
+import { useAuth } from "@hooks/auth/AuthContext";
 
 type MachineModalProp = {
   confirm?: boolean;
@@ -15,11 +16,12 @@ interface ApiResponse {
 }
 
 export const BillModal = ({ confirm, current }: MachineModalProp) => {
+  const { user } = useAuth();
   const [input, setInput] = useState({
     billId: current?.billId || 0,
     storeName: current?.storeName || "",
     orderDate: current?.orderDate || new Date(),
-    orderBy: current?.orderBy || 0,
+    orderBy: current?.orderBy || user?.staffId,
   });
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +79,7 @@ export const BillModal = ({ confirm, current }: MachineModalProp) => {
           <InputBox
             name="orderBy"
             type="number"
-            value={input.orderBy}
+            value={user?.staffId!}
             onChange={handleInput}
           />
         </div>

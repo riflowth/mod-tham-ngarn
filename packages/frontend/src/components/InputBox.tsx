@@ -1,4 +1,5 @@
 import { ClassUtils } from "@utils/CommonUtils";
+import { Attributes } from "react";
 
 type InputBoxProp = {
   name: string;
