@@ -78,7 +78,7 @@ export const BillModal = ({ confirm, current }: MachineModalProp) => {
           <label htmlFor="">Order by</label>
           <InputBox
             name="orderBy"
-            type="number"
+            type="disabled"
             value={user?.staffId!}
             onChange={handleInput}
           />
