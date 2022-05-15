@@ -35,7 +35,7 @@ export const BillBoard = ({
   }, [billId]);
 
   if (!bill) {
-    return <div>Loading...</div>;
+    return <div> </div>;
   }
 
   return (

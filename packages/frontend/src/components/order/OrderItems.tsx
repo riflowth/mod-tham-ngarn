@@ -1,3 +1,5 @@
+import { MyDialog } from '@components/MyDiaLog';
+import { OrderModal } from '@components/order/OrderModal';
 import { ExternalLinkIcon, PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
 import { MaintenancePart } from "@models/MaintenancePart";
 import { Order } from '@models/Order';
@@ -21,6 +23,10 @@ import Swal from "sweetalert2";
 function Row(props: { row: Order }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
+  const [isClick, setIsClick] = React.useState(false);
+
+  const openModal = () => setIsClick(true);
+  const closeModal = () => setIsClick(false);
 
   const deleteOrder = async (orderId: number) => {
     Swal.fire({
@@ -70,18 +76,15 @@ function Row(props: { row: Order }) {
         </TableCell>
         <TableCell style={{ width: 160, color: 'white' }} className="text-white">
           {row.status}
-          <button
-             className="w-10 h-10 p-2 mx-2 text-teal-500 bg-transparent rounded-md ring-1 ring-teal-500 hover:bg-teal-500 hover:text-white"
-            onClick={() => handleOrderStatus()}
-          >
-            <ExternalLinkIcon />
-          </button>
         </TableCell>
 
         <TableCell>
           <div className="flex flex-row space-x-4">
-            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
-              <PencilAltIcon />
+            <button
+              className="w-10 h-10 p-2 mx-2 text-teal-500 bg-transparent rounded-md ring-1 ring-teal-500 hover:bg-teal-500 hover:text-white"
+              onClick={() => handleOrderStatus()}
+            >
+              <ExternalLinkIcon />
             </button>
             <button
               className="w-10 h-10 p-2 text-red-500 bg-transparent rounded-md ring-1 ring-red-500 hover:bg-red-500 hover:text-white"
@@ -124,6 +127,9 @@ function Row(props: { row: Order }) {
           </Collapse>
         </TableCell>
       </TableRow>
+      <MyDialog<Order> isModalOpen={isClick} close={closeModal} action={'edit'} current={row} >
+        <OrderModal />
+      </MyDialog>
     </React.Fragment>
   );
 }

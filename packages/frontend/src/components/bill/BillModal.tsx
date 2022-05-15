@@ -9,19 +9,20 @@ import { useAuth } from "@hooks/auth/AuthContext";
 type MachineModalProp = {
   confirm?: boolean;
   current?: Bill;
+  action?: string;
 };
 
 interface ApiResponse {
   data: Array<Bill>;
 }
 
-export const BillModal = ({ confirm, current }: MachineModalProp) => {
+export const BillModal = ({ confirm, current, action }: MachineModalProp) => {
   const { user } = useAuth();
   const [input, setInput] = useState({
     billId: current?.billId || 0,
     storeName: current?.storeName || "",
     orderDate: current?.orderDate || new Date(),
-    orderBy: user?.staffId,
+    orderBy: action == 'add' ? user?.staffId : current?.orderBy || 0,
   });
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,15 +33,29 @@ export const BillModal = ({ confirm, current }: MachineModalProp) => {
     const submit = async () => {
       try {
         if (confirm) {
-          await fetch
-            .post<ApiResponse>(`/bill`, input)
-            .then(() => {
-              Swal.fire("Success!", "Your bill has been add.", "success");
+          if (action == 'add') {
+            await fetch
+              .post<ApiResponse>(`/bill`, input)
+              .then(() => {
+                Swal.fire("Success!", "Your bill has been added.", "success");
+                Router.reload();
+              })
+              .catch((error: any) =>
+                Swal.fire("Failed", error.response.data.message, "error")
+              );
+          } else if (action == 'edit') {
+            await fetch
+              .put<ApiResponse>(`/bill/${current?.billId}`, {
+                storeName: input.storeName == current?.storeName ? undefined : input.storeName,
+                orderDate: input.orderDate == current?.orderDate ? undefined : input.orderDate,
+                orderBy: input.orderBy == current?.orderBy ? undefined : input.orderBy,
+            }).then(() => {
+              Swal.fire("Success!", "Your info has been updated.", "success");
               Router.reload();
-            })
-            .catch((error: any) =>
+            }).catch((error: any) =>
               Swal.fire("Failed", error.response.data.message, "error")
             );
+          }
         }
       } catch (e) {
         console.log(e);
@@ -48,7 +63,7 @@ export const BillModal = ({ confirm, current }: MachineModalProp) => {
     };
 
     submit();
-  }, [confirm, input]);
+  }, [confirm]);
 
   return (
     <div className="space-y-2 text-white">
@@ -74,6 +89,17 @@ export const BillModal = ({ confirm, current }: MachineModalProp) => {
             onChange={handleInput}
           />
         </div>
+        {(action == 'edit') &&
+          <div className="flex flex-col justify-around space-y-1">
+            <label htmlFor="">Order by</label>
+            <InputBox
+              name="orderBy"
+              type="number"
+              value={input.orderBy!}
+              onChange={handleInput}
+            />
+          </div>
+        }
       </form>
     </div>
   );

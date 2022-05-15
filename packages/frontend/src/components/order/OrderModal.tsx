@@ -9,13 +9,14 @@ type OrderModalProp = {
   confirm?: boolean;
   current?: Order ;
   billId?: number;
+  action?: string;
 };
 
 interface ApiResponse {
   data: Array<Order>;
 }
 
-export const OrderModal = ({ confirm, current, billId }: OrderModalProp) => {
+export const OrderModal = ({ confirm, current, billId, action }: OrderModalProp) => {
   const [input, setInput] = useState({
     machineId: current?.machineId || 0,
     partId: current?.partId || 0,
@@ -30,19 +31,17 @@ export const OrderModal = ({ confirm, current, billId }: OrderModalProp) => {
     const submit = async () => {
       try {
         if (confirm) {
-          await fetch
-            .post<ApiResponse>(`/bill/${billId}/order`, {
-              machineId: input.machineId == 0 ? undefined : input.machineId,
-              partId: input.partId == 0 ? undefined : input.partId,
-              price: input.price == 0 ? undefined : input.price,
-            })
-            .then(() => {
-              Swal.fire("Success!", "Your file has been add.", "success");
-              Router.reload();
-            })
-            .catch((error: any) =>
-              Swal.fire("Failed", error.response.data.message, "error")
-            );
+          if (action == 'add') {
+            await fetch
+              .post<ApiResponse>(`/bill/${billId}/order`, input)
+              .then(() => {
+                Swal.fire("Success!", "Your file has been add.", "success");
+                Router.reload();
+              })
+              .catch((error: any) =>
+                Swal.fire("Failed", error.response.data.message, "error")
+              );
+          }
         }
       } catch (e) {
         console.log(e);
@@ -50,7 +49,7 @@ export const OrderModal = ({ confirm, current, billId }: OrderModalProp) => {
     };
 
     submit();
-  }, [confirm, input]);
+  }, [confirm]);
 
   return (
     <div className="space-y-2 text-white">

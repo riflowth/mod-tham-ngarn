@@ -1,3 +1,5 @@
+import { BillModal } from '@components/bill/BillModal';
+import { MyDialog } from '@components/MyDiaLog';
 import { ExternalLinkIcon, PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
 import { Bill } from "@models/Bill";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -20,7 +22,12 @@ import Swal from "sweetalert2";
 function Row(props: { row: Bill }) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
+  const [isClick, setIsClick] = React.useState(false);
 
+  const openModal = () => setIsClick(true);
+  const closeModal = () => setIsClick(false);
+
+  
   const deleteBill = async (billId: number) => {
     Swal.fire({
       title: "Are you sure?",
@@ -74,7 +81,10 @@ function Row(props: { row: Bill }) {
             >
               <ExternalLinkIcon />
             </button>
-            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
+            <button 
+              onClick={openModal}
+              className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white"
+            >
               <PencilAltIcon />
             </button>
             <button
@@ -120,6 +130,9 @@ function Row(props: { row: Bill }) {
           </Collapse>
         </TableCell>
       </TableRow>
+      <MyDialog<Bill> isModalOpen={isClick} close={closeModal} action={'edit'} current={row} >
+        <BillModal />
+      </MyDialog>
     </React.Fragment>
   );
 }
