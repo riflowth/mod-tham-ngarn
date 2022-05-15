@@ -100,7 +100,7 @@ function Row(props: { row: Order }) {
             </button>
           </div>
         </TableCell>
-        <TableCell>
+        {/* <TableCell>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -109,7 +109,7 @@ function Row(props: { row: Order }) {
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
-        </TableCell>
+        </TableCell> */}
       </TableRow>
       <TableRow className="w-full bg-gray-800">
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
