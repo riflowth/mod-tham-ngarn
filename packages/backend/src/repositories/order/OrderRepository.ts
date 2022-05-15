@@ -5,4 +5,6 @@ export interface OrderRepository extends Repository<Order> {
 
   readByOrderId(orderId: number): Promise<Order>
 
+  readPriceByMaintenanceId(maintenanceId: number): Promise<number>
+
 }

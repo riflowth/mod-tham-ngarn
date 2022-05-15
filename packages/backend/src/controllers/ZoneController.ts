@@ -23,7 +23,7 @@ export class ZoneController extends Controller {
     this.zoneService = zoneService;
   }
 
-  @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
+  @Authentication(Role.MANAGER, Role.CEO)
   @RouteMapping('/', Methods.GET)
   private async getAllZones(req: Request, res: Response): Promise<void> {
     const readOptions: ReadOptions = {
@@ -37,15 +37,30 @@ export class ZoneController extends Controller {
   @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/me', Methods.GET)
   private async getZoneByRequester(req: Request, res: Response): Promise<void> {
-    const zone = await this.zoneService.getZoneByZoneId(req.session?.zoneId);
+    const {
+      role: roleToValidate,
+      zoneId: zoneIdToValidate,
+      branchId: branchIdToValidate,
+    } = req.session;
+    const zone = await this.zoneService
+      .getZoneByZoneId(req.session.zoneId, roleToValidate, zoneIdToValidate, branchIdToValidate);
     res.status(200).json({ data: zone });
   }
 
   @Authentication(Role.OFFICER, Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/:zoneId', Methods.GET)
   private async getZoneByZoneId(req: Request, res: Response): Promise<void> {
+    const {
+      role: roleToValidate,
+      zoneId: zoneIdToValidate,
+      branchId: branchIdToValidate,
+    } = req.session;
+
     const parseZoneId = NumberUtils.parsePositiveInteger(req.params.zoneId);
-    const zone = await this.zoneService.getZoneByZoneId(parseZoneId);
+
+    const zone = await this.zoneService
+      .getZoneByZoneId(parseZoneId, roleToValidate, zoneIdToValidate, branchIdToValidate);
+
     res.status(200).json({ data: zone });
   }
 
@@ -54,6 +69,10 @@ export class ZoneController extends Controller {
   @RequestBody('branchId', '?timeToStart', '?timeToEnd')
   private async addZone(req: Request, res: Response): Promise<void> {
     const { timeToStart, timeToEnd, branchId } = req.body;
+    const {
+      role: roleToValidate,
+      branchId: branchIdToValidate,
+    } = req.session;
 
     const parseBranchId = NumberUtils.parsePositiveInteger(branchId);
 
@@ -61,7 +80,8 @@ export class ZoneController extends Controller {
       .setBranchId(parseBranchId)
       .setTimeToStart(timeToStart)
       .setTimeToEnd(timeToEnd);
-    const createdField = await this.zoneService.addZone(newZone);
+    const createdField = await this.zoneService
+      .addZone(newZone, roleToValidate, branchIdToValidate);
 
     res.status(200).json({ data: { createdField } });
   }
@@ -72,6 +92,10 @@ export class ZoneController extends Controller {
   private async editZoneByZoneId(req: Request, res: Response): Promise<void> {
     const { timeToStart, timeToEnd, branchId } = req.body;
     const { zoneId } = req.params;
+    const {
+      role: roleToValidate,
+      branchId: branchIdToValidate,
+    } = req.session;
 
     const parseZoneId = NumberUtils.parsePositiveInteger(zoneId);
     const parseBranchId = NumberUtils.parsePositiveInteger(branchId);
@@ -80,7 +104,8 @@ export class ZoneController extends Controller {
       .setBranchId(parseBranchId)
       .setTimeToStart(timeToStart)
       .setTimeToEnd(timeToEnd);
-    const updatedField = await this.zoneService.editZone(parseZoneId, newZone);
+    const updatedField = await this.zoneService
+      .editZone(parseZoneId, newZone, roleToValidate, branchIdToValidate);
 
     res.status(200).json({ data: { updatedField } });
   }
@@ -88,8 +113,15 @@ export class ZoneController extends Controller {
   @Authentication(Role.MANAGER, Role.CEO)
   @RouteMapping('/:zoneId', Methods.DELETE)
   public async deleteZoneByZoneId(req: Request, res: Response): Promise<void> {
+    const {
+      role: roleToValidate,
+      branchId: branchIdToValidate,
+    } = req.session;
+
     const parseZoneId = NumberUtils.parsePositiveInteger(req.params.zoneId);
-    const deletedField = await this.zoneService.deleteZone(parseZoneId);
+    const deletedField = await this.zoneService
+      .deleteZone(parseZoneId, roleToValidate, branchIdToValidate);
+
     res.status(200).json({ data: { deletedField } });
   }
 

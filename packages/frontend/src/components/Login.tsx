@@ -1,19 +1,26 @@
+import { useAuth } from '@hooks/auth/AuthContext';
+import axios from 'axios';
 import Image from "next/image";
-import axios from "axios";
-import React, { useState } from "react";
+import { useRouter } from 'next/router';
+import { useState } from "react";
 import Swal from "sweetalert2";
 
-const Login = () => {
+export const Login = () => {
+  const { login, error } = useAuth();
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
+    username: "",
+    password: "",
   });
-  
+
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const submitFrom = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const submitFrom = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
 
     const { username, password } = formData;
@@ -30,37 +37,33 @@ const Login = () => {
       return;
     }
 
-    try {
-      const response = await axios.post('http://localhost:4000/auth/login', {
-        username, password,
-      });
+    const error = await login(username, password);
 
+    if (error) {
       Swal.fire({
-        icon: 'success',
-        title: 'Yeahh...',
-        text: response.data.message,
+        icon: "error",
+        title: "Oops...",
+        text: axios.isAxiosError(error) ? error!.response!.data.message : 'Unexpected error',
       });
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 400) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: error.response.data.message,
-          });
-        }
-      }
+    } else {
+      Swal.fire({
+        icon: "success",
+        title: "Yeahh...",
+        text: 'Login successfully!',
+      }).then(() => {
+        router.push('/');
+      });
     }
   };
 
   const image = () => {
-    return 'https://images.unsplash.com/photo-1522543558187-768b6df7c25c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80';
+    return "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80";
   };
 
   return (
-    <div className="flex items-center justify-center w-full h-screen bg-violet-700">
-      <div className="flex w-full max-w-7xl drop-shadow-2xl">
-        <div className="relative w-2/3">
+    <div className="flex items-center justify-center w-full h-screen bg-zinc-800">
+      <div className="flex justify-center w-full lg:max-w-7xl drop-shadow-2xl mx-12">
+        <div className="hidden lg:block relative w-2/3">
           <Image
             loader={image}
             src={image()}
@@ -71,9 +74,9 @@ const Login = () => {
           />
         </div>
 
-        <div className="w-1/3 bg-white rounded-r-xl px-5 py-24 space-y-10">
+        <div className="w-full lg:w-1/3 px-5 py-24 space-y-10 bg-white rounded-xl lg:rounded-r-xl">
           <div className="flex flex-col items-center w-full mx-auto space-y-5">
-            <div className="text-2xl font-bold mb-4">
+            <div className="mb-4 text-2xl font-bold">
               <span className="text-[#6043D0]">Login</span> your account
             </div>
 
@@ -98,15 +101,16 @@ const Login = () => {
                   onChange={handleInput}
                 />
               </div>
-              <div className=" text-xl font-extrabold bg-[#6043D0] w-[60%] flex items-center mx-auto text-white py-2 hover:bg-[#6043D0]/90">
-                <button className="items-center w-full" type="submit">
-                  Login
-                </button>
-              </div>
+              <button
+                className="flex justify-center w-2/3 mx-auto py-2 rounded-md text-xl bg-violet-700 text-white hover:bg-violet-700/90"
+                type="submit"
+              >
+                Login
+              </button>
             </form>
             <a
               href=""
-              className="text-[#6043D0] border-b border-[#6043D0] hover:font-medium hover:border-b-2"
+              className="text-violet-700 border-b border-violet-700 hover:font-medium hover:border-b-2"
             >
               Forget Password?
             </a>
@@ -116,5 +120,3 @@ const Login = () => {
     </div>
   );
 };
-
-export default Login;

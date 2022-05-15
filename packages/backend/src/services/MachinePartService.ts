@@ -7,6 +7,8 @@ import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRep
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
+import { MaintenancePartStatus } from '@/services/MaintenanceLogService';
+import { OrderStatus } from '@/services/OrderService';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { BadRequestException, NotFoundException } from 'springpress';
 
@@ -117,8 +119,8 @@ export class MachinePartService {
     const allMaintenancePartRelated = await this.maintenancePartRepository
       .read(relatedMaintenancePart);
     allMaintenancePartRelated.forEach((maintenancePart) => {
-      if (status === 'DISABLE') {
-        if (maintenancePart.getStatus() !== 'SUCCESS') {
+      if (status === MachinePartStatus.UNAVAILABLE) {
+        if (maintenancePart.getStatus() !== MaintenancePartStatus.SUCCESS) {
           throw new BadRequestException('Can not change status because MaintenancePart is not SUCCESS');
         }
       }
@@ -126,8 +128,8 @@ export class MachinePartService {
     const relatedOrder = new Order().setPartId(partId);
     const allOrder = await this.orderRepository.read(relatedOrder);
     allOrder.forEach((order) => {
-      if (status === 'DISABLE') {
-        if (order.getStatus() !== 'DELIVERED') {
+      if (status === MachinePartStatus.UNAVAILABLE) {
+        if (order.getStatus() !== OrderStatus.DELIVERED) {
           throw new BadRequestException('Can not change status because Order is not DELIVERED');
         }
       }
@@ -143,10 +145,10 @@ export class MachinePartService {
     }
     const machinePartToRead = await this.getAllMachinePartByMachineId(machineId);
     const resultsStatus = machinePartToRead.filter((machinePart) => {
-      return machinePart.getStatus() === 'Disable';
+      return machinePart.getStatus() === MachinePartStatus.UNAVAILABLE;
     });
 
-    return resultsStatus[0] ? 'Disable' : 'Active';
+    return resultsStatus[0] ? MachinePartStatus.UNAVAILABLE : MachinePartStatus.AVAILABLE;
   }
 
   public async getMachineMaintenanceCost(machineId: number): Promise<number> {
@@ -158,13 +160,18 @@ export class MachinePartService {
     }
 
     const machinePartToRead = await this.getAllMachinePartByMachineId(machineId);
-    let totalCost = 0;
-    machinePartToRead.forEach(async (machinePart) => {
+
+    const orders = await Promise.all(machinePartToRead.map((machinePart) => {
       const targetOrder = new Order().setPartId(machinePart.getPartId());
-      const [order] = await this.orderRepository.read(targetOrder);
-      totalCost += order.getPrice();
-    });
-    return totalCost;
+      return this.orderRepository.read(targetOrder);
+    }));
+
+    const cost = orders.reduce((acc, order) => {
+      const price = (order.length !== 0) ? order[0].getPrice() : 0;
+      return acc + price;
+    }, 0);
+
+    return cost;
   }
 
 }

@@ -81,4 +81,11 @@ export class DefaultMachinePartRepository extends Database implements MachinePar
     return part;
   }
 
+  public async updateStatus(targetPartId: number, status: string): Promise<number> {
+    const targetPart = new MachinePart().setPartId(targetPartId);
+    const editedPart = new MachinePart().setStatus(status);
+
+    return this.update(editedPart, targetPart);
+  }
+
 }

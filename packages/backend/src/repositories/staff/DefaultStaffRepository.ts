@@ -36,7 +36,7 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
       tel_no: staff.getTelNo(),
       salary: staff.getSalary(),
       position: staff.getPosition(),
-      dob: staff.getDateOfBirth(),
+      dob: DateUtil.formatToSQL(staff.getDateOfBirth()),
     };
 
     const results: any = await this.getSqlBuilder().read('Staff', parameter, readOptions);
@@ -66,7 +66,7 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
       tel_no: source.getTelNo(),
       salary: source.getSalary(),
       position: source.getPosition(),
-      dob: source.getDateOfBirth(),
+      dob: DateUtil.formatToSQL(source.getDateOfBirth()),
     };
 
     const destinationParameter = {
@@ -77,7 +77,7 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
       tel_no: destination.getTelNo(),
       salary: destination.getSalary(),
       position: destination.getPosition(),
-      dob: destination.getDateOfBirth(),
+      dob: DateUtil.formatToSQL(destination.getDateOfBirth()),
     };
 
     const result: any = await this.getSqlBuilder().update('Staff', sourceParameter, destinationParameter);
@@ -94,7 +94,7 @@ export class DefaultStaffRepository extends Database implements StaffRepository 
       tel_no: staff.getTelNo(),
       salary: staff.getSalary(),
       position: staff.getPosition(),
-      dob: staff.getDateOfBirth(),
+      dob: DateUtil.formatToSQL(staff.getDateOfBirth()),
     };
 
     const result: any = await this.getSqlBuilder().delete('Staff', parameter);

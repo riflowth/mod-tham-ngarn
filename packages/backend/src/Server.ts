@@ -117,6 +117,7 @@ export class Server extends Springpress {
       this.zoneRepository,
     );
     this.maintenanceLogService = new MaintenanceLogService(
+      this.branchRepository,
       this.machineRepository,
       this.maintenanceLogRepository,
       this.maintenancePartRepository,
@@ -134,6 +135,7 @@ export class Server extends Springpress {
       this.staffRepository,
     );
     this.machineService = new MachineService(
+      this.billRepository,
       this.machineRepository,
       this.machinePartRepository,
       this.maintenanceLogRepository,
@@ -189,7 +191,10 @@ export class Server extends Springpress {
     registry.register(new OrderController(this.orderService), authMiddleware);
     registry.register(new StaffController(this.staffService), authMiddleware);
     registry.register(new ZoneController(this.zoneService), authMiddleware);
-    registry.register(new MachineController(this.machineService), authMiddleware);
+    registry.register(
+      new MachineController(this.machinePartService, this.machineService),
+      authMiddleware,
+    );
   }
 
   private async connectDatabase(): Promise<void> {

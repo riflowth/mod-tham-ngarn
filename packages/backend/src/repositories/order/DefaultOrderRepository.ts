@@ -100,4 +100,11 @@ export class DefaultOrderRepository extends Database implements OrderRepository 
     return order;
   }
 
+  public async readPriceByMaintenanceId(maintenanceId: number): Promise<number> {
+    const query = 'SELECT SUM(price) as totalPrice FROM `Order` WHERE order_id IN (SELECT order_id FROM MaintenancePart WHERE maintenance_id = ?)';
+
+    const result: any = await this.execute(query, [maintenanceId]);
+    return result[0][0];
+  }
+
 }

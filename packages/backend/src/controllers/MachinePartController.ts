@@ -67,7 +67,7 @@ export class MachinePartController extends Controller {
   }
 
   @Authentication(Role.TECHNICIAN, Role.PURCHASING, Role.MANAGER, Role.CEO)
-  @RouteMapping('/', Methods.PUT)
+  @RouteMapping('/:partId', Methods.PUT)
   @RequestBody('?machineId', '?partName', '?status')
   private async editMachinePartByPartId(req: Request, res: Response): Promise<void> {
     const parsePartId = NumberUtils.parsePositiveInteger(req.params.partId);

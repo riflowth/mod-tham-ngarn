@@ -53,6 +53,7 @@ export class AuthService {
     await this.sessionRepository.cacheSession(sessionId, {
       sessionId,
       staffId: Number(username),
+      name: staff.getFullName(),
       role: staff.getPosition(),
       zoneId: staff.getZoneId(),
       branchId: staff.getBranchId(),

@@ -78,6 +78,7 @@ export class MaintenanceLog implements Entity<MaintenanceLog, number> {
   }
 
   public setMaintenanceDate(maintenanceDate: Date): MaintenanceLog {
+    this.maintenanceDate = maintenanceDate;
     return this;
   }
 

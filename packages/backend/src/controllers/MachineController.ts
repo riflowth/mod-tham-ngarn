@@ -1,6 +1,7 @@
 import { Authentication, Role } from '@/decorators/AuthenticationDecorator';
 import { Machine } from '@/entities/Machine';
 import { ReadOptions } from '@/repositories/ReadOptions';
+import { MachinePartService } from '@/services/MachinePartService';
 import { MachineService } from '@/services/MachineService';
 import { NumberUtils } from '@/utils/NumberUtils';
 import {
@@ -19,13 +20,18 @@ import {
 export class MachineController extends Controller {
 
   private readonly machineService: MachineService;
+  private readonly machinePartService: MachinePartService;
 
-  public constructor(machineService: MachineService) {
+  public constructor(
+    machinePartService: MachinePartService,
+    machineService: MachineService,
+  ) {
     super();
+    this.machinePartService = machinePartService;
     this.machineService = machineService;
   }
 
-  @Authentication(Role.CEO)
+  // @Authentication(Role.CEO)
   @RouteMapping('/', Methods.GET)
   private async getAllMachines(req: Request, res: Response): Promise<void> {
     const readOptions: ReadOptions = {
@@ -76,9 +82,19 @@ export class MachineController extends Controller {
     res.status(200).json({ data: machines });
   }
 
+  @Authentication(Role.MANAGER, Role.CEO, Role.TECHNICIAN, Role.PURCHASING)
+  @RouteMapping('/:machineId/part', Methods.GET)
+  private async getMachinePartByMachineId(req: Request, res: Response): Promise<void> {
+    const parseMachineId = NumberUtils.parsePositiveInteger(req.params.machineId);
+
+    const machineParts = await this.machinePartService.getAllMachinePartByMachineId(parseMachineId);
+
+    res.status(200).json({ data: machineParts });
+  }
+
   @Authentication(Role.MANAGER, Role.CEO, Role.PURCHASING, Role.TECHNICIAN)
   @RouteMapping('/', Methods.POST)
-  @RequestBody('zoneId', 'name', 'serial', 'manufacturer', 'registrationDate', 'retiredDate')
+  @RequestBody('zoneId', 'name', 'serial', 'manufacturer', 'registrationDate', 'retiredDate', 'storeName', 'price')
   private async addMachine(req: Request, res: Response): Promise<void> {
     const {
       zoneId,
@@ -87,6 +103,8 @@ export class MachineController extends Controller {
       manufacturer,
       registrationDate,
       retiredDate,
+      price,
+      storeName,
     } = req.body;
 
     const parseZoneId = NumberUtils.parsePositiveInteger(zoneId);
@@ -96,15 +114,17 @@ export class MachineController extends Controller {
       .setSerial(serial)
       .setManufacturer(manufacturer)
       .setRegistrationDate(new Date(registrationDate))
-      .setRetiredDate(new Date(retiredDate));
-    const createdField = await this.machineService.addMachine(newMachine, req.session.staffId);
+      .setRetiredDate(new Date(retiredDate))
+      .setPrice(price);
+    const createdField = await this.machineService
+      .addMachine(newMachine, req.session.staffId, storeName);
 
     res.status(200).json({ data: { createdField } });
   }
 
   @Authentication(Role.MANAGER, Role.CEO, Role.PURCHASING, Role.TECHNICIAN)
   @RouteMapping('/:machineId', Methods.PUT)
-  @RequestBody('?zoneId', '?name', '?serial', '?manufacturer', '?registrationDate', '?retiredDate')
+  @RequestBody('?zoneId', '?name', '?serial', '?manufacturer', '?registrationDate', '?retiredDate', '?price')
   private async editMachineByMachineId(req: Request, res: Response) :Promise<void> {
     const parseMachineId = NumberUtils.parsePositiveInteger(req.params.machineId);
 
@@ -119,6 +139,7 @@ export class MachineController extends Controller {
       manufacturer,
       registrationDate,
       retiredDate,
+      price,
     } = req.body;
 
     let parseZoneId: number;
@@ -132,6 +153,7 @@ export class MachineController extends Controller {
       .setSerial(serial)
       .setManufacturer(manufacturer)
       .setRegistrationDate(registrationDate ? new Date(registrationDate) : undefined)
+      .setPrice(price)
       .setRetiredDate(retiredDate ? new Date(retiredDate) : undefined);
     const updatedField = await this.machineService.editMachine(
       parseMachineId,

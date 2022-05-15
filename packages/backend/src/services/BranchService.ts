@@ -33,12 +33,18 @@ export class BranchService {
     return this.branchRepository.read(branchToRead);
   }
 
+  public async getZonesByBranchId(branch: number, readOptions?: ReadOptions): Promise<Zone[]> {
+    const zoneToRead = new Zone().setBranchId(branch);
+    return this.zoneRepository.read(zoneToRead, readOptions);
+  }
+
   public async addBranch(newBranch: Branch): Promise<Branch> {
     const relatedAddressToRead = new Address().setPostalCode(newBranch.getPostalCode());
     const [relatedAddress] = await this.addressRepository.read(relatedAddressToRead);
 
     if (!relatedAddress) {
-      throw new BadRequestException('Postal code related to branch does not existed');
+      const addressToAdd = new Address().setPostalCode(newBranch.getPostalCode());
+      await this.addressRepository.create(addressToAdd);
     }
 
     return this.branchRepository.create(newBranch);

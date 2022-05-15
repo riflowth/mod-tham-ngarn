@@ -3,6 +3,7 @@ declare namespace Express {
     session?: {
       sessionId: string,
       staffId: number,
+      name: string,
       role?: string,
       zoneId?: number,
       branchId?: number,

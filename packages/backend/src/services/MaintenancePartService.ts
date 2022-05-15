@@ -1,3 +1,4 @@
+import { Role } from '@/decorators/AuthenticationDecorator';
 import { MaintenanceLog } from '@/entities/MaintenanceLog';
 import { MaintenancePart } from '@/entities/MaintenancePart';
 import { Order } from '@/entities/Order';
@@ -6,8 +7,10 @@ import { MaintenanceLogRepository } from '@/repositories/maintenancelog/Maintena
 import { MaintenancePartRepository } from '@/repositories/maintenancepart/MaintenancePartRepository';
 import { OrderRepository } from '@/repositories/order/OrderRepository';
 import { ReadOptions } from '@/repositories/ReadOptions';
+import { MachinePartStatus } from '@/services/MachinePartService';
 import { MaintenanceLogStatus, MaintenancePartStatus } from '@/services/MaintenanceLogService';
 import { OrderStatus } from '@/services/OrderService';
+import { EnumUtils } from '@/utils/EnumUtils';
 import { NumberUtils } from '@/utils/NumberUtils';
 import { BadRequestException } from 'springpress';
 
@@ -42,7 +45,8 @@ export class MaintenancePartService {
 
   public async addMaintenancePart(
     newMaintenancePart: MaintenancePart,
-    maintainerId: number,
+    maintainerIdToValidate: number,
+    maintainerRoleToValidate: string,
   ): Promise<MaintenancePart> {
     const newMaintenanceId = newMaintenancePart.getMaintenanceId();
     const newPartId = newMaintenancePart.getPartId();
@@ -70,7 +74,8 @@ export class MaintenancePartService {
 
     this.validateChangeMaintenanceLogData(
       maintenanceLogToValidate,
-      maintainerId,
+      maintainerIdToValidate,
+      maintainerRoleToValidate,
     );
 
     this.validateMachinePartRelation(
@@ -95,6 +100,8 @@ export class MaintenancePartService {
       throw new BadRequestException('Maintenance part already exists');
     }
 
+    await this.machinePartRepository.updateStatus(newPartId, MachinePartStatus.UNAVAILABLE);
+
     return this.maintenancePartRepository.create(
       newMaintenancePart.setStatus(MaintenancePartStatus.MAINTAINING),
     );
@@ -103,7 +110,8 @@ export class MaintenancePartService {
   public async editMaintenancePart(
     primaryKey: [number, number],
     newMaintenancePart: MaintenancePart,
-    maintainerId: number,
+    maintainerIdToValidate: number,
+    maintainerRoleToValidate: string,
   ): Promise<MaintenancePart> {
     const maintenanceIdToSet = primaryKey[0];
     const partIdToSet = primaryKey[1];
@@ -140,7 +148,11 @@ export class MaintenancePartService {
     const maintenanceLogToValidate = await this.maintenanceLogRepository
       .readByMaintenanceId(targetMaintenancePart.getMaintenanceId());
 
-    this.validateChangeMaintenanceLogData(maintenanceLogToValidate, maintainerId);
+    this.validateChangeMaintenanceLogData(
+      maintenanceLogToValidate,
+      maintainerIdToValidate,
+      maintainerRoleToValidate,
+    );
 
     if (newPartId) {
       const machinePartToValidate = await this.machinePartRepository.readByPartId(newPartId);
@@ -173,6 +185,7 @@ export class MaintenancePartService {
     primaryKey: [number, number],
     newStatus: string,
     maintainerIdToValidate: number,
+    maintainerRoleToValidate: string,
   ): Promise<MaintenancePart> {
     const maintenanceIdToSet = primaryKey[0];
     const partIdToSet = primaryKey[1];
@@ -180,6 +193,10 @@ export class MaintenancePartService {
     this.validatePositiveInteger(partIdToSet, 'partIdToSet');
     this.validateNonEmptyString(newStatus, 'newStatus');
     this.validatePositiveInteger(maintainerIdToValidate, 'maintainerId');
+
+    if (!EnumUtils.isIncludesInEnum(newStatus, MaintenancePartStatus)) {
+      throw new BadRequestException('status field only accept ORDERING, MAINTAINING, SUCCESS, FAILED');
+    }
 
     const maintenancePartToValidate = await this.maintenancePartRepository
       .readByPrimaryKey(maintenanceIdToSet, partIdToSet);
@@ -190,6 +207,19 @@ export class MaintenancePartService {
       .readByOrderId(maintenancePartToValidate.getOrderId());
 
     this.validateOrderProgress(orderRelatedToMaintenancePart);
+
+    const maintenanceRelatedToMaintenancePart = await this.maintenanceLogRepository
+      .readByMaintenanceId(maintenanceIdToSet);
+
+    this.validateChangeMaintenanceLogData(
+      maintenanceRelatedToMaintenancePart,
+      maintainerIdToValidate,
+      maintainerRoleToValidate,
+    );
+
+    if (newStatus === MaintenancePartStatus.SUCCESS || newStatus === MaintenancePartStatus.FAILED) {
+      await this.machinePartRepository.updateStatus(partIdToSet, MachinePartStatus.AVAILABLE);
+    }
 
     const expectedMaintenancePartToEdit = new MaintenancePart()
       .setPrimaryKey([maintenanceIdToSet, partIdToSet]);
@@ -202,7 +232,11 @@ export class MaintenancePartService {
     return affectedRowsAmount === 1 ? newMaintenancePart.setPrimaryKey(primaryKey) : null;
   }
 
-  public async deleteMaintenancePart(primaryKey: [number, number]): Promise<MaintenancePart> {
+  public async deleteMaintenancePart(
+    primaryKey: [number, number],
+    maintainerIdToValidate: number,
+    maintainerRoleToValidate: string,
+  ): Promise<MaintenancePart> {
     const maintenanceIdToDelete = primaryKey[0];
     const partIdToDelete = primaryKey[1];
 
@@ -223,8 +257,11 @@ export class MaintenancePartService {
 
     this.validateChangeMaintenanceLogData(
       maintenanceLogToValidate,
-      maintenanceLogToValidate.getMaintainerId(),
+      maintainerIdToValidate,
+      maintainerRoleToValidate,
     );
+
+    await this.machinePartRepository.updateStatus(partIdToDelete, MachinePartStatus.AVAILABLE);
 
     const expectedMaintenancePart = new MaintenancePart()
       .setPrimaryKey([maintenanceIdToDelete, partIdToDelete]);
@@ -267,24 +304,29 @@ export class MaintenancePartService {
   private validateChangeMaintenanceLogData(
     maintenanceLogToValidate: MaintenanceLog,
     maintainerId: number,
+    maintainerRole: string,
   ): void {
     if (!maintenanceLogToValidate) {
       throw new BadRequestException('Maintenance log not found');
     }
 
-    if (maintenanceLogToValidate.getMaintainerId() !== maintainerId) {
-      throw new BadRequestException('You cannot edit/add the maintenance that not belong to you');
+    if (
+      maintainerRole !== Role.CEO
+      && maintainerRole !== Role.MANAGER
+      && maintenanceLogToValidate.getMaintainerId() !== maintainerId
+    ) {
+      throw new BadRequestException('You cannot edit/add/delete the maintenance that not belong to you');
     }
 
     if (
       maintenanceLogToValidate.getStatus() === MaintenanceLogStatus.SUCCESS
       || maintenanceLogToValidate.getStatus() === MaintenanceLogStatus.FAILED
     ) {
-      throw new BadRequestException('Cannot edit/add maintenance part to finished maintenance log');
+      throw new BadRequestException('Cannot edit/add/delete maintenance part to finished maintenance log');
     }
 
     if (maintenanceLogToValidate.getStatus() === MaintenanceLogStatus.OPENED) {
-      throw new BadRequestException('Cannot edit/add maintenance part to maintenance log that don\t have maintainer');
+      throw new BadRequestException('Cannot edit/add/delete maintenance part to maintenance log that don\t have maintainer');
     }
   }
 
@@ -324,7 +366,8 @@ export class MaintenancePartService {
   }
 
   private validateOrderProgress(orderRelatedToMaintenancePart: Order): void {
-    if (orderRelatedToMaintenancePart.getStatus() === OrderStatus.SHIPPING) {
+    console.log(orderRelatedToMaintenancePart);
+    if (orderRelatedToMaintenancePart?.getStatus() === OrderStatus.SHIPPING) {
       throw new BadRequestException('Order is shipping so it cannot change');
     }
   }

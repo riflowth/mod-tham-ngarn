@@ -130,4 +130,30 @@ export class DefaultMaintenanceLogRepository extends Database implements Mainten
     return maintenanceLogs;
   }
 
+  public async readByStatusByBranchId(
+    branchId: number,
+    expectedStatus: string[],
+    readOptions?: ReadOptions,
+  ): Promise<MaintenanceLog[]> {
+    const query = `SELECT * FROM MaintenanceLog WHERE status IN (${expectedStatus.map((e) => `'${e}'`).join(',')}) AND machine_id IN (SELECT machine_id FROM Machine WHERE zone_id IN (SELECT zone_id FROM Zone WHERE branch_id = ?))`;
+
+    const values = [branchId];
+
+    const results: any = await this.execute(query, values);
+
+    const maintenanceLogs = results[0].map((result) => {
+      return new MaintenanceLog()
+        .setMaintenanceId(result.maintenance_id)
+        .setMachineId(result.machine_id)
+        .setReporterId(result.reporter_id)
+        .setMaintainerId(result.maintainer_id)
+        .setReportDate(DateUtil.formatFromSQL(result.report_date))
+        .setMaintenanceDate(DateUtil.formatFromSQL(result.maintenance_date))
+        .setReason(result.reason)
+        .setStatus(result.status);
+    });
+
+    return maintenanceLogs;
+  }
+
 }

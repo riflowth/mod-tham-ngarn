@@ -1,14 +1,25 @@
-import Home from '@components/Home';
-import Navbar from '@components/Navbar/Navbar';
+import { Dashboard } from '@components/dashboard/Dashboard';
+import { withUser } from '@components/hoc/withUser';
 import { NextPage } from 'next';
+import ModThamNgarnLogo from '@publics/mtn-logo.svg';
+import Image from 'next/image';
 
 const IndexPage: NextPage = () => {
   return (
-    <div className="h-screen bg-[#22202e]">
-      <Navbar />
-      <Home />
-    </div>
+    <Dashboard current="Home">
+      <div className="flex flex-col w-full justify-center items-center text-white mb-4">
+        <div>
+          <Image
+            src={ModThamNgarnLogo}
+            alt="Mod Tham Ngarn Logo"
+          />
+        </div>
+
+        <div className="text-3xl font-bold">&quot;Mod Tham Ngarn&quot;</div>
+        <div className="text-base font-light text-zinc-400">The Smartest Industrial Management Software!</div>
+      </div>
+    </Dashboard>
   );
 };
 
-export default IndexPage;
+export default withUser(IndexPage);
