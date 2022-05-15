@@ -1,5 +1,6 @@
 import { MyDialog } from '@components/MyDiaLog';
 import { OrderModal } from '@components/order/OrderModal';
+import { UpdateOrderStatusModal } from '@components/order/UpdateOrderStatusModal';
 import { ExternalLinkIcon, PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
 import { MaintenancePart } from "@models/MaintenancePart";
 import { Order } from '@models/Order';
@@ -27,6 +28,11 @@ function Row(props: { row: Order }) {
 
   const openModal = () => setIsClick(true);
   const closeModal = () => setIsClick(false);
+
+  const [isClickUpdate, setIsClickUpdate] = React.useState(false);
+
+  const openUpdateModal = () => setIsClickUpdate(true);
+  const closeUpdateModal = () => setIsClickUpdate(false);
 
   const deleteOrder = async (orderId: number) => {
     Swal.fire({
@@ -82,7 +88,7 @@ function Row(props: { row: Order }) {
           <div className="flex flex-row space-x-4">
             <button
               className="w-10 h-10 p-2 mx-2 text-teal-500 bg-transparent rounded-md ring-1 ring-teal-500 hover:bg-teal-500 hover:text-white"
-              onClick={() => handleOrderStatus()}
+              onClick={() => openUpdateModal()}
             >
               <ExternalLinkIcon />
             </button>
@@ -129,6 +135,9 @@ function Row(props: { row: Order }) {
       </TableRow>
       <MyDialog<Order> isModalOpen={isClick} close={closeModal} action={'edit'} current={row} >
         <OrderModal />
+      </MyDialog>
+      <MyDialog<Order> isModalOpen={isClickUpdate} close={closeUpdateModal} action={'I just want to be happy'} current={row} >
+        <UpdateOrderStatusModal billId={row.billId} orderId={row.orderId}/>
       </MyDialog>
     </React.Fragment>
   );
