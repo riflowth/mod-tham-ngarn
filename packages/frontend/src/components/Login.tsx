@@ -1,4 +1,5 @@
 import { useAuth } from '@hooks/auth/AuthContext';
+import axios from 'axios';
 import Image from "next/image";
 import { useRouter } from 'next/router';
 import { useState } from "react";
@@ -36,13 +37,13 @@ export const Login = () => {
       return;
     }
 
-    login(username, password);
+    const error = await login(username, password);
 
     if (error) {
       Swal.fire({
         icon: "error",
         title: "Oops...",
-        text: error.response.data.message,
+        text: axios.isAxiosError(error) ? error!.response!.data.message : 'Unexpected error',
       });
     } else {
       Swal.fire({

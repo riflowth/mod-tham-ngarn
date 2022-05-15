@@ -13,7 +13,7 @@ type User = {
 type AuthContextType = {
   user?: User,
   setUser: Dispatch<SetStateAction<User | undefined>>,
-  login: (username: string, password: string) => Promise<void>,
+  login: (username: string, password: string) => Promise<Error>,
   logout: () => Promise<void>,
   error?: any,
 }
@@ -49,12 +49,12 @@ export const AuthProvider = ({
       await fetch.post('/auth/login', {
         username, password
       });
+      const response = await fetch.get('/auth/me');
+      setUser(response.data.data);
     } catch (error: any) {
       setError(error);
+      return error;
     }
-
-    const response = await fetch.get('/auth/me');
-    setUser(response.data.data);
   };
 
   const logout = async () => {
