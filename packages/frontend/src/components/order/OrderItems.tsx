@@ -33,12 +33,12 @@ function Row(props: { row: Order }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await fetch
-          .delete(`/maintenance/${orderId}/part/${row.partId}`)
+          .delete(`/bill/${row.billId}/order/${orderId}`)
           .then(() => {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
             Router.reload();
           })
-          .catch((error: any) => Swal.fire("Failed", error.response.data.message, "error"));
+          .catch((error: any) => Swal.fire("Failed", error.response?.data.message, "error"));
       }
     });
   };

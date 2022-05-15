@@ -9,5 +9,6 @@ export interface Machine extends Entity {
   manufacturer: string;
   registrationDate: Date;
   retiredDate: Date;
+  price: number;
 
 }

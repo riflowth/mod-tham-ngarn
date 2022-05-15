@@ -1,9 +1,11 @@
+import { Bill } from '@/entities/Bill';
 import { Machine } from '@/entities/Machine';
 import { MachinePart } from '@/entities/MachinePart';
 import { MaintenanceLog } from '@/entities/MaintenanceLog';
 import { Order } from '@/entities/Order';
 import { Staff } from '@/entities/Staff';
 import { Zone } from '@/entities/Zone';
+import { BillRepository } from '@/repositories/bill/BillRepository';
 import { MachineRepository } from '@/repositories/machine/MachineRepository';
 import { MachinePartRepository } from '@/repositories/machinepart/MachinePartRepository';
 import { MaintenanceLogRepository } from '@/repositories/maintenancelog/MaintenanceLogRepository';
@@ -15,6 +17,7 @@ import { BadRequestException, ForbiddenException, NotFoundException } from 'spri
 
 export class MachineService {
 
+  private readonly billRepository: BillRepository;
   private readonly machineRepository: MachineRepository;
   private readonly machinePartRepository: MachinePartRepository;
   private readonly maintenanceLogRepository: MaintenanceLogRepository;
@@ -23,6 +26,7 @@ export class MachineService {
   private readonly zoneRepository: ZoneRepository;
 
   public constructor(
+    billRepository: BillRepository,
     machineRepository: MachineRepository,
     machinePartRepository: MachinePartRepository,
     maintenanceLogRepository: MaintenanceLogRepository,
@@ -30,6 +34,7 @@ export class MachineService {
     staffRepository: StaffRepository,
     zoneRepository: ZoneRepository,
   ) {
+    this.billRepository = billRepository;
     this.machineRepository = machineRepository;
     this.machinePartRepository = machinePartRepository;
     this.maintenanceLogRepository = maintenanceLogRepository;
@@ -63,11 +68,29 @@ export class MachineService {
     return this.machineRepository.readByBranchId(branchId, readOptions);
   }
 
-  public async addMachine(newMachine: Machine, staffId: number): Promise<Machine> {
+  public async addMachine(
+    newMachine: Machine,
+    staffId: number,
+    storeName: string,
+  ): Promise<Machine> {
     await this.validateNumber(newMachine.getZoneId(), 'Zone id');
     await this.validateZone(newMachine.getZoneId(), staffId);
 
-    return this.machineRepository.create(newMachine);
+    const createdMachine = await this.machineRepository.create(newMachine);
+
+    const billToCreate = new Bill()
+      .setOrderBy(staffId)
+      .setOrderDate(new Date())
+      .setStoreName(storeName);
+    const createBill = await this.billRepository.create(billToCreate);
+
+    const orderToCreate = new Order()
+      .setMachineId(createdMachine.getMachineId())
+      .setBillId(createBill.getBillId())
+      .setPrice(newMachine.getPrice());
+    await this.orderRepository.create(orderToCreate);
+
+    return createdMachine;
   }
 
   public async editMachine(

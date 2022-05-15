@@ -9,6 +9,7 @@ export class Machine implements Entity<Machine, number> {
   private manufacturer: string;
   private registrationDate: Date;
   private retiredDate: Date;
+  private price: number;
 
   public getPrimaryKey(): number {
     return this.machineId;
@@ -40,6 +41,10 @@ export class Machine implements Entity<Machine, number> {
 
   public getRetiredDate(): Date {
     return this.retiredDate;
+  }
+
+  public getPrice(): number {
+    return this.price;
   }
 
   public setPrimaryKey(machineId: number): Machine {
@@ -79,6 +84,11 @@ export class Machine implements Entity<Machine, number> {
 
   public setRetiredDate(retiredDate: Date): Machine {
     this.retiredDate = retiredDate;
+    return this;
+  }
+
+  public setPrice(price: number): Machine {
+    this.price = price;
     return this;
   }
 

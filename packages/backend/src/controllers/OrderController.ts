@@ -119,7 +119,6 @@ export class OrderController extends Controller {
 
   @Authentication(Role.PURCHASING, Role.MANAGER, Role.CEO)
   @RouteMapping('/:billId/order/:orderId', Methods.DELETE)
-  @RequestBody('orderId')
   private async deleteOrder(req: Request, res: Response): Promise<void> {
     const { staffId: ordererIdToValidate, role: ordererRoleToValidate } = req.session;
     const { orderId, billId } = req.params;

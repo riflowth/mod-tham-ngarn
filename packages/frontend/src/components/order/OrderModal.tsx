@@ -1,23 +1,25 @@
-import { MaintenanceLog } from "@models/MaintenanceLog";
 import { useEffect, useState } from "react";
 import { InputBox } from "@components/InputBox";
 import fetch from "@utils/Fetch";
 import Swal from "sweetalert2";
 import Router from "next/router";
+import { Order } from '@models/Order';
 
-type MachineModalProp = {
+type OrderModalProp = {
   confirm?: boolean;
-  current?: MaintenanceLog;
+  current?: Order ;
+  billId?: number;
 };
 
 interface ApiResponse {
-  data: Array<MaintenanceLog>;
+  data: Array<Order>;
 }
 
-export const MaintenanceLogModal = ({ confirm, current }: MachineModalProp) => {
+export const OrderModal = ({ confirm, current, billId }: OrderModalProp) => {
   const [input, setInput] = useState({
-    machineId: current?.machineId || 0,
-    reason: current?.reason || "",
+    machineId: current?.machineId || null,
+    partId: current?.partId || null,
+    price: current?.price || 0,
   });
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,7 +31,7 @@ export const MaintenanceLogModal = ({ confirm, current }: MachineModalProp) => {
       try {
         if (confirm) {
           await fetch
-            .post<ApiResponse>(`/maintenance`, input)
+            .post<ApiResponse>(`/bill/${billId}/order`, input)
             .then(() => {
               Swal.fire("Success!", "Your file has been add.", "success");
               Router.reload();
@@ -49,11 +51,11 @@ export const MaintenanceLogModal = ({ confirm, current }: MachineModalProp) => {
   return (
     <div className="space-y-2 text-white">
       <div className="p-2 font-semibold text-center rounded-md bg-violet-400 ">
-        MaintenanceLog
+        Order
       </div>
       <form className="w-full space-y-2">
         <div className="flex flex-col justify-around space-y-1">
-          <label>MachineId</label>
+          <label>machineId</label>
           <InputBox
             name="machineId"
             type="number"
@@ -62,11 +64,20 @@ export const MaintenanceLogModal = ({ confirm, current }: MachineModalProp) => {
           />
         </div>
         <div className="flex flex-col justify-around space-y-1">
-          <label htmlFor="">Reason</label>
+          <label htmlFor="">partId</label>
           <InputBox
-            name="reason"
-            type="string"
-            value={input.reason}
+            name="partId"
+            type="number"
+            value={input.partId}
+            onChange={handleInput}
+          />
+        </div>
+        <div className="flex flex-col justify-around space-y-1">
+          <label htmlFor="">price</label>
+          <InputBox
+            name="price"
+            type="number"
+            value={input.price}
             onChange={handleInput}
           />
         </div>

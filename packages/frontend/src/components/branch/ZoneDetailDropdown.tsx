@@ -20,6 +20,7 @@ type Machine = {
   manufacturer: string,
   registrationDate: string,
   retiredDate: string,
+  price: number,
   status: string,
 };
 
@@ -27,7 +28,9 @@ type Zone = {
   machines: {
     id: number,
     status: string,
+    price: number,
   }[],
+  price: number,
   zoneId: number,
   timeToStart: string,
   timeToEnd: string,
@@ -70,9 +73,11 @@ export const ZoneDetailDropdown = ({
         zoneId: info.zoneId,
         timeToStart: info.timeToStart,
         timeToEnd: info.timeToEnd,
+        price: zoneMachines.reduce((acc, obj) => (acc + obj.price), 0),
         machines: zoneMachines.map((machine) => ({
           id: machine.machineId,
           status: machineStatus.filter((status) => status.id === machine.machineId)[0].status.data,
+          price: machine.price,
         })),
       };
     });
@@ -137,6 +142,12 @@ export const ZoneDetailDropdown = ({
                   <div className="flex flex-col">
                     <span className="text-zinc-400 text-sm">Machine Count</span>
                     <span className="text-white text-sm">{zone.machines.length}</span>
+                  </div>
+                </td>
+                <td className="px-2 py-3">
+                  <div className="flex flex-col">
+                    <span className="text-zinc-400 text-sm">Price</span>
+                    <span className="text-white text-sm">{new Intl.NumberFormat('th-TH').format(zone.price)} ฿</span>
                   </div>
                 </td>
 
