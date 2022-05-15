@@ -1,3 +1,5 @@
+import { MachinePartsModal } from "@components/machinepart/MachinePartModal";
+import { MyDialog } from "@components/MyDiaLog";
 import {
   ExternalLinkIcon,
   PencilAltIcon,
@@ -25,7 +27,10 @@ import Swal from "sweetalert2";
 
 function Row(props: { row: MachinePart }) {
   const { row } = props;
+  const [isClick, setIsClick] = React.useState(false);
 
+  const openModal = () => setIsClick(true);
+  const closeModal = () => setIsClick(false);
   const handleOrderStatus = () => {
     Swal.fire("Error", "Not implemented yet", "error");
   };
@@ -64,12 +69,9 @@ function Row(props: { row: MachinePart }) {
         >
           <div className="space-x-4">
             <button
-              className="w-10 h-10 p-2 mx-2 text-teal-500 bg-transparent rounded-md ring-1 ring-teal-500 hover:bg-teal-500 hover:text-white"
-              onClick={() => handleOrderStatus()}
+              className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white"
+              onClick={openModal}
             >
-              <ExternalLinkIcon />
-            </button>
-            <button className="w-10 h-10 p-2 text-purple-500 bg-transparent rounded-md ring-1 ring-violet-500 hover:bg-violet-500 hover:text-white">
               <PencilAltIcon />
             </button>
           </div>
@@ -77,6 +79,14 @@ function Row(props: { row: MachinePart }) {
 
         <TableCell></TableCell>
       </TableRow>
+      <MyDialog<MachinePart>
+        isModalOpen={isClick}
+        close={closeModal}
+        action={"edit"}
+        current={row}
+      >
+        <MachinePartsModal />
+      </MyDialog>
     </React.Fragment>
   );
 }

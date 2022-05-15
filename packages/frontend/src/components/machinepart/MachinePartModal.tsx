@@ -10,6 +10,7 @@ type OrderModalProp = {
   confirm?: boolean;
   current?: MachinePart;
   machineId?: number;
+  action?: string;
 };
 
 interface ApiResponse {
@@ -20,6 +21,7 @@ export const MachinePartsModal = ({
   confirm,
   current,
   machineId,
+  action,
 }: OrderModalProp) => {
   const [input, setInput] = useState({
     machineId: current?.machineId || 0,
@@ -36,20 +38,40 @@ export const MachinePartsModal = ({
     const submit = async () => {
       try {
         if (confirm) {
-          await fetch
-            .post<ApiResponse>(`/part`, {
-              machineId: machineId,
-              partId: input.partId == 0 ? undefined : input.partId,
-              partName: input.partName == "" ? undefined : input.partName,
-              status: input.status == "" ? undefined : input.status,
-            })
-            .then(() => {
-              Swal.fire("Success!", "Your file has been add.", "success");
-              Router.reload();
-            })
-            .catch((error: any) =>
-              Swal.fire("Failed", error.response.data.message, "error")
-            );
+          if (action == "add") {
+            await fetch
+              .post<ApiResponse>(`/part`, {
+                machineId: machineId,
+                partId: input.partId == 0 ? undefined : input.partId,
+                partName: input.partName == "" ? undefined : input.partName,
+                status: input.status == "" ? undefined : input.status,
+              })
+              .then(() => {
+                Swal.fire("Success!", "Your file has been add.", "success");
+                Router.reload();
+              })
+              .catch((error: any) =>
+                Swal.fire("Failed", error.response.data.message, "error")
+              );
+          } else if (action == "edit") {
+            await fetch
+              .put<ApiResponse>(`/part/${current?.partId}`, {
+                machineId: machineId,
+                partName:
+                  input.partName == current?.partName
+                    ? undefined
+                    : input.partName,
+                status:
+                  input.status == current?.status ? undefined : input.status,
+              })
+              .then(() => {
+                Swal.fire("Added!", "Your info has been updated.", "success");
+                Router.reload();
+              })
+              .catch((error: any) =>
+                Swal.fire("Failed", error.response.data.message, "error")
+              );
+          }
         }
       } catch (e) {
         console.log(e);
