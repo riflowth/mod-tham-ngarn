@@ -1,4 +1,4 @@
-import { PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
+import { ExternalLinkIcon, PencilAltIcon, TrashIcon } from "@heroicons/react/outline";
 import { MaintenanceLog } from "@models/MaintenanceLog";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -78,6 +78,13 @@ function Row(props: { row: MaintenanceLog }) {
             >
               <TrashIcon />
             </button>
+            <button
+              className="w-10 h-10 p-2 text-green-500 bg-transparent rounded-md ring-1 ring-green-500 hover:bg-green-500 hover:text-white"
+              onClick={() => Router.push(`/maintenance/${row.maintenanceId}`)}
+            >
+              <ExternalLinkIcon />
+            </button>
+            
           </div>
         </TableCell>
         <TableCell>
