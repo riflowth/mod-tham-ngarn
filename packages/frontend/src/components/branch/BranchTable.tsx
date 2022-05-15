@@ -9,7 +9,7 @@ type BranchTableProp = {
 
 export const BranchTable = ({
   branches,
-  sortBy
+  sortBy,
 }: BranchTableProp) => {
   return (
     <div className="overflow-x-auto rounded-md">
@@ -19,8 +19,10 @@ export const BranchTable = ({
             <BranchRow
               key={branch.branchId}
               id={branch.branchId.toString()}
+              managerId={branch.managerId}
               managerName={branch.managerName}
               address={branch.address}
+              telNo={branch.telNo}
               pendingTicket={Math.floor(Math.random() * 100)}
               last={index === branches.length - 1}
             />

@@ -1,24 +1,57 @@
+import { EditBranchModal } from '@components/branch/EditBranchModal';
 import { ZoneDetailDropdown } from '@components/branch/ZoneDetailDropdown';
 import { Disclosure } from '@headlessui/react';
-import { ChevronDownIcon, ClockIcon } from '@heroicons/react/outline';
+import { ChevronDownIcon, TrashIcon, XIcon } from '@heroicons/react/outline';
 import { ClassUtils } from '@utils/CommonUtils';
+import fetch from '@utils/Fetch';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
+import Swal from 'sweetalert2';
 
 type BranchItemProp = {
   id: string,
+  managerId: number,
   managerName: string,
   address: string,
+  telNo: string,
   pendingTicket: number,
   last: boolean,
 };
 
 export const BranchRow = ({
   id,
+  managerId,
   managerName,
   address,
+  telNo,
   pendingTicket,
   last,
 }: BranchItemProp) => {
+  const router = useRouter();
+
+  const deleteBranch = (branchId: string) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await fetch
+          .delete(`/branch/${branchId}`)
+          .then(() => {
+            Swal.fire("Deleted!", "This Branch has been deleted.", "success");
+            router.reload();
+          })
+          .catch((error: any) => Swal.fire("Failed", error.response.data.message, "error"));
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire("Cancelled", "Your Branch is safe :)", "error");
+      }
+    });
+  };
+
   return (
     <Disclosure>
       {({ open }) => (
@@ -35,17 +68,21 @@ export const BranchRow = ({
               <div className="flex flex-row items-center space-x-3">
                 <div className="flex flex-col">
                   <div className="relative w-10 h-10 rounded-full bg-zinc-500 overflow-hidden">
-                    <Image
-                      src={`https://avatars.dicebear.com/api/micah/${id}.svg`}
-                      alt=""
-                      layout="fill"
-                      objectFit="cover"
-                    />
+                    {managerId !== -1 ? (
+                      <Image
+                        src={`https://avatars.dicebear.com/api/micah/${managerId}.svg`}
+                        alt=""
+                        layout="fill"
+                        objectFit="cover"
+                      />
+                    ) : (
+                      <XIcon className="text-zinc-300 p-2" />
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-zinc-400 text-sm">Manager</span>
-                  <span className="text-white text-sm">{managerName}</span>
+                  <span className="text-white text-sm">{managerName || '-'}</span>
                 </div>
               </div>
             </td>
@@ -58,9 +95,26 @@ export const BranchRow = ({
             </td>
 
             <td className="px-6 py-5">
-              <div className="flex flex-rol items-center">
-                <button className="flex justify-center items-center border border-violet-500 hover:bg-violet-500 text-violet-400 hover:text-white rounded-md w-10 h-10 p-1.5 mr-2 transition ease-in duration-100"><ClockIcon /></button>
-                <div className="text-zinc-300 font-light text-xs leading-tight">View Tickets</div>
+              <div className="flex flex-col">
+                <span className="text-zinc-400 text-sm">Tel No.</span>
+                <span className="text-white text-sm">{telNo}</span>
+              </div>
+            </td>
+
+            <td className="px-6 py-5">
+              <div className="flex flex-rol space-x-2 items-center">
+                <button
+                  className="flex justify-center items-center border border-red-500 hover:bg-red-500 text-red-400 hover:text-white rounded-md w-10 h-10 p-2 transition ease-in duration-100"
+                  onClick={() => deleteBranch(id)}
+                >
+                  <TrashIcon />
+                </button>
+                <EditBranchModal
+                  branchId={id}
+                  manager={managerName}
+                  address={address}
+                  telNo={telNo}
+                />
               </div>
             </td>
 
@@ -79,16 +133,16 @@ export const BranchRow = ({
               !open ? 'hidden' : ''
             )}
           >
-            <td colSpan={5}>
-            <ZoneDetailDropdown
-              isOpen={open}
-              branchId={id}
-            />
-          </td>
-        </tr>
-      </>
-  )
-}
+            <td colSpan={6}>
+              <ZoneDetailDropdown
+                isOpen={open}
+                branchId={id}
+              />
+            </td>
+          </tr>
+        </>
+      )
+      }
     </Disclosure >
   );
 };
