@@ -31,12 +31,12 @@ function Row(props: { row: MaintenancePart }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await fetch
-          .delete(`/maintenance/${maintenanceId}/part`)
+          .delete(`/maintenance/${maintenanceId}/part/${row.partId}`)
           .then(() => {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
             Router.reload();
           })
-          .catch((error: any) => Swal.fire("Failed", error, "error"));
+          .catch((error: any) => Swal.fire("Failed", error.response.data.message, "error"));
       }
     });
   };
@@ -96,9 +96,7 @@ function Row(props: { row: MaintenancePart }) {
                     <TableCell style={{ color: 'white' }}>Date</TableCell>
                     <TableCell style={{ color: 'white' }}>Customer</TableCell>
                     <TableCell style={{ color: 'white' }}>Amount</TableCell>
-                    <TableCell style={{ color: 'white' }}>
-                      Total price ($)
-                    </TableCell>
+                    <TableCell style={{ color: 'white' }}>Total price ($)</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>{/* เนิ้อหา */}</TableBody>
