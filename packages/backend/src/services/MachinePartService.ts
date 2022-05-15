@@ -164,7 +164,11 @@ export class MachinePartService {
     machinePartToRead.forEach(async (machinePart) => {
       const targetOrder = new Order().setPartId(machinePart.getPartId());
       const [order] = await this.orderRepository.read(targetOrder);
-      totalCost += order.getPrice();
+      if (!order) {
+        totalCost += 0;
+      } else {
+        totalCost += order.getPrice();
+      }
     });
     return totalCost;
   }
