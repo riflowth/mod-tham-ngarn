@@ -43,7 +43,7 @@ const swalWhenError = async (func: () => Promise<void>) => {
   try {
     await func();
   } catch (e: any) {
-    Swal.fire(e.response.data.message);
+    Swal.fire("Failed", e.response.data.message, "error");
   }
 };
 

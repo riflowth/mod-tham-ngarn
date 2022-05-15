@@ -37,7 +37,7 @@ function Row(props: { row: MaintenanceLog }) {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
             Router.reload();
           })
-          .catch((error: any) => Swal.fire("Failed", error, "error"));
+          .catch((error: any) => Swal.fire("Failed", error.response.data.message, "error"));
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         Swal.fire("Cancelled", "Your imaginary file is safe :)", "error");
       }
