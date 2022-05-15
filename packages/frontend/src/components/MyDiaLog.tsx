@@ -1,14 +1,16 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment, useState, cloneElement, useEffect } from "react";
 import Swal from 'sweetalert2';
 
 type MyDialogProp = {
-  children: React.ReactChild,
+  children: React.ReactElement,
   isModalOpen: boolean,
   close: Function,
 };
 
 export function MyDialog({ children, isModalOpen, close }: MyDialogProp) {
+
+  const [confirm, setConfirm] = useState(false);
 
   const openConfirm = async () => {
     const value = await Swal.fire({
@@ -20,9 +22,14 @@ export function MyDialog({ children, isModalOpen, close }: MyDialogProp) {
       confirmButtonText: 'Confirm',
     });
     if (value.isConfirmed) {
+      setConfirm(true);
       close();
     }
   };
+
+  useEffect(() => {
+    setConfirm(false);
+  }, [isModalOpen]);
 
   return (
     <>
@@ -52,7 +59,7 @@ export function MyDialog({ children, isModalOpen, close }: MyDialogProp) {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
-                  {children}
+                  {cloneElement(children, { confirm: confirm })}
                   <div className="flex flex-row justify-around">
                     <div className="mt-4">
                       <button

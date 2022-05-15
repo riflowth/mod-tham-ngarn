@@ -3,31 +3,28 @@ import { NextPage } from "next";
 import { TableComponent } from "@components/table/TableComponent";
 import { StaffItems } from "@components/staff/StaffItems";
 import { Staff } from "@models/Staff";
-import { withUser } from "@components/hoc/withUser";
+import { withUser } from '@components/hoc/withUser';
+import { StaffModal } from '@components/staff/StaffModal';
 
 const StaffsPage: NextPage = () => {
   return (
     <Dashboard current="Staff">
-      <div className="w-full p-8 overflow-y-auto">
-        <TableComponent<Staff>
-          path={"staff"}
-          title={"Staffs"}
-          columns={[
-            "",
-            "Id",
-            "First Name",
-            "Last Name",
-            "Branch",
-            "Zone",
-            "Position",
-            "",
-            "",
-          ]}
-        >
-          <StaffItems rows={[]} />
-          <div>deleteme</div>
-        </TableComponent>
-      </div>
+      <TableComponent<Staff>
+        path={"staff"}
+        title={"Staffs"}
+        columns={[
+          "",
+          "Id",
+          "First Name",
+          "Last Name",
+          "Branch",
+          "Zone",
+          "Position",
+        ]}
+      >
+        <StaffItems rows={[]} />
+        <StaffModal />
+      </TableComponent>
     </Dashboard>
   );
 };

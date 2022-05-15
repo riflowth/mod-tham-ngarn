@@ -3,6 +3,7 @@ import { Entity } from './Entity';
 export interface Staff extends Entity {
 
   staffId: number;
+  password: string;
   fullName: string;
   branchId: number;
   zoneId: number;
