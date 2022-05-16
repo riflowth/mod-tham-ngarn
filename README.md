@@ -30,3 +30,12 @@ On the backend, we use [Springpress](https://github.com/riflowth/springpress), d
 <a href="https://www.digitalocean.com/?refcode=95b43da7102f&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge">
   <img width="150" src="https://web-platforms.sfo2.digitaloceanspaces.com/WWW/Badge%203.svg" alt="DigitalOcean Referral Badge" />
 </a>
+
+## Preview
+
+| | | |
+|-|-|-|
+|![](https://i.imgur.com/X6FVQrZ.png)|![](https://i.imgur.com/YTrsrcn.png)|![](https://i.imgur.com/pXWWYZL.png)|
+|![](https://i.imgur.com/NHoRwRu.png)|![](https://i.imgur.com/F1tge6l.png)|![](https://i.imgur.com/6aBNTDn.png)|
+
+> These previews are just some parts of our website. *NOTE: Do not support mobile phone at some components*
