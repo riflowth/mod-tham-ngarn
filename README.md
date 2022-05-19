@@ -6,11 +6,13 @@
 Mod Tham Ngarn *(web application)* is an industrial business assistant for
 machine maintenance, error logging, and service operations in the small-medium factory.
 
-This is a part of **CPE231 Database System project** for learning/practicing about the database system, especially on RDMS.
+## Disclaimer
+
+> This is a part of **CPE231 Database System project** for learning/practicing about the database system, especially on RDMS. We do not recommend using this project in your own business. But you can explore our system design and code here.
 
 ## Architecture
 
-<img src="https://i.imgur.com/ANFIRls.png" alt="mod tham ngarn system design" />
+<img width="700" src="https://i.imgur.com/ANFIRls.png" alt="mod tham ngarn system design" />
 
 We provide the frontend project and backend project in this single repository, called monorepo,
 using [Lerna](https://github.com/lerna/lerna) for managing stuffs. 
