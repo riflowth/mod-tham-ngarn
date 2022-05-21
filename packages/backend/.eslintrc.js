@@ -1,6 +1,7 @@
 module.exports = {
   root: true,
   env: {
+    es2021: true,
     node: true,
   },
   extends: [
@@ -8,6 +9,9 @@ module.exports = {
     'airbnb-typescript/base',
   ],
   settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts'],
+    },
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
@@ -17,13 +21,16 @@ module.exports = {
   },
   plugins: [
     '@typescript-eslint',
+    'import',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: './tsconfig.json',
+    project: 'tsconfig.json',
     tsconfigRootDir: __dirname,
   },
   rules: {
+    'import/no-unresolved': 'error',
+
     // allow console logging for nodejs
     'no-console': 'off',
 
@@ -40,7 +47,7 @@ module.exports = {
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { args: 'none' }],
 
-    // except empty line after atrribute scope variable declarations
+    // except empty line after attribute scope variable declarations
     '@typescript-eslint/lines-between-class-members': [
       'error',
       'always',

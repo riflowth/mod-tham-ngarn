@@ -3,9 +3,10 @@ const distPath = path.resolve(__dirname, 'dist');
 const srcPath = path.resolve(__dirname, 'src');
 
 const nodeExternals = require('webpack-node-externals');
+const { ESBuildMinifyPlugin } = require('esbuild-loader');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const app = (env) => {
   return {
@@ -14,24 +15,21 @@ const app = (env) => {
       rules: [
         {
           test: /\.ts$/,
-          loader: 'ts-loader',
-          include: srcPath,
-          options: { transpileOnly: true },
+          loader: 'esbuild-loader',
+          options: {
+            loader: 'ts',
+          },
         },
       ],
     },
+    resolve: {
+      extensions: ['.ts'],
+      plugins: [new TsconfigPathsPlugin()],
+    },
     plugins: [
-      new ESLintPlugin({
-        extensions: ['ts'],
-      }),
+      new ESLintPlugin({ extensions: ['ts'] }),
       new ForkTsCheckerWebpackPlugin(),
     ],
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, 'src'),
-      },
-      extensions: ['.ts'],
-    },
     externalsPresets: { node: true },
     externals: [nodeExternals(env.ci ? {} : {
       modulesDir: path.resolve(__dirname, '../../node_modules'),
@@ -42,8 +40,9 @@ const app = (env) => {
       modules: false,
     },
     optimization: {
-      minimize: true,
-      minimizer: [new TerserPlugin({ extractComments: false })],
+      minimizer: [
+        new ESBuildMinifyPlugin(),
+      ],
     },
     output: {
       filename: 'app.js',
